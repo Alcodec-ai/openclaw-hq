@@ -214,8 +214,7 @@ body {
 .fstat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
 
 #canvas-wrap { flex: 1; position: relative; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; margin: 0 14px; }
-#office { position: absolute; inset: 0; display: block; z-index: 2; }
-#particles { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+#office { position: absolute; inset: 0; display: block; z-index: 2; cursor: pointer; }
 
 /* ── OVERLAY ── */
 #overlay {
@@ -329,7 +328,7 @@ body {
 
 /* ── INFO DRAWER ── */
 #info-drawer {
-  position: fixed; top: var(--topbar-h); right: 0; width: 360px; bottom: 0;
+  position: fixed; top: var(--topbar-h); right: 0; width: 400px; bottom: 0;
   background: var(--bg-panel);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -390,6 +389,172 @@ body {
 .log-l.DEBUG { background: rgba(0,0,0,0.04); color: var(--text-tertiary); }
 .log-m { color: var(--text-secondary); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 #log-wrap { max-height: 280px; overflow-y: auto; }
+
+/* Model selector */
+.model-select {
+  width: 100%; padding: 8px 12px; border-radius: var(--radius-xs);
+  background: var(--bg-white); border: 0.5px solid var(--border-strong);
+  color: var(--text); font-size: 12px; font-family: inherit;
+  outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  transition: all 0.2s;
+}
+.model-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12); }
+.model-status { font-size: 10px; margin-top: 4px; min-height: 14px; }
+
+/* ── SETTINGS PANEL ── */
+.settings-group {
+  background: var(--bg-white); border-radius: var(--radius);
+  padding: 16px 18px; margin-bottom: 12px;
+  box-shadow: var(--shadow-sm); border: 0.5px solid var(--border);
+}
+.settings-group .sg-title {
+  font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.8px;
+  text-transform: uppercase; font-weight: 700; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sg-title .sg-icon { font-size: 14px; }
+
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { color: var(--text); font-weight: 500; flex: 1; }
+.setting-sublabel { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+
+.setting-select {
+  padding: 6px 28px 6px 10px; border-radius: var(--radius-xs);
+  background: var(--bg); border: 0.5px solid var(--border-strong);
+  color: var(--text); font-size: 12px; font-family: inherit;
+  outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  transition: all 0.2s; min-width: 140px;
+}
+.setting-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12); }
+
+.setting-input {
+  padding: 6px 10px; border-radius: var(--radius-xs);
+  background: var(--bg); border: 0.5px solid var(--border-strong);
+  color: var(--text); font-size: 12px; font-family: inherit;
+  outline: none; transition: all 0.2s; width: 200px;
+}
+.setting-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12); }
+
+/* Toggle switch */
+.toggle-switch {
+  position: relative; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0; background: #e5e5ea; border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.toggle-switch input:checked + .toggle-track { background: var(--green); }
+.toggle-knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  background: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.toggle-switch input:checked ~ .toggle-knob { left: 20px; }
+
+/* Buttons */
+.btn-action {
+  padding: 7px 14px; border-radius: var(--radius-xs); border: none;
+  font-size: 12px; font-family: inherit; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; display: inline-flex;
+  align-items: center; gap: 6px;
+}
+.btn-action:active { transform: scale(0.97); }
+.btn-action.primary { background: var(--blue); color: white; }
+.btn-action.primary:hover { background: #0066d6; }
+.btn-action.success { background: var(--green); color: white; }
+.btn-action.success:hover { background: #2db950; }
+.btn-action.danger { background: var(--red); color: white; }
+.btn-action.danger:hover { background: #e6352b; }
+.btn-action.secondary { background: rgba(0,0,0,0.05); color: var(--text-secondary); }
+.btn-action.secondary:hover { background: rgba(0,0,0,0.08); }
+.btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-group { display: flex; gap: 6px; }
+
+/* Fallback list */
+.fallback-list { margin-top: 8px; }
+.fallback-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; margin-bottom: 4px;
+  background: var(--bg); border-radius: var(--radius-xs);
+  font-size: 12px; border: 0.5px solid var(--border);
+}
+.fallback-item .fb-order {
+  font-size: 10px; font-weight: 700; color: var(--text-tertiary);
+  min-width: 18px; text-align: center;
+}
+.fallback-item .fb-name { flex: 1; color: var(--text); font-weight: 500; }
+.fallback-item .fb-remove {
+  background: none; border: none; color: var(--text-tertiary); cursor: pointer;
+  font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: all 0.15s;
+}
+.fallback-item .fb-remove:hover { color: var(--red); background: rgba(255,59,48,0.08); }
+.fallback-item .fb-move {
+  background: none; border: none; color: var(--text-tertiary); cursor: pointer;
+  font-size: 11px; padding: 2px 4px; border-radius: 4px; transition: all 0.15s;
+}
+.fallback-item .fb-move:hover { color: var(--blue); background: rgba(0,122,255,0.08); }
+
+/* Channel card */
+.channel-card {
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 12px 14px; margin-bottom: 8px; border: 0.5px solid var(--border);
+}
+.channel-card .cc-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.channel-card .cc-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.cc-dot.enabled { background: var(--green); box-shadow: 0 0 4px rgba(52,199,89,0.3); }
+.cc-dot.disabled { background: #c7c7cc; }
+.channel-card .cc-name { font-weight: 600; font-size: 13px; color: var(--text); flex: 1; }
+.channel-card .cc-bot { font-size: 10px; color: var(--text-tertiary); }
+.channel-card .cc-policies {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+}
+.cc-policy-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-secondary);
+}
+.cc-policy-row .cc-p-label { flex-shrink: 0; min-width: 45px; }
+.cc-policy-select {
+  flex: 1; padding: 4px 22px 4px 8px; border-radius: 6px;
+  background: var(--bg-white); border: 0.5px solid var(--border);
+  color: var(--text); font-size: 11px; font-family: inherit;
+  outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 6px center;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  padding: 10px 18px; border-radius: var(--radius-xs);
+  font-size: 12px; font-weight: 500; font-family: inherit;
+  box-shadow: var(--shadow-lg); transform: translateY(80px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.25,0.1,0.25,1);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); color: white; }
+.toast.error { background: var(--red); color: white; }
+.toast.info { background: var(--blue); color: white; }
+
+/* Settings status */
+.settings-status {
+  font-size: 10px; margin-top: 4px; min-height: 14px;
+  transition: all 0.2s;
+}
 </style>
 </head>
 <body>
@@ -415,8 +580,8 @@ body {
     <span id="topbar-meta"></span>
     <span id="live-clock"></span>
     <button id="btn-drawer" onclick="toggleDrawer()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-      System
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      Settings
     </button>
   </div>
 </div>
@@ -461,7 +626,6 @@ body {
     </div>
   </div>
   <div id="canvas-wrap">
-    <canvas id="particles"></canvas>
     <canvas id="office"></canvas>
   </div>
 </div>
@@ -495,19 +659,88 @@ body {
   </div>
 </div>
 
-<!-- SYSTEM DRAWER -->
+<!-- SETTINGS DRAWER -->
 <div id="info-drawer">
   <div id="idr-hdr">
-    <span>System Panel</span>
+    <span>Settings</span>
     <button id="btn-idr-close" onclick="toggleDrawer()">&#x2715;</button>
   </div>
   <div id="idr-body">
-    <div class="drawer-section"><div class="ds-title"><span class="ds-icon">&#x1F4E1;</span> Channels</div><div id="ch-info"></div></div>
-    <div class="drawer-section"><div class="ds-title"><span class="ds-icon">&#x1F9E0;</span> Models</div><div id="mo-info"></div></div>
-    <div class="drawer-section"><div class="ds-title"><span class="ds-icon">&#x1F4C2;</span> Sessions</div><div id="se-info"></div></div>
-    <div class="drawer-section"><div class="ds-title"><span class="ds-icon">&#x1F4DC;</span> Live Logs</div><div id="log-wrap"></div></div>
+
+    <!-- Gateway Control -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x26A1;</span> Gateway</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Service Status</div>
+          <div class="setting-sublabel" id="gw-service-status">Checking...</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-action success" onclick="gatewayAction('start')" id="btn-gw-start">Start</button>
+          <button class="btn-action primary" onclick="gatewayAction('restart')" id="btn-gw-restart">Restart</button>
+          <button class="btn-action danger" onclick="gatewayAction('stop')" id="btn-gw-stop">Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Default Model -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F9E0;</span> Default Model</div>
+      <div class="setting-row">
+        <div class="setting-label">Primary Model</div>
+        <select class="setting-select" id="settings-primary-model" onchange="saveDefaultModel()"></select>
+      </div>
+      <div class="settings-status" id="default-model-status"></div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Fallback Chain</div>
+        <div class="fallback-list" id="fallback-list"></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <select class="setting-select" id="add-fallback-select" style="flex:1;min-width:0"></select>
+          <button class="btn-action secondary" onclick="addFallback()">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compaction -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F504;</span> Compaction</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Compaction Mode</div>
+          <div class="setting-sublabel">How context is managed when limit is reached</div>
+        </div>
+        <select class="setting-select" id="settings-compaction" onchange="saveCompaction()">
+          <option value="safeguard">Safeguard</option>
+          <option value="full">Full</option>
+          <option value="off">Off</option>
+        </select>
+      </div>
+      <div class="settings-status" id="compaction-status"></div>
+    </div>
+
+    <!-- Channels -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F4E1;</span> Telegram Channels</div>
+      <div id="settings-channels"></div>
+    </div>
+
+    <!-- Sessions -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F4C2;</span> Sessions</div>
+      <div id="se-info"></div>
+    </div>
+
+    <!-- Live Logs -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F4DC;</span> Live Logs</div>
+      <div id="log-wrap"></div>
+    </div>
+
   </div>
 </div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
 const AGENT_CELLS = {
@@ -561,6 +794,7 @@ let selectedId = null;
 let curTab = 'overview';
 let detailCache = null;
 let drawerOpen = false;
+let availableModels = [];
 
 /* Clock */
 function updateClock() {
@@ -569,53 +803,30 @@ function updateClock() {
 }
 setInterval(updateClock, 1000); updateClock();
 
-/* Particles — soft pastel */
-class ParticleField {
-  constructor(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.particles = [];
-    this._resize(); window.addEventListener('resize', () => this._resize());
-    for (let i = 0; i < 30; i++) this.particles.push(this._spawn());
-    this._loop();
-  }
-  _resize() { this.canvas.width = this.canvas.parentElement.clientWidth; this.canvas.height = this.canvas.parentElement.clientHeight; }
-  _spawn() {
-    return { x:Math.random()*this.canvas.width, y:Math.random()*this.canvas.height,
-      vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.15,
-      r:Math.random()*1.5+0.5, a:Math.random()*0.08+0.02 };
-  }
-  _loop() {
-    const f = () => {
-      const {ctx, canvas, particles} = this;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(0,122,255,${p.a})`; ctx.fill();
-      });
-      for (let i = 0; i < particles.length; i++)
-        for (let j = i+1; j < particles.length; j++) {
-          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
-          const dist = Math.sqrt(dx*dx+dy*dy);
-          if (dist < 100) {
-            ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
-            ctx.strokeStyle = `rgba(0,122,255,${0.025*(1-dist/100)})`; ctx.lineWidth=0.5; ctx.stroke();
-          }
-        }
-      requestAnimationFrame(f);
-    };
-    requestAnimationFrame(f);
-  }
+/* Fetch available models */
+async function fetchAvailableModels() {
+  try { availableModels = await (await fetch('/api/models/available')).json(); } catch(e) {}
 }
 
-/* OfficeMap — light pastel rooms */
+/* OfficeMap — integrated particles + rooms */
 class OfficeMap {
   constructor(canvas) {
     this.canvas = canvas; this.ctx = canvas.getContext('2d');
     this.sprites = {}; this.tick = 0;
-    this._resize(); window.addEventListener('resize', () => this._resize());
+    this.particles = [];
+    for (let i = 0; i < 35; i++) this.particles.push(this._spawnParticle());
+    this.hoveredCell = null;
+    this._resize();
+    window.addEventListener('resize', () => this._resize());
+    canvas.addEventListener('click', e => this._onClick(e));
+    canvas.addEventListener('mousemove', e => this._onHover(e));
+    canvas.addEventListener('mouseleave', () => { this.hoveredCell = null; });
     this._loop();
+  }
+  _spawnParticle() {
+    return { x:Math.random()*this.canvas.width, y:Math.random()*this.canvas.height,
+      vx:(Math.random()-0.5)*0.25, vy:(Math.random()-0.5)*0.18,
+      r:Math.random()*2+0.8, a:Math.random()*0.12+0.04 };
   }
   _resize() {
     const a = this.canvas.parentElement;
@@ -630,6 +841,22 @@ class OfficeMap {
     const o = this._cellO(c.col,c.row);
     return {x:o.x+this.CW*0.55, y:o.y+this.CH*0.75};
   }
+  _cellAt(px, py) {
+    const col = Math.floor(px / this.CW), row = Math.floor(py / this.CH);
+    if (col < 0 || col > 2 || row < 0 || row > 2) return null;
+    return {col, row};
+  }
+  _onClick(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const cell = this._cellAt(e.clientX - rect.left, e.clientY - rect.top);
+    if (!cell) return;
+    const id = Object.keys(AGENT_CELLS).find(k => AGENT_CELLS[k].col===cell.col && AGENT_CELLS[k].row===cell.row);
+    if (id) selectAgent(id);
+  }
+  _onHover(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    this.hoveredCell = this._cellAt(e.clientX - rect.left, e.clientY - rect.top);
+  }
   update(agents) {
     agents.forEach(a => {
       if (!this.sprites[a.id]) { const h=this._home(a.id)||{x:0,y:0}; this.sprites[a.id]={x:h.x,y:h.y,dir:1}; }
@@ -641,9 +868,29 @@ class OfficeMap {
   _render() {
     const {ctx, CW, CH, canvas} = this;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     // Background
     ctx.fillStyle = '#f5f5f7';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw particles on the background
+    this.particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(0,122,255,${p.a})`; ctx.fill();
+    });
+    // Connection lines
+    for (let i=0; i<this.particles.length; i++)
+      for (let j=i+1; j<this.particles.length; j++) {
+        const dx=this.particles[i].x-this.particles[j].x, dy=this.particles[i].y-this.particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if (dist<120) {
+          ctx.beginPath(); ctx.moveTo(this.particles[i].x,this.particles[i].y); ctx.lineTo(this.particles[j].x,this.particles[j].y);
+          ctx.strokeStyle=`rgba(0,122,255,${0.06*(1-dist/120)})`; ctx.lineWidth=0.6; ctx.stroke();
+        }
+      }
 
     for (let r=0;r<3;r++) for (let c=0;c<3;c++) {
       if (c===1&&r===1) { this._drawMeeting(c,r); continue; }
@@ -689,8 +936,20 @@ class OfficeMap {
 
     ctx.restore();
 
-    // Border
-    ctx.strokeStyle = th.border; ctx.lineWidth = 1;
+    // Hover highlight
+    const isHovered = this.hoveredCell && this.hoveredCell.col===col && this.hoveredCell.row===row;
+    if (isHovered) {
+      ctx.save();
+      this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16);
+      ctx.shadowColor = pal.body; ctx.shadowBlur = 12;
+      ctx.strokeStyle = pal.accent; ctx.lineWidth = 2; ctx.stroke();
+      ctx.restore();
+    }
+
+    // Border — breathing animation
+    const breathe = 0.6 + 0.4 * Math.sin(tick * 0.02);
+    ctx.strokeStyle = isHovered ? pal.accent : th.border;
+    ctx.lineWidth = isHovered ? 2 : 0.5 + breathe * 0.5;
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.stroke();
 
     // Name badge
@@ -1032,6 +1291,13 @@ function renderDetail() {
       </div>
       <div class="sec">Last Activity</div>
       <div class="info-row"><span>Time</span><span class="v">${a.lastActivity?new Date(a.lastActivity).toLocaleTimeString():'--'}</span></div>
+      <div class="sec">Model</div>
+      <select class="model-select" id="model-selector" onchange="changeModel(this.value)">
+        <option value="">${a.model||'(default)'}</option>
+        ${availableModels.map(m=>`<option value="${esc(m)}" ${m===(a.model||'')?'selected':''}>${esc(m)}</option>`).join('')}
+      </select>
+      <div class="model-status" id="model-status"></div>
+
       <div class="sec">Current Task</div>
       <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;background:rgba(0,0,0,0.02);padding:12px;border-radius:var(--radius-xs);word-break:break-word">
         ${a.currentTask?esc(a.currentTask):'<em style="color:var(--text-tertiary)">No active task</em>'}
@@ -1060,21 +1326,259 @@ async function sendTask() {
   finally { btn.disabled=false; btn.textContent='Send Message'; }
 }
 
-/* SYSTEM DRAWER */
-function toggleDrawer() { drawerOpen=!drawerOpen; document.getElementById('info-drawer').classList.toggle('open',drawerOpen); }
-
-function renderChannels(ch) {
-  const el=document.getElementById('ch-info');
-  if(!ch.length){el.innerHTML='<div style="color:var(--text-tertiary);font-size:11px">No channels</div>';return;}
-  el.innerHTML=ch.map(c=>`<div class="ch-row"><div class="ch-dot ${c.running?'running':c.enabled?'stopped':'off'}"></div><span class="ch-name">${c.botName}</span><span class="ch-detail">${c.running?'Running':c.enabled?'Stopped':'Off'}${c.lastIn?' &middot; in:'+c.lastIn:''}</span></div>`).join('');
-  const running=ch.filter(c=>c.running).length;
-  document.getElementById('fs-channels').textContent=running;
-  document.getElementById('fs-ch-detail').textContent=`/ ${ch.length} running`;
-  document.getElementById('fs-ch-bar').style.width=(ch.length?running/ch.length*100:0)+'%';
+/* MODEL CHANGE */
+async function changeModel(model) {
+  if (!model || !selectedId) return;
+  const status = document.getElementById('model-status');
+  status.textContent = 'Changing model...'; status.style.color = 'var(--text-tertiary)';
+  try {
+    const r = await fetch(`/api/agent/${selectedId}/model`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model})
+    });
+    const data = await r.json();
+    if (data.ok) {
+      status.textContent = 'Model updated to ' + data.model;
+      status.style.color = 'var(--green)';
+      fetchAgents(); // refresh
+    } else throw new Error(data.error || 'Error');
+  } catch(e) {
+    status.textContent = 'Failed: ' + e.message;
+    status.style.color = 'var(--red)';
+  }
 }
 
-function renderModels(d) {
-  document.getElementById('mo-info').innerHTML=`<div class="ch-row"><div class="ch-dot running"></div><span class="ch-name">Primary</span><span class="ch-detail" style="color:var(--indigo);font-weight:500">${d.primary||'--'}</span></div>${(d.fallbacks||[]).map((m,i)=>`<div class="ch-row"><div class="ch-dot stopped"></div><span class="ch-name">Fallback ${i+1}</span><span class="ch-detail">${m}</span></div>`).join('')}`;
+/* SETTINGS DRAWER */
+function toggleDrawer() {
+  drawerOpen=!drawerOpen;
+  document.getElementById('info-drawer').classList.toggle('open',drawerOpen);
+  if (drawerOpen) fetchSettings();
+}
+
+let settingsData = null;
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* Gateway Actions */
+async function gatewayAction(action) {
+  const btn = document.getElementById('btn-gw-'+action);
+  const prev = btn.textContent;
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const r = await fetch('/api/gateway/'+action, {method:'POST'});
+    const d = await r.json();
+    showToast('Gateway '+action+' OK', 'success');
+    setTimeout(fetchStatus, 2000);
+  } catch(e) { showToast('Gateway '+action+' failed', 'error'); }
+  finally { btn.disabled = false; btn.textContent = prev; }
+}
+
+/* Fetch all settings */
+async function fetchSettings() {
+  try {
+    settingsData = await (await fetch('/api/settings')).json();
+    renderSettingsPanel();
+  } catch(e) {}
+}
+
+function renderSettingsPanel() {
+  if (!settingsData) return;
+  const s = settingsData;
+
+  // Gateway status
+  fetchStatus();
+
+  // Primary model dropdown
+  const pmSel = document.getElementById('settings-primary-model');
+  pmSel.innerHTML = availableModels.map(m =>
+    `<option value="${esc(m)}" ${m===s.defaults.primary?'selected':''}>${esc(m)}</option>`
+  ).join('');
+
+  // Compaction
+  document.getElementById('settings-compaction').value = s.defaults.compaction || 'safeguard';
+
+  // Fallbacks
+  renderFallbacks(s.defaults.fallbacks || []);
+
+  // Add fallback dropdown
+  const afSel = document.getElementById('add-fallback-select');
+  afSel.innerHTML = availableModels.map(m =>
+    `<option value="${esc(m)}">${esc(m)}</option>`
+  ).join('');
+
+  // Channels
+  renderSettingsChannels(s.channels || {});
+}
+
+function renderFallbacks(fallbacks) {
+  const el = document.getElementById('fallback-list');
+  if (!fallbacks.length) { el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px;padding:4px 0">No fallbacks configured</div>'; return; }
+  el.innerHTML = fallbacks.map((m, i) => `
+    <div class="fallback-item">
+      <span class="fb-order">${i+1}</span>
+      <span class="fb-name">${esc(m)}</span>
+      <button class="fb-move" onclick="moveFallback(${i},-1)" ${i===0?'disabled':''}>&uarr;</button>
+      <button class="fb-move" onclick="moveFallback(${i},1)" ${i===fallbacks.length-1?'disabled':''}>&darr;</button>
+      <button class="fb-remove" onclick="removeFallback(${i})">&times;</button>
+    </div>
+  `).join('');
+}
+
+async function saveDefaultModel() {
+  const model = document.getElementById('settings-primary-model').value;
+  const status = document.getElementById('default-model-status');
+  status.textContent = 'Saving...'; status.style.color = 'var(--text-tertiary)';
+  try {
+    const r = await fetch('/api/defaults/model', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({primary: model})
+    });
+    const d = await r.json();
+    if (d.ok) { status.textContent = 'Saved'; status.style.color = 'var(--green)'; showToast('Default model updated'); }
+    else throw new Error(d.error);
+  } catch(e) { status.textContent = 'Error: '+e.message; status.style.color = 'var(--red)'; }
+  setTimeout(() => { status.textContent = ''; }, 3000);
+}
+
+async function saveFallbacks(fallbacks) {
+  try {
+    const r = await fetch('/api/defaults/model', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({fallbacks})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      if (settingsData) settingsData.defaults.fallbacks = d.fallbacks;
+      renderFallbacks(d.fallbacks);
+      showToast('Fallback chain updated');
+    }
+  } catch(e) { showToast('Failed to save fallbacks', 'error'); }
+}
+
+function addFallback() {
+  const sel = document.getElementById('add-fallback-select');
+  const model = sel.value;
+  if (!model || !settingsData) return;
+  const fb = [...(settingsData.defaults.fallbacks || []), model];
+  saveFallbacks(fb);
+}
+
+function removeFallback(idx) {
+  if (!settingsData) return;
+  const fb = [...(settingsData.defaults.fallbacks || [])];
+  fb.splice(idx, 1);
+  saveFallbacks(fb);
+}
+
+function moveFallback(idx, dir) {
+  if (!settingsData) return;
+  const fb = [...(settingsData.defaults.fallbacks || [])];
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= fb.length) return;
+  [fb[idx], fb[newIdx]] = [fb[newIdx], fb[idx]];
+  saveFallbacks(fb);
+}
+
+async function saveCompaction() {
+  const mode = document.getElementById('settings-compaction').value;
+  const status = document.getElementById('compaction-status');
+  status.textContent = 'Saving...'; status.style.color = 'var(--text-tertiary)';
+  try {
+    const r = await fetch('/api/defaults/compaction', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({mode})
+    });
+    const d = await r.json();
+    if (d.ok) { status.textContent = 'Saved'; status.style.color = 'var(--green)'; showToast('Compaction mode: '+d.mode); }
+    else throw new Error(d.error);
+  } catch(e) { status.textContent = 'Error: '+e.message; status.style.color = 'var(--red)'; }
+  setTimeout(() => { status.textContent = ''; }, 3000);
+}
+
+function renderSettingsChannels(channels) {
+  const el = document.getElementById('settings-channels');
+  const names = Object.keys(channels);
+  if (!names.length) { el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px">No channels configured</div>'; return; }
+
+  el.innerHTML = names.map(name => {
+    const ch = channels[name];
+    return `
+    <div class="channel-card">
+      <div class="cc-header">
+        <div class="cc-dot ${ch.enabled?'enabled':'disabled'}"></div>
+        <span class="cc-name">${esc(name)}</span>
+        <span class="cc-bot">${esc(ch.botName)}</span>
+        <label class="toggle-switch">
+          <input type="checkbox" ${ch.enabled?'checked':''} onchange="toggleChannel('${esc(name)}')">
+          <div class="toggle-track"></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
+      <div class="cc-policies">
+        <div class="cc-policy-row">
+          <span class="cc-p-label">DM</span>
+          <select class="cc-policy-select" onchange="saveChannelSetting('${esc(name)}','dmPolicy',this.value)">
+            <option value="open" ${ch.dmPolicy==='open'?'selected':''}>Open</option>
+            <option value="allowlist" ${ch.dmPolicy==='allowlist'?'selected':''}>Allowlist</option>
+            <option value="closed" ${ch.dmPolicy==='closed'?'selected':''}>Closed</option>
+          </select>
+        </div>
+        <div class="cc-policy-row">
+          <span class="cc-p-label">Group</span>
+          <select class="cc-policy-select" onchange="saveChannelSetting('${esc(name)}','groupPolicy',this.value)">
+            <option value="open" ${ch.groupPolicy==='open'?'selected':''}>Open</option>
+            <option value="allowlist" ${ch.groupPolicy==='allowlist'?'selected':''}>Allowlist</option>
+            <option value="closed" ${ch.groupPolicy==='closed'?'selected':''}>Closed</option>
+          </select>
+        </div>
+        <div class="cc-policy-row">
+          <span class="cc-p-label">Stream</span>
+          <select class="cc-policy-select" onchange="saveChannelSetting('${esc(name)}','streamMode',this.value)">
+            <option value="partial" ${ch.streamMode==='partial'?'selected':''}>Partial</option>
+            <option value="full" ${ch.streamMode==='full'?'selected':''}>Full</option>
+            <option value="off" ${ch.streamMode==='off'?'selected':''}>Off</option>
+          </select>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleChannel(name) {
+  try {
+    const r = await fetch('/api/channel/'+name+'/toggle', {method:'POST'});
+    const d = await r.json();
+    if (d.ok) {
+      showToast(name + ' ' + (d.enabled ? 'enabled' : 'disabled'));
+      fetchSettings();
+      fetchSys();
+    }
+  } catch(e) { showToast('Failed to toggle channel', 'error'); }
+}
+
+async function saveChannelSetting(name, key, value) {
+  try {
+    const body = {}; body[key] = value;
+    const r = await fetch('/api/channel/'+name+'/settings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (d.ok) showToast(name + ' ' + key + ' updated');
+  } catch(e) { showToast('Failed to save setting', 'error'); }
+}
+
+/* Channels top stat bar — updated from /api/channels */
+function renderChannelsStats(ch) {
+  const running = ch.filter(c=>c.running).length;
+  document.getElementById('fs-channels').textContent = running;
+  document.getElementById('fs-ch-detail').textContent = `/ ${ch.length} running`;
+  document.getElementById('fs-ch-bar').style.width = (ch.length ? running/ch.length*100 : 0) + '%';
 }
 
 function renderSessions(se) {
@@ -1105,6 +1609,9 @@ async function fetchStatus() {
     document.getElementById('fs-gw-status').textContent=d.active?'Online':'Offline';
     document.getElementById('fs-gw-uptime').textContent=d.uptime?d.uptime.split(';')[0]:'';
     document.getElementById('fs-gw-bar').style.width=d.active?'100%':'0%';
+    // Update settings panel gateway status
+    const gwSt=document.getElementById('gw-service-status');
+    if(gwSt) gwSt.textContent=d.active?'Running'+(d.pid?' (PID '+d.pid+')':'')+(d.memory?' \u00B7 '+d.memory:''):'Stopped';
   } catch(e){}
 }
 
@@ -1119,8 +1626,8 @@ async function fetchAgents() {
 
 async function fetchSys() {
   try {
-    const [ch,mo,se]=await Promise.all([fetch('/api/channels').then(r=>r.json()),fetch('/api/models').then(r=>r.json()),fetch('/api/sessions').then(r=>r.json())]);
-    renderChannels(ch); renderModels(mo); renderSessions(se);
+    const [ch,se]=await Promise.all([fetch('/api/channels').then(r=>r.json()),fetch('/api/sessions').then(r=>r.json())]);
+    renderChannelsStats(ch); renderSessions(se);
   } catch(e){}
 }
 
@@ -1133,12 +1640,12 @@ function startSSE() {
 }
 
 /* INIT */
-const particles=new ParticleField(document.getElementById('particles'));
 const office=new OfficeMap(document.getElementById('office'));
 document.getElementById('task-form').style.display='none';
 
 (async()=>{
   await fetchStatus(); await fetchAgents(); fetchSys(); fetchLogs(); startSSE();
+  fetchAvailableModels();
   document.getElementById('task-form').style.display=curTab==='task'?'block':'none';
 })();
 setInterval(fetchStatus,10000); setInterval(fetchAgents,10000); setInterval(fetchSys,30000);

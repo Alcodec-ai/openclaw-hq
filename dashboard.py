@@ -29,6 +29,10 @@ def load_config():
         return {}
 
 
+def save_config(cfg):
+    CONFIG_PATH.write_text(json.dumps(cfg, indent=2, ensure_ascii=False))
+
+
 def run_cmd(cmd, timeout=10):
     try:
         result = subprocess.run(
@@ -339,6 +343,175 @@ def api_agent_detail(agent_id):
         'messages': messages[-20:],
         'tokens': tokens,
     })
+
+
+@app.route('/api/models/available')
+def api_models_available():
+    """Return all available model IDs from provider configs."""
+    cfg = load_config()
+    providers = cfg.get('models', {}).get('providers', {})
+    models = set()
+    for provider_name, provider_cfg in providers.items():
+        # Collect model IDs from provider definitions
+        for model_entry in provider_cfg.get('models', []):
+            if isinstance(model_entry, str):
+                models.add(model_entry)
+            elif isinstance(model_entry, dict) and 'id' in model_entry:
+                models.add(model_entry['id'])
+    # Also add currently used models
+    defaults = cfg.get('agents', {}).get('defaults', {})
+    primary = defaults.get('model', {}).get('primary', '')
+    if primary:
+        models.add(primary)
+    for fb in defaults.get('model', {}).get('fallbacks', []):
+        if fb:
+            models.add(fb)
+    for agent in cfg.get('agents', {}).get('list', []):
+        ap = agent.get('model', {}).get('primary', '')
+        if ap:
+            models.add(ap)
+        for af in agent.get('model', {}).get('fallbacks', []):
+            if af:
+                models.add(af)
+    return jsonify(sorted(models))
+
+
+@app.route('/api/agent/<agent_id>/model', methods=['POST'])
+def api_agent_model(agent_id):
+    """Change the primary model for an agent."""
+    data = request.get_json() or {}
+    model = data.get('model', '').strip()
+    if not model:
+        return jsonify({'error': 'model required'}), 400
+
+    cfg = load_config()
+    agents_list = cfg.get('agents', {}).get('list', [])
+    agent = next((a for a in agents_list if a['id'] == agent_id), None)
+    if not agent:
+        return jsonify({'error': 'agent not found'}), 404
+
+    if 'model' not in agent:
+        agent['model'] = {}
+    agent['model']['primary'] = model
+    save_config(cfg)
+    return jsonify({'ok': True, 'model': model})
+
+
+@app.route('/api/settings')
+def api_settings():
+    """Return full settings overview."""
+    cfg = load_config()
+    defaults = cfg.get('agents', {}).get('defaults', {})
+    channels_cfg = cfg.get('channels', {}).get('telegram', {})
+    accounts = channels_cfg.get('accounts', {})
+    gateway = cfg.get('gateway', {})
+
+    return jsonify({
+        'defaults': {
+            'primary': defaults.get('model', {}).get('primary', ''),
+            'fallbacks': defaults.get('model', {}).get('fallbacks', []),
+            'compaction': defaults.get('compaction', {}).get('mode', 'safeguard'),
+            'workspace': defaults.get('workspace', ''),
+        },
+        'channels': {
+            name: {
+                'enabled': acc.get('enabled', False),
+                'dmPolicy': acc.get('dmPolicy', 'open'),
+                'groupPolicy': acc.get('groupPolicy', 'open'),
+                'streamMode': acc.get('streamMode', 'partial'),
+                'botName': BOT_NAMES.get(name, f'@{name}_Bot'),
+            }
+            for name, acc in accounts.items()
+        },
+        'gateway': {
+            'port': gateway.get('port'),
+            'mode': gateway.get('mode', 'local'),
+            'bind': gateway.get('bind', 'loopback'),
+        },
+    })
+
+
+@app.route('/api/defaults/model', methods=['POST'])
+def api_defaults_model():
+    """Change default primary model and/or fallbacks."""
+    data = request.get_json() or {}
+    cfg = load_config()
+    defaults = cfg.setdefault('agents', {}).setdefault('defaults', {})
+    model_cfg = defaults.setdefault('model', {})
+
+    if 'primary' in data:
+        model_cfg['primary'] = data['primary'].strip()
+    if 'fallbacks' in data and isinstance(data['fallbacks'], list):
+        model_cfg['fallbacks'] = [f.strip() for f in data['fallbacks'] if f.strip()]
+
+    save_config(cfg)
+    return jsonify({'ok': True, 'primary': model_cfg.get('primary', ''), 'fallbacks': model_cfg.get('fallbacks', [])})
+
+
+@app.route('/api/defaults/compaction', methods=['POST'])
+def api_defaults_compaction():
+    """Change compaction mode."""
+    data = request.get_json() or {}
+    mode = data.get('mode', '').strip()
+    if mode not in ('safeguard', 'full', 'off'):
+        return jsonify({'error': 'mode must be safeguard, full, or off'}), 400
+
+    cfg = load_config()
+    cfg.setdefault('agents', {}).setdefault('defaults', {}).setdefault('compaction', {})['mode'] = mode
+    save_config(cfg)
+    return jsonify({'ok': True, 'mode': mode})
+
+
+@app.route('/api/channel/<name>/toggle', methods=['POST'])
+def api_channel_toggle(name):
+    """Enable or disable a telegram channel."""
+    cfg = load_config()
+    accounts = cfg.get('channels', {}).get('telegram', {}).get('accounts', {})
+    if name not in accounts:
+        return jsonify({'error': 'channel not found'}), 404
+
+    accounts[name]['enabled'] = not accounts[name].get('enabled', False)
+    save_config(cfg)
+    return jsonify({'ok': True, 'enabled': accounts[name]['enabled']})
+
+
+@app.route('/api/channel/<name>/settings', methods=['POST'])
+def api_channel_settings(name):
+    """Update channel policies."""
+    data = request.get_json() or {}
+    cfg = load_config()
+    accounts = cfg.get('channels', {}).get('telegram', {}).get('accounts', {})
+    if name not in accounts:
+        return jsonify({'error': 'channel not found'}), 404
+
+    acc = accounts[name]
+    for key in ('dmPolicy', 'groupPolicy', 'streamMode'):
+        if key in data:
+            acc[key] = data[key]
+
+    save_config(cfg)
+    return jsonify({'ok': True})
+
+
+@app.route('/api/gateway/restart', methods=['POST'])
+def api_gateway_restart():
+    """Restart the openclaw-gateway systemd user service."""
+    output = run_cmd(['systemctl', '--user', 'restart', 'openclaw-gateway'], timeout=15)
+    return jsonify({'ok': True, 'output': output[:500]})
+
+
+@app.route('/api/gateway/stop', methods=['POST'])
+def api_gateway_stop():
+    """Stop the openclaw-gateway systemd user service."""
+    output = run_cmd(['systemctl', '--user', 'stop', 'openclaw-gateway'], timeout=15)
+    return jsonify({'ok': True, 'output': output[:500]})
+
+
+@app.route('/api/gateway/start', methods=['POST'])
+def api_gateway_start():
+    """Start the openclaw-gateway systemd user service."""
+    output = run_cmd(['systemctl', '--user', 'start', 'openclaw-gateway'], timeout=15)
+    return jsonify({'ok': True, 'output': output[:500]})
 
 
 @app.route('/api/task', methods=['POST'])
