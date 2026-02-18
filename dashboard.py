@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 import re
 import subprocess
 import time
@@ -9,6 +10,8 @@ from pathlib import Path
 from flask import Flask, Response, jsonify, render_template, request
 
 app = Flask(__name__)
+IS_MACOS = platform.system() == 'Darwin'
+SERVICE_NAME = 'com.openclaw.gateway' if IS_MACOS else 'openclaw-gateway'
 
 CONFIG_PATH = Path.home() / '.openclaw' / 'openclaw.json'
 LOG_DIR = Path('/tmp/openclaw')
@@ -56,18 +59,38 @@ def index():
 
 @app.route('/api/status')
 def api_status():
-    output = run_cmd(['systemctl', '--user', 'status', 'openclaw-gateway'])
-    active = 'active (running)' in output
+    active = False
     pid = memory = uptime_raw = None
 
-    for line in output.splitlines():
-        stripped = line.strip()
-        if 'Main PID:' in stripped:
-            pid = stripped.split('Main PID:')[1].split()[0]
-        elif 'Memory:' in stripped:
-            memory = stripped.split('Memory:')[1].strip()
-        elif stripped.startswith('Active:') and 'since' in stripped:
-            uptime_raw = stripped.split('Active:')[1].strip()
+    if IS_MACOS:
+        # macOS: check via launchctl or pgrep
+        output = run_cmd(['pgrep', '-f', 'openclaw.*gateway'])
+        if output.strip():
+            active = True
+            pid = output.strip().splitlines()[0]
+            # Get memory via ps
+            ps_out = run_cmd(['ps', '-o', 'rss=', '-p', pid])
+            try:
+                rss_kb = int(ps_out.strip())
+                memory = f"{rss_kb // 1024}M" if rss_kb > 1024 else f"{rss_kb}K"
+            except Exception:
+                pass
+            # Get start time
+            ps_time = run_cmd(['ps', '-o', 'lstart=', '-p', pid])
+            if ps_time.strip():
+                uptime_raw = ps_time.strip()
+    else:
+        output = run_cmd(['systemctl', '--user', 'status', 'openclaw-gateway'])
+        active = 'active (running)' in output
+
+        for line in output.splitlines():
+            stripped = line.strip()
+            if 'Main PID:' in stripped:
+                pid = stripped.split('Main PID:')[1].split()[0]
+            elif 'Memory:' in stripped:
+                memory = stripped.split('Memory:')[1].strip()
+            elif stripped.startswith('Active:') and 'since' in stripped:
+                uptime_raw = stripped.split('Active:')[1].strip()
 
     cfg = load_config()
     version = cfg.get('meta', {}).get('lastTouchedVersion', 'unknown')
@@ -495,22 +518,33 @@ def api_channel_settings(name):
 
 @app.route('/api/gateway/restart', methods=['POST'])
 def api_gateway_restart():
-    """Restart the openclaw-gateway systemd user service."""
-    output = run_cmd(['systemctl', '--user', 'restart', 'openclaw-gateway'], timeout=15)
+    """Restart the openclaw-gateway service."""
+    if IS_MACOS:
+        run_cmd(['pkill', '-f', 'openclaw.*gateway'], timeout=5)
+        time.sleep(1)
+        output = run_cmd(['openclaw', 'gateway', 'start'], timeout=15)
+    else:
+        output = run_cmd(['systemctl', '--user', 'restart', 'openclaw-gateway'], timeout=15)
     return jsonify({'ok': True, 'output': output[:500]})
 
 
 @app.route('/api/gateway/stop', methods=['POST'])
 def api_gateway_stop():
-    """Stop the openclaw-gateway systemd user service."""
-    output = run_cmd(['systemctl', '--user', 'stop', 'openclaw-gateway'], timeout=15)
+    """Stop the openclaw-gateway service."""
+    if IS_MACOS:
+        output = run_cmd(['pkill', '-f', 'openclaw.*gateway'], timeout=10)
+    else:
+        output = run_cmd(['systemctl', '--user', 'stop', 'openclaw-gateway'], timeout=15)
     return jsonify({'ok': True, 'output': output[:500]})
 
 
 @app.route('/api/gateway/start', methods=['POST'])
 def api_gateway_start():
-    """Start the openclaw-gateway systemd user service."""
-    output = run_cmd(['systemctl', '--user', 'start', 'openclaw-gateway'], timeout=15)
+    """Start the openclaw-gateway service."""
+    if IS_MACOS:
+        output = run_cmd(['openclaw', 'gateway', 'start'], timeout=15)
+    else:
+        output = run_cmd(['systemctl', '--user', 'start', 'openclaw-gateway'], timeout=15)
     return jsonify({'ok': True, 'output': output[:500]})
 
 
@@ -604,4 +638,5 @@ def events():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=7842, debug=False, threaded=True)
+    port = int(os.environ.get('OPENCLAW_DASH_PORT', 7842))
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
