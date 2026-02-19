@@ -555,6 +555,90 @@ body {
   font-size: 10px; margin-top: 4px; min-height: 14px;
   transition: all 0.2s;
 }
+
+/* Provider cards */
+.provider-card {
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 14px 16px; margin-bottom: 8px; border: 0.5px solid var(--border);
+  transition: all 0.2s;
+}
+.provider-card:hover { border-color: var(--border-strong); }
+.provider-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.provider-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.provider-name { font-weight: 600; font-size: 13px; color: var(--text); flex: 1; }
+.provider-badge {
+  font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.provider-badge.has-key { background: rgba(52,199,89,0.08); color: var(--green); }
+.provider-badge.no-key { background: rgba(255,149,0,0.08); color: var(--orange); }
+.provider-field {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 8px; font-size: 12px;
+}
+.provider-field-label {
+  font-size: 10px; color: var(--text-tertiary); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.3px; min-width: 55px; flex-shrink: 0;
+}
+.provider-field-value {
+  flex: 1; min-width: 0; font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 11px; color: var(--text-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.provider-input {
+  flex: 1; padding: 5px 8px; border-radius: 6px;
+  background: var(--bg-white); border: 0.5px solid var(--border);
+  color: var(--text); font-size: 11px; font-family: 'SF Mono', 'Menlo', monospace;
+  outline: none; transition: all 0.2s; min-width: 0;
+}
+.provider-input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,122,255,0.1); }
+.provider-input::placeholder { color: var(--text-tertiary); font-family: inherit; }
+.provider-models-list {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;
+}
+.provider-model-tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 6px;
+  background: rgba(0,122,255,0.06); color: var(--blue); font-weight: 500;
+  display: flex; align-items: center; gap: 4px;
+}
+.provider-model-tag .tag-remove {
+  cursor: pointer; font-size: 12px; color: var(--text-tertiary);
+  transition: color 0.15s; line-height: 1;
+}
+.provider-model-tag .tag-remove:hover { color: var(--red); }
+.provider-actions {
+  display: flex; gap: 6px; margin-top: 10px; padding-top: 10px;
+  border-top: 0.5px solid var(--border);
+}
+.btn-icon {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-tertiary); font-size: 13px; padding: 4px 6px;
+  border-radius: 6px; transition: all 0.15s;
+}
+.btn-icon:hover { background: rgba(0,0,0,0.04); color: var(--text); }
+.btn-icon.danger:hover { background: rgba(255,59,48,0.08); color: var(--red); }
+
+/* Add provider form */
+.add-provider-form {
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 14px 16px; border: 1.5px dashed var(--border-strong);
+  transition: all 0.2s;
+}
+.add-provider-form:focus-within { border-color: var(--blue); }
+.add-provider-row {
+  display: flex; gap: 6px; margin-bottom: 8px; align-items: center;
+}
+.add-provider-row:last-child { margin-bottom: 0; }
+.add-provider-label {
+  font-size: 10px; color: var(--text-tertiary); font-weight: 600;
+  text-transform: uppercase; min-width: 55px; flex-shrink: 0;
+}
 </style>
 </head>
 <body>
@@ -716,6 +800,36 @@ body {
         </select>
       </div>
       <div class="settings-status" id="compaction-status"></div>
+    </div>
+
+    <!-- Models & API Keys -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F511;</span> Models & API Keys</div>
+      <div id="providers-list"></div>
+      <div class="add-provider-form" id="add-provider-form" style="margin-top:10px">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Add Provider</div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">Name</span>
+          <input class="provider-input" id="new-provider-name" placeholder="e.g. anthropic, openai">
+        </div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">API Key</span>
+          <input class="provider-input" id="new-provider-key" placeholder="sk-..." type="password">
+          <button class="btn-icon" onclick="toggleNewKeyVis()" title="Show/Hide">&#x1F441;</button>
+        </div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">Base URL</span>
+          <input class="provider-input" id="new-provider-url" placeholder="https://api.example.com (optional)">
+        </div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">Models</span>
+          <input class="provider-input" id="new-provider-models" placeholder="model-1, model-2 (comma separated)">
+        </div>
+        <div class="add-provider-row" style="justify-content:flex-end">
+          <button class="btn-action primary" onclick="addProvider()">Add Provider</button>
+        </div>
+      </div>
+      <div class="settings-status" id="provider-status"></div>
     </div>
 
     <!-- Channels -->
@@ -1487,7 +1601,203 @@ async function fetchSettings() {
   try {
     settingsData = await (await fetch('/api/settings')).json();
     renderSettingsPanel();
+    fetchProviders();
   } catch(e) {}
+}
+
+let providersData = null;
+
+async function fetchProviders() {
+  try {
+    providersData = await (await fetch('/api/providers')).json();
+    renderProviders();
+  } catch(e) {}
+}
+
+const PROVIDER_COLORS = {
+  anthropic: '#d97706', openai: '#10a37f', google: '#4285f4', groq: '#f55036',
+  mistral: '#ff7000', cohere: '#39594d', deepseek: '#4d6bfe', openrouter: '#6366f1',
+  bedrock: '#ff9900', vertex: '#4285f4', azure: '#0078d4', ollama: '#ffffff',
+};
+
+function getProviderColor(name) {
+  const lower = name.toLowerCase();
+  for (const [key, color] of Object.entries(PROVIDER_COLORS)) {
+    if (lower.includes(key)) return color;
+  }
+  const hash = Array.from(name).reduce((h, c) => (h * 31 + c.charCodeAt(0)) & 0xffffff, 0);
+  return '#' + hash.toString(16).padStart(6, '0');
+}
+
+function renderProviders() {
+  const el = document.getElementById('providers-list');
+  if (!providersData || !Object.keys(providersData).length) {
+    el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px;padding:4px 0">No providers configured</div>';
+    return;
+  }
+
+  el.innerHTML = Object.entries(providersData).map(([name, p]) => {
+    const color = getProviderColor(name);
+    const initials = name.substring(0, 2).toUpperCase();
+    const models = (p.models || []);
+    return `
+    <div class="provider-card" id="provider-${esc(name)}">
+      <div class="provider-header">
+        <div class="provider-icon" style="background:${color}">${initials}</div>
+        <span class="provider-name">${esc(name)}</span>
+        <span class="provider-badge ${p.hasKey ? 'has-key' : 'no-key'}">${p.hasKey ? 'Key Set' : 'No Key'}</span>
+      </div>
+      <div class="provider-field">
+        <span class="provider-field-label">API Key</span>
+        <input class="provider-input" id="key-${esc(name)}" type="password"
+          value="${p.hasKey ? p.apiKey : ''}" placeholder="Enter API key...">
+        <button class="btn-icon" onclick="toggleKeyVis('${esc(name)}')" title="Show/Hide">&#x1F441;</button>
+      </div>
+      ${p.baseUrl ? `
+      <div class="provider-field">
+        <span class="provider-field-label">Base URL</span>
+        <input class="provider-input" id="url-${esc(name)}" value="${esc(p.baseUrl)}" placeholder="Base URL...">
+      </div>` : `
+      <div class="provider-field">
+        <span class="provider-field-label">Base URL</span>
+        <input class="provider-input" id="url-${esc(name)}" value="" placeholder="Default (optional)">
+      </div>`}
+      <div class="provider-field" style="align-items:flex-start">
+        <span class="provider-field-label" style="margin-top:4px">Models</span>
+        <div style="flex:1">
+          <div class="provider-models-list" id="models-${esc(name)}">
+            ${models.map(m => `
+              <span class="provider-model-tag">
+                ${esc(m)}
+                <span class="tag-remove" onclick="removeProviderModel('${esc(name)}','${esc(m)}')">&times;</span>
+              </span>
+            `).join('')}
+          </div>
+          <div style="display:flex;gap:4px;margin-top:6px">
+            <input class="provider-input" id="add-model-${esc(name)}" placeholder="Add model..." style="font-family:inherit"
+              onkeydown="if(event.key==='Enter')addProviderModel('${esc(name)}')">
+            <button class="btn-action secondary" style="font-size:10px;padding:4px 8px" onclick="addProviderModel('${esc(name)}')">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="provider-actions">
+        <button class="btn-action primary" style="font-size:11px;padding:5px 12px" onclick="saveProvider('${esc(name)}')">Save</button>
+        <div style="flex:1"></div>
+        <button class="btn-icon danger" onclick="deleteProvider('${esc(name)}')" title="Delete provider">&#x1F5D1;</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleKeyVis(name) {
+  const el = document.getElementById('key-' + name);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function toggleNewKeyVis() {
+  const el = document.getElementById('new-provider-key');
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+async function saveProvider(name) {
+  const keyEl = document.getElementById('key-' + name);
+  const urlEl = document.getElementById('url-' + name);
+  const payload = {};
+
+  if (keyEl) payload.apiKey = keyEl.value;
+  if (urlEl) payload.baseUrl = urlEl.value;
+
+  try {
+    const r = await fetch('/api/providers/' + encodeURIComponent(name) + '/update', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.ok) {
+      showToast(name + ' updated', 'success');
+      fetchProviders();
+      fetchAvailableModels();
+    } else throw new Error(d.error);
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+async function addProvider() {
+  const name = document.getElementById('new-provider-name').value.trim();
+  const apiKey = document.getElementById('new-provider-key').value.trim();
+  const baseUrl = document.getElementById('new-provider-url').value.trim();
+  const modelsStr = document.getElementById('new-provider-models').value.trim();
+
+  if (!name) { showToast('Provider name required', 'error'); return; }
+
+  const models = modelsStr ? modelsStr.split(',').map(m => m.trim()).filter(Boolean) : [];
+
+  try {
+    const r = await fetch('/api/providers', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name, apiKey, baseUrl, models })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      showToast(name + ' added', 'success');
+      document.getElementById('new-provider-name').value = '';
+      document.getElementById('new-provider-key').value = '';
+      document.getElementById('new-provider-url').value = '';
+      document.getElementById('new-provider-models').value = '';
+      fetchProviders();
+      fetchAvailableModels();
+    } else throw new Error(d.error);
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+async function deleteProvider(name) {
+  if (!confirm('Delete provider "' + name + '"?')) return;
+  try {
+    const r = await fetch('/api/providers/' + encodeURIComponent(name) + '/delete', { method: 'POST' });
+    const d = await r.json();
+    if (d.ok) {
+      showToast(name + ' deleted', 'info');
+      fetchProviders();
+      fetchAvailableModels();
+    } else throw new Error(d.error);
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+async function addProviderModel(name) {
+  const input = document.getElementById('add-model-' + name);
+  const model = input.value.trim();
+  if (!model || !providersData || !providersData[name]) return;
+
+  const models = [...(providersData[name].models || []), model];
+  try {
+    const r = await fetch('/api/providers/' + encodeURIComponent(name) + '/update', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ models })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      input.value = '';
+      showToast('Model added', 'success');
+      fetchProviders();
+      fetchAvailableModels();
+    } else throw new Error(d.error);
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+async function removeProviderModel(name, model) {
+  if (!providersData || !providersData[name]) return;
+  const models = (providersData[name].models || []).filter(m => m !== model);
+  try {
+    const r = await fetch('/api/providers/' + encodeURIComponent(name) + '/update', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ models })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      showToast('Model removed', 'info');
+      fetchProviders();
+      fetchAvailableModels();
+    } else throw new Error(d.error);
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
 }
 
 function renderSettingsPanel() {

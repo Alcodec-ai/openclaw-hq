@@ -288,6 +288,109 @@ def api_models():
     })
 
 
+def _mask_key(key):
+    """Mask an API key, showing only first 4 and last 4 chars."""
+    if not key or len(key) <= 12:
+        return '****' if key else ''
+    return key[:4] + '*' * (len(key) - 8) + key[-4:]
+
+
+@app.route('/api/providers')
+def api_providers():
+    """List all model providers with masked API keys."""
+    cfg = load_config()
+    providers = cfg.get('models', {}).get('providers', {})
+    result = {}
+    for name, pcfg in providers.items():
+        models = []
+        for m in pcfg.get('models', []):
+            if isinstance(m, str):
+                models.append(m)
+            elif isinstance(m, dict) and 'id' in m:
+                models.append(m['id'])
+        result[name] = {
+            'apiKey': _mask_key(pcfg.get('apiKey', '')),
+            'hasKey': bool(pcfg.get('apiKey')),
+            'baseUrl': pcfg.get('baseUrl', ''),
+            'models': models,
+        }
+    return jsonify(result)
+
+
+@app.route('/api/providers', methods=['POST'])
+def api_providers_add():
+    """Add a new provider."""
+    data = request.get_json() or {}
+    name = data.get('name', '').strip()
+    if not name:
+        return jsonify({'error': 'provider name required'}), 400
+
+    cfg = load_config()
+    providers = cfg.setdefault('models', {}).setdefault('providers', {})
+    if name in providers:
+        return jsonify({'error': 'provider already exists'}), 409
+
+    provider = {}
+    if data.get('apiKey', '').strip():
+        provider['apiKey'] = data['apiKey'].strip()
+    if data.get('baseUrl', '').strip():
+        provider['baseUrl'] = data['baseUrl'].strip()
+    provider['models'] = []
+    for m in data.get('models', []):
+        m = m.strip() if isinstance(m, str) else ''
+        if m:
+            provider['models'].append(m)
+
+    providers[name] = provider
+    save_config(cfg)
+    return jsonify({'ok': True, 'name': name})
+
+
+@app.route('/api/providers/<name>/update', methods=['POST'])
+def api_provider_update(name):
+    """Update a provider's API key, base URL, or models."""
+    data = request.get_json() or {}
+    cfg = load_config()
+    providers = cfg.get('models', {}).get('providers', {})
+    if name not in providers:
+        return jsonify({'error': 'provider not found'}), 404
+
+    pcfg = providers[name]
+
+    if 'apiKey' in data:
+        key = data['apiKey'].strip()
+        if key and '*' not in key:
+            pcfg['apiKey'] = key
+        elif not key:
+            pcfg.pop('apiKey', None)
+
+    if 'baseUrl' in data:
+        url = data['baseUrl'].strip()
+        if url:
+            pcfg['baseUrl'] = url
+        else:
+            pcfg.pop('baseUrl', None)
+
+    if 'models' in data and isinstance(data['models'], list):
+        pcfg['models'] = [m.strip() for m in data['models'] if isinstance(m, str) and m.strip()]
+
+    save_config(cfg)
+    return jsonify({'ok': True})
+
+
+@app.route('/api/providers/<name>/delete', methods=['POST'])
+def api_provider_delete(name):
+    """Delete a provider."""
+    cfg = load_config()
+    providers = cfg.get('models', {}).get('providers', {})
+    if name not in providers:
+        return jsonify({'error': 'provider not found'}), 404
+
+    del providers[name]
+    save_config(cfg)
+    return jsonify({'ok': True})
+
+
 @app.route('/api/agent/<agent_id>')
 def api_agent_detail(agent_id):
     cfg = load_config()
