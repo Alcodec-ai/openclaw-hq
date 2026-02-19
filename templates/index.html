@@ -437,6 +437,12 @@ body {
 .model-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12); }
 .model-status { font-size: 10px; margin-top: 4px; min-height: 14px; }
 
+.platform-badge { font-size:9px; font-weight:600; padding:1px 6px; border-radius:6px; }
+.platform-badge.telegram { background:rgba(0,136,204,0.08); color:#0088cc; }
+.platform-badge.discord { background:rgba(88,101,242,0.08); color:#5865f2; }
+.platform-badge.whatsapp { background:rgba(37,211,102,0.08); color:#25d366; }
+.platform-badge.none { background:rgba(0,0,0,0.04); color:var(--text-tertiary); }
+
 /* ── SETTINGS PANEL ── */
 .settings-group {
   background: var(--bg-white); border-radius: var(--radius);
@@ -726,6 +732,11 @@ body {
 [data-theme="dark"] .provider-model-tag { background: rgba(10,132,255,0.1); }
 [data-theme="dark"] .shdr-count { background: rgba(10,132,255,0.12); }
 [data-theme="dark"] .add-provider-form { border-color: rgba(255,255,255,0.12); }
+
+[data-theme="dark"] .platform-badge.telegram { background:rgba(0,136,204,0.15); }
+[data-theme="dark"] .platform-badge.discord { background:rgba(88,101,242,0.15); }
+[data-theme="dark"] .platform-badge.whatsapp { background:rgba(37,211,102,0.15); }
+[data-theme="dark"] .platform-badge.none { background:rgba(255,255,255,0.05); }
 
 [data-theme="dark"] .model-select,
 [data-theme="dark"] .setting-select,
@@ -1237,6 +1248,20 @@ let curTab = 'overview';
 let detailCache = null;
 let drawerOpen = false;
 let availableModels = [];
+
+const PLATFORM_ICONS = { telegram:'\u2708\uFE0F', discord:'\uD83D\uDCAC', whatsapp:'\uD83D\uDCF1' };
+const PLATFORM_LABELS = { telegram:'Telegram', discord:'Discord', whatsapp:'WhatsApp' };
+let availablePlatforms = ['telegram','discord','whatsapp'];
+
+function platformBadgeHtml(p) {
+  const label = PLATFORM_LABELS[p] || 'No Platform';
+  const icon = PLATFORM_ICONS[p] || '';
+  return `<span class="platform-badge ${esc(p||'none')}">${icon} ${esc(label)}</span>`;
+}
+
+async function fetchAvailablePlatforms() {
+  try { availablePlatforms = await (await fetch('/api/platforms')).json(); } catch(e) {}
+}
 
 /* Clock */
 function updateClock() {
@@ -1763,7 +1788,7 @@ function renderSidebar(agents) {
       <div class="agent-info">
         <div class="ai-name">${a.name}</div>
         ${task?`<div class="ai-task">${esc(task)}</div>`:`<div class="ai-task" style="font-style:italic">${st}</div>`}
-        <div class="ai-meta"><span class="ai-sessions">${a.activeSessions} sessions</span></div>
+        <div class="ai-meta">${platformBadgeHtml(a.platform)}<span class="ai-sessions">${a.activeSessions} sessions</span></div>
       </div>`;
     list.appendChild(div);
   });
@@ -1851,6 +1876,12 @@ function renderDetail() {
       </select>
       <div class="model-status" id="model-status"></div>
 
+      <div class="sec">Platform</div>
+      <select class="model-select" id="platform-selector" onchange="changePlatform(this.value)">
+        ${availablePlatforms.map(p => `<option value="${esc(p)}" ${p===(d.platform||'')?'selected':''}>${PLATFORM_LABELS[p]||p}</option>`).join('')}
+      </select>
+      <div class="model-status" id="platform-status"></div>
+
       <div class="sec">Current Task</div>
       <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;background:${isDarkMode()?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)'};padding:12px;border-radius:var(--radius-xs);word-break:break-word">
         ${a.currentTask?esc(a.currentTask):'<em style="color:var(--text-tertiary)">No active task</em>'}
@@ -1894,6 +1925,29 @@ async function changeModel(model) {
       status.textContent = 'Model updated to ' + data.model;
       status.style.color = 'var(--green)';
       fetchAgents(); // refresh
+    } else throw new Error(data.error || 'Error');
+  } catch(e) {
+    status.textContent = 'Failed: ' + e.message;
+    status.style.color = 'var(--red)';
+  }
+}
+
+/* PLATFORM CHANGE */
+async function changePlatform(platform) {
+  if (!platform || !selectedId) return;
+  const status = document.getElementById('platform-status');
+  status.textContent = 'Changing platform...'; status.style.color = 'var(--text-tertiary)';
+  try {
+    const r = await fetch(`/api/agent/${selectedId}/platform`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({platform})
+    });
+    const data = await r.json();
+    if (data.ok) {
+      status.textContent = 'Platform updated to ' + data.platform;
+      status.style.color = 'var(--green)';
+      if (agentMap[selectedId]) agentMap[selectedId].platform = data.platform;
+      renderSidebar(Object.values(agentMap));
     } else throw new Error(data.error || 'Error');
   } catch(e) {
     status.textContent = 'Failed: ' + e.message;
@@ -2582,6 +2636,7 @@ document.getElementById('task-form').style.display='none';
 (async()=>{
   await fetchStatus(); await fetchAgents(); fetchSys(); fetchLogs(); startSSE();
   fetchAvailableModels();
+  fetchAvailablePlatforms();
   document.getElementById('task-form').style.display=curTab==='task'?'block':'none';
 })();
 setInterval(fetchStatus,10000); setInterval(fetchAgents,10000); setInterval(fetchSys,30000);

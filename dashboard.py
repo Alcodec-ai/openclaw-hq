@@ -29,6 +29,13 @@ BOT_NAMES = {
     'raven': '@Raven_Bot',
 }
 
+PLATFORMS = ['telegram', 'discord', 'whatsapp']
+PLATFORM_LABELS = {
+    'telegram': 'Telegram',
+    'discord': 'Discord',
+    'whatsapp': 'WhatsApp',
+}
+
 
 def load_config():
     try:
@@ -195,6 +202,7 @@ def api_status():
 def api_agents():
     cfg = load_config()
     agents_list = cfg.get('agents', {}).get('list', [])
+    bindings = cfg.get('bindings', [])
 
     result = []
     for agent in agents_list:
@@ -255,10 +263,14 @@ def api_agents():
             except Exception:
                 pass
 
+        binding = next((b for b in bindings if b.get('agentId') == agent_id), None)
+        platform = binding.get('channel', '') if binding else ''
+
         result.append({
             'id': agent_id,
             'name': agent['name'],
             'model': agent.get('model', {}).get('primary', 'unknown'),
+            'platform': platform,
             'lastActivity': last_activity.isoformat() if last_activity else None,
             'activeSessions': active_sessions,
             'currentTask': current_task,
@@ -548,10 +560,15 @@ def api_agent_detail(agent_id):
             'context': best_sess.get('contextTokens', 128000),
         }
 
+    bindings = cfg.get('bindings', [])
+    binding = next((b for b in bindings if b.get('agentId') == agent_id), None)
+    platform = binding.get('channel', '') if binding else ''
+
     return jsonify({
         'id': agent_id,
         'name': agent.get('name', agent_id),
         'model': agent.get('model', {}).get('primary', 'unknown'),
+        'platform': platform,
         'sessionCount': len(sessions_data),
         'messages': messages[-20:],
         'tokens': tokens,
@@ -589,6 +606,11 @@ def api_models_available():
     return jsonify(sorted(models))
 
 
+@app.route('/api/platforms')
+def api_platforms():
+    return jsonify(PLATFORMS)
+
+
 @app.route('/api/agent/<agent_id>/model', methods=['POST'])
 def api_agent_model(agent_id):
     """Change the primary model for an agent."""
@@ -608,6 +630,32 @@ def api_agent_model(agent_id):
     agent['model']['primary'] = model
     save_config(cfg)
     return jsonify({'ok': True, 'model': model})
+
+
+@app.route('/api/agent/<agent_id>/platform', methods=['POST'])
+def api_agent_platform(agent_id):
+    """Change the platform binding for an agent."""
+    data = request.get_json() or {}
+    platform = data.get('platform', '').strip()
+    if not platform:
+        return jsonify({'error': 'platform required'}), 400
+
+    cfg = load_config()
+    agents_list = cfg.get('agents', {}).get('list', [])
+    agent = next((a for a in agents_list if a['id'] == agent_id), None)
+    if not agent:
+        return jsonify({'error': 'agent not found'}), 404
+
+    bindings = cfg.get('bindings', [])
+    match = next((b for b in bindings if b.get('agentId') == agent_id), None)
+    if match:
+        match['channel'] = platform
+    else:
+        bindings.append({'agentId': agent_id, 'channel': platform})
+        cfg['bindings'] = bindings
+
+    save_config(cfg)
+    return jsonify({'ok': True, 'platform': platform})
 
 
 @app.route('/api/settings')
