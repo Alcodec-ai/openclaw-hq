@@ -947,6 +947,43 @@ body {
       <div id="settings-channels"></div>
     </div>
 
+    <!-- MD File Backup -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F4BE;</span> MD File Backup</div>
+      <div class="setting-row">
+        <div class="setting-label">Target Path</div>
+        <input class="setting-input" id="backup-path" placeholder="/mnt/external/backup" style="width:220px" onchange="saveBackupSettings()">
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Auto Backup</div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="backup-enabled" onchange="saveBackupSettings()">
+          <div class="toggle-track"></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Interval</div>
+        <select class="setting-select" id="backup-interval" onchange="saveBackupSettings()">
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="60">1 hour</option>
+          <option value="120">2 hours</option>
+          <option value="360">6 hours</option>
+          <option value="720">12 hours</option>
+          <option value="1440">24 hours</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Export Now</div>
+          <div class="setting-sublabel" id="backup-last-info">No backup yet</div>
+        </div>
+        <button class="btn-action primary" id="btn-backup-export" onclick="triggerBackupExport()">Export Now</button>
+      </div>
+      <div class="settings-status" id="backup-status"></div>
+    </div>
+
     <!-- Sessions -->
     <div class="settings-group">
       <div class="sg-title"><span class="sg-icon">&#x1F4C2;</span> Sessions</div>
@@ -1812,6 +1849,7 @@ async function fetchSettings() {
     settingsData = await (await fetch('/api/settings')).json();
     renderSettingsPanel();
     fetchProviders();
+    fetchBackupStatus();
   } catch(e) {}
 }
 
@@ -2225,6 +2263,74 @@ function addLog(entry) {
   const t=entry.time?new Date(entry.time).toTimeString().slice(0,8):'';
   d.innerHTML=`<span class="log-t">${t}</span><span class="log-l ${entry.level||'INFO'}">${(entry.level||'INFO').slice(0,4)}</span><span class="log-m">${esc((entry.message||'').substring(0,150))}</span>`;
   c.appendChild(d); if(c.children.length>150)c.firstChild.remove(); c.scrollTop=c.scrollHeight;
+}
+
+/* ── MD BACKUP ── */
+let backupData = null;
+
+async function fetchBackupStatus() {
+  try {
+    backupData = await (await fetch('/api/md-backup/status')).json();
+    renderBackupPanel();
+  } catch(e) {}
+}
+
+function renderBackupPanel() {
+  if (!backupData) return;
+  const pathEl = document.getElementById('backup-path');
+  const enabledEl = document.getElementById('backup-enabled');
+  const intervalEl = document.getElementById('backup-interval');
+  const lastEl = document.getElementById('backup-last-info');
+
+  if (pathEl) pathEl.value = backupData.path || '';
+  if (enabledEl) enabledEl.checked = backupData.enabled || false;
+  if (intervalEl) intervalEl.value = String(backupData.interval_minutes || 60);
+
+  if (lastEl) {
+    if (backupData.last_backup) {
+      const r = backupData.last_result || {};
+      lastEl.textContent = 'Last: ' + backupData.last_backup + ' \u2014 ' + (r.files_copied||0) + ' files, ' + (r.agents||[]).length + ' agents';
+    } else {
+      lastEl.textContent = 'No backup yet';
+    }
+  }
+}
+
+async function saveBackupSettings() {
+  const path = document.getElementById('backup-path').value.trim();
+  const enabled = document.getElementById('backup-enabled').checked;
+  const interval = parseInt(document.getElementById('backup-interval').value);
+  const st = document.getElementById('backup-status');
+  try {
+    const r = await fetch('/api/md-backup/settings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({path, enabled, interval_minutes: interval})
+    });
+    const d = await r.json();
+    if (!r.ok) { showToast(d.error || 'Failed to save', 'error'); if(st) st.textContent=d.error||''; return; }
+    showToast('Backup settings saved');
+    if(st) st.textContent='';
+    fetchBackupStatus();
+  } catch(e) { showToast('Failed to save backup settings', 'error'); }
+}
+
+async function triggerBackupExport() {
+  const btn = document.getElementById('btn-backup-export');
+  const st = document.getElementById('backup-status');
+  const path = document.getElementById('backup-path').value.trim();
+  if (path && (!backupData || backupData.path !== path)) {
+    await saveBackupSettings();
+  }
+  btn.disabled = true; btn.textContent = 'Exporting...';
+  try {
+    const r = await fetch('/api/md-backup/export', {method:'POST'});
+    const d = await r.json();
+    if (!r.ok) { showToast(d.error || 'Export failed', 'error'); if(st) st.textContent=d.error||''; return; }
+    showToast('Backup complete: ' + d.files_copied + ' files from ' + d.agents.length + ' agents');
+    if(st) st.textContent='';
+    fetchBackupStatus();
+  } catch(e) { showToast('Export failed', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Export Now'; }
 }
 
 /* FETCH */

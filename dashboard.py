@@ -2,7 +2,9 @@ import json
 import os
 import platform
 import re
+import shutil
 import subprocess
+import threading
 import time
 from datetime import datetime
 from pathlib import Path
@@ -16,6 +18,9 @@ SERVICE_NAME = 'com.openclaw.gateway' if IS_MACOS else 'openclaw-gateway'
 CONFIG_PATH = Path.home() / '.openclaw' / 'openclaw.json'
 LOG_DIR = Path('/tmp/openclaw')
 AGENTS_DIR = Path.home() / '.openclaw' / 'agents'
+
+_backup_timer = None
+_backup_lock = threading.Lock()
 
 BOT_NAMES = {
     'kate': '@KateAdler_Bot',
@@ -50,6 +55,88 @@ def run_cmd(cmd, timeout=10):
 def today_log():
     today = datetime.now().strftime('%Y-%m-%d')
     return LOG_DIR / f'openclaw-{today}.log'
+
+
+def perform_md_backup(target_path):
+    """Copy all .md files from each agent's 'agent' subdirectory to target."""
+    target = Path(target_path)
+    if not target.exists():
+        return {'ok': False, 'error': 'Target path does not exist'}
+    test_file = target / '.openclaw_write_test'
+    try:
+        test_file.write_text('test')
+        test_file.unlink()
+    except OSError:
+        return {'ok': False, 'error': 'Target path is not writable'}
+
+    cfg = load_config()
+    agents_list = cfg.get('agents', {}).get('list', [])
+    files_copied = 0
+    agents_done = []
+    errors = []
+
+    for agent in agents_list:
+        agent_id = agent['id']
+        agent_src = AGENTS_DIR / agent_id / 'agent'
+        if not agent_src.is_dir():
+            continue
+        agent_copied = 0
+        for md_file in agent_src.rglob('*.md'):
+            rel = md_file.relative_to(agent_src)
+            dest = target / 'agents' / agent_id / rel
+            try:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(str(md_file), str(dest))
+                files_copied += 1
+                agent_copied += 1
+            except Exception as e:
+                errors.append(f'{agent_id}/{rel}: {e}')
+        if agent_copied > 0:
+            agents_done.append(agent_id)
+
+    timestamp = datetime.now().isoformat(timespec='seconds')
+    result = {
+        'ok': len(errors) == 0,
+        'files_copied': files_copied,
+        'agents': agents_done,
+        'errors': errors,
+        'timestamp': timestamp,
+    }
+
+    cfg = load_config()
+    backup_cfg = cfg.setdefault('md_backup', {})
+    backup_cfg['last_backup'] = timestamp
+    backup_cfg['last_result'] = {'files_copied': files_copied, 'agents': agents_done, 'ok': result['ok']}
+    save_config(cfg)
+
+    return result
+
+
+def _auto_backup_tick():
+    """Timer callback: perform backup and reschedule."""
+    cfg = load_config()
+    backup_cfg = cfg.get('md_backup', {})
+    target = backup_cfg.get('path', '')
+    if target and backup_cfg.get('enabled', False):
+        with _backup_lock:
+            perform_md_backup(target)
+    _restart_backup_timer()
+
+
+def _restart_backup_timer():
+    """Cancel existing timer and start a new one if auto-backup is enabled."""
+    global _backup_timer
+    if _backup_timer is not None:
+        _backup_timer.cancel()
+        _backup_timer = None
+
+    cfg = load_config()
+    backup_cfg = cfg.get('md_backup', {})
+    if backup_cfg.get('enabled', False) and backup_cfg.get('path', ''):
+        interval = backup_cfg.get('interval_minutes', 60) * 60
+        _backup_timer = threading.Timer(interval, _auto_backup_tick)
+        _backup_timer.daemon = True
+        _backup_timer.start()
 
 
 @app.route('/')
@@ -651,6 +738,66 @@ def api_gateway_start():
     return jsonify({'ok': True, 'output': output[:500]})
 
 
+@app.route('/api/md-backup/status')
+def api_md_backup_status():
+    """Return current md_backup config and last backup info."""
+    cfg = load_config()
+    backup_cfg = cfg.get('md_backup', {})
+    return jsonify({
+        'path': backup_cfg.get('path', ''),
+        'enabled': backup_cfg.get('enabled', False),
+        'interval_minutes': backup_cfg.get('interval_minutes', 60),
+        'last_backup': backup_cfg.get('last_backup'),
+        'last_result': backup_cfg.get('last_result'),
+    })
+
+
+@app.route('/api/md-backup/settings', methods=['POST'])
+def api_md_backup_settings():
+    """Save md_backup settings: path, enabled, interval_minutes."""
+    data = request.get_json() or {}
+    cfg = load_config()
+    backup_cfg = cfg.setdefault('md_backup', {})
+
+    if 'path' in data:
+        p = data['path'].strip()
+        if p:
+            target = Path(p)
+            if not target.exists():
+                return jsonify({'error': f'Path does not exist: {p}'}), 400
+            test_file = target / '.openclaw_write_test'
+            try:
+                test_file.write_text('test')
+                test_file.unlink()
+            except OSError:
+                return jsonify({'error': f'Path is not writable: {p}'}), 400
+        backup_cfg['path'] = p
+
+    if 'enabled' in data:
+        backup_cfg['enabled'] = bool(data['enabled'])
+
+    if 'interval_minutes' in data:
+        backup_cfg['interval_minutes'] = int(data['interval_minutes'])
+
+    save_config(cfg)
+    _restart_backup_timer()
+    return jsonify({'ok': True})
+
+
+@app.route('/api/md-backup/export', methods=['POST'])
+def api_md_backup_export():
+    """Manually trigger an MD file backup."""
+    cfg = load_config()
+    target = cfg.get('md_backup', {}).get('path', '')
+    if not target:
+        return jsonify({'error': 'No backup path configured'}), 400
+    with _backup_lock:
+        result = perform_md_backup(target)
+    if not result['ok'] and 'error' in result:
+        return jsonify(result), 400
+    return jsonify(result)
+
+
 @app.route('/api/task', methods=['POST'])
 def api_task():
     data = request.get_json() or {}
@@ -742,4 +889,5 @@ def events():
 
 if __name__ == '__main__':
     port = int(os.environ.get('OPENCLAW_DASH_PORT', 7842))
+    _restart_backup_timer()
     app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
