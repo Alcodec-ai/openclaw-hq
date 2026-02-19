@@ -37,6 +37,40 @@
   --radius-xs: 8px;
 }
 
+[data-theme="dark"] {
+  --bg: #1c1c1e;
+  --bg-white: #2c2c2e;
+  --bg-panel: rgba(44,44,46,0.72);
+  --bg-hover: rgba(255,255,255,0.05);
+  --bg-active: rgba(10,132,255,0.12);
+  --border: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.1);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
+  --shadow-xl: 0 20px 60px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
+  --text: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --text-tertiary: #636366;
+  --blue: #0a84ff;
+  --green: #30d158;
+  --orange: #ff9f0a;
+  --red: #ff453a;
+  --purple: #bf5af2;
+  --teal: #64d2ff;
+  --pink: #ff375f;
+  --indigo: #5e5ce6;
+}
+
+/* Theme transition */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.15s ease !important;
+}
+html.theme-transition canvas { transition: none !important; }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -639,6 +673,76 @@ body {
   font-size: 10px; color: var(--text-tertiary); font-weight: 600;
   text-transform: uppercase; min-width: 55px; flex-shrink: 0;
 }
+
+/* ── DARK MODE OVERRIDES ── */
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+[data-theme="dark"] .toggle-track { background: #48484a; }
+[data-theme="dark"] .toggle-knob { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+
+[data-theme="dark"] .kpi-pill { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] #live-clock { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] #btn-drawer { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] #btn-drawer:hover { background: rgba(255,255,255,0.08); }
+[data-theme="dark"] #gw-badge.offline-badge { background: rgba(255,255,255,0.05); }
+
+[data-theme="dark"] .ss-item { background: rgba(255,255,255,0.03); }
+[data-theme="dark"] .ai-sessions { background: rgba(255,255,255,0.05); }
+
+[data-theme="dark"] .agent-avatar .av-status { border-color: #2c2c2e; }
+[data-theme="dark"] .av-status.offline { background: #48484a; }
+
+[data-theme="dark"] .fstat-bar { background: rgba(255,255,255,0.06); }
+[data-theme="dark"] .tbar { background: rgba(255,255,255,0.06); }
+
+[data-theme="dark"] .stat-card { background: rgba(255,255,255,0.03); }
+
+[data-theme="dark"] .mb.user { background: rgba(10,132,255,0.1); color: #a0c4ff; }
+[data-theme="dark"] .mb.assistant { background: rgba(48,209,88,0.1); color: #80e6a0; }
+
+[data-theme="dark"] .log-l.DEBUG { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .log-l.INFO { background: rgba(10,132,255,0.12); }
+[data-theme="dark"] .log-l.WARN { background: rgba(255,159,10,0.12); }
+[data-theme="dark"] .log-l.ERROR { background: rgba(255,69,58,0.12); }
+
+[data-theme="dark"] .btn-action.secondary { background: rgba(255,255,255,0.06); }
+[data-theme="dark"] .btn-action.secondary:hover { background: rgba(255,255,255,0.1); }
+[data-theme="dark"] .btn-icon:hover { background: rgba(255,255,255,0.06); }
+[data-theme="dark"] #btn-dp-close { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] #btn-idr-close { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] #btn-send:disabled { background: #48484a; }
+
+[data-theme="dark"] #task-form { background: rgba(255,255,255,0.02); }
+[data-theme="dark"] #overlay { background: rgba(0,0,0,0.4); }
+[data-theme="dark"] #detail-panel { box-shadow: -8px 0 30px rgba(0,0,0,0.3); }
+[data-theme="dark"] #info-drawer { box-shadow: -8px 0 30px rgba(0,0,0,0.3); }
+
+[data-theme="dark"] .cc-dot.off { background: #48484a; }
+[data-theme="dark"] .cc-dot.disabled { background: #48484a; }
+
+[data-theme="dark"] .provider-badge.has-key { background: rgba(48,209,88,0.12); }
+[data-theme="dark"] .provider-badge.no-key { background: rgba(255,159,10,0.12); }
+[data-theme="dark"] .provider-model-tag { background: rgba(10,132,255,0.1); }
+[data-theme="dark"] .shdr-count { background: rgba(10,132,255,0.12); }
+[data-theme="dark"] .add-provider-form { border-color: rgba(255,255,255,0.12); }
+
+[data-theme="dark"] .model-select,
+[data-theme="dark"] .setting-select,
+[data-theme="dark"] .cc-policy-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%23a1a1a6' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+/* Theme toggle button */
+#btn-theme {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.04); border: none; color: var(--text-secondary);
+  width: 32px; height: 32px; border-radius: var(--radius-xs);
+  cursor: pointer; font-size: 15px; transition: all 0.2s;
+}
+#btn-theme:hover { background: rgba(0,0,0,0.07); color: var(--text); }
+[data-theme="dark"] #btn-theme { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] #btn-theme:hover { background: rgba(255,255,255,0.08); }
 </style>
 </head>
 <body>
@@ -663,6 +767,10 @@ body {
   <div class="topbar-right">
     <span id="topbar-meta"></span>
     <span id="live-clock"></span>
+    <button id="btn-theme" onclick="toggleTheme()" title="Toggle dark mode">
+      <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
     <button id="btn-drawer" onclick="toggleDrawer()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Settings
@@ -858,6 +966,33 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+/* ── THEME ── */
+function getPreferredTheme() {
+  const stored = localStorage.getItem('theme');
+  if (stored) return stored;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const sun = document.getElementById('theme-icon-sun');
+  const moon = document.getElementById('theme-icon-moon');
+  if (sun) sun.style.display = theme === 'dark' ? 'none' : 'block';
+  if (moon) moon.style.display = theme === 'dark' ? 'block' : 'none';
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.classList.add('theme-transition');
+  applyTheme(next);
+  setTimeout(() => document.documentElement.classList.remove('theme-transition'), 400);
+}
+function isDarkMode() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+applyTheme(getPreferredTheme());
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
+});
+
 const AGENT_CELLS = {
   kate:{col:0,row:0}, main:{col:1,row:0}, nova:{col:2,row:0},
   dona:{col:0,row:1},                      tom: {col:2,row:1},
@@ -898,6 +1033,73 @@ const PALETTES = {
   jack: {body:'#2dd4bf', eye:'#1e1b4b', shirt:'#14b8a6', accent:'#99f6e4', bg:'#ccfbf1', bgSolid:'#f0fdfa', dark:'#0f766e'},
   raven:{body:'#818cf8', eye:'#1e1b4b', shirt:'#6366f1', accent:'#a5b4fc', bg:'#e0e7ff', bgSolid:'#eef2ff', dark:'#4338ca'},
 };
+
+const STATUS_THEMES_DARK = {
+  busy: {
+    floor:'#1a2332', wall:'#1e293b', wallTop:'#0f172a',
+    accent:'#3b82f6', accentLight:'#60a5fa', label:'#93c5fd',
+    text:'#bfdbfe', glow:'rgba(59,130,246,0.15)', border:'rgba(59,130,246,0.25)'
+  },
+  idle: {
+    floor:'#162321', wall:'#1a2e25', wallTop:'#0f1f17',
+    accent:'#22c55e', accentLight:'#4ade80', label:'#86efac',
+    text:'#bbf7d0', glow:'rgba(34,197,94,0.12)', border:'rgba(34,197,94,0.2)'
+  },
+  inactive: {
+    floor:'#27200e', wall:'#2d2510', wallTop:'#1f1a0a',
+    accent:'#f59e0b', accentLight:'#fbbf24', label:'#fcd34d',
+    text:'#fde68a', glow:'rgba(245,158,11,0.12)', border:'rgba(245,158,11,0.2)'
+  },
+  offline: {
+    floor:'#1c1c1e', wall:'#2c2c2e', wallTop:'#1c1c1e',
+    accent:'#636366', accentLight:'#48484a', label:'#a1a1a6',
+    text:'#8e8e93', glow:'transparent', border:'rgba(255,255,255,0.05)'
+  },
+};
+
+const PALETTES_DARK = {
+  kate: {body:'#f472b6', eye:'#f5f5f7', shirt:'#ec4899', accent:'#f9a8d4', bg:'#3b1530', bgSolid:'#2d1024', dark:'#f9a8d4'},
+  main: {body:'#60a5fa', eye:'#f5f5f7', shirt:'#3b82f6', accent:'#93c5fd', bg:'#1a2744', bgSolid:'#132035', dark:'#93c5fd'},
+  nova: {body:'#a78bfa', eye:'#f5f5f7', shirt:'#8b5cf6', accent:'#c4b5fd', bg:'#291e48', bgSolid:'#1f1638', dark:'#c4b5fd'},
+  dona: {body:'#4ade80', eye:'#f5f5f7', shirt:'#22c55e', accent:'#86efac', bg:'#14301b', bgSolid:'#0d2313', dark:'#86efac'},
+  tom:  {body:'#fbbf24', eye:'#f5f5f7', shirt:'#f59e0b', accent:'#fde68a', bg:'#2d230a', bgSolid:'#221a07', dark:'#fde68a'},
+  jack: {body:'#2dd4bf', eye:'#f5f5f7', shirt:'#14b8a6', accent:'#99f6e4', bg:'#0f2a25', bgSolid:'#0a1f1b', dark:'#99f6e4'},
+  raven:{body:'#818cf8', eye:'#f5f5f7', shirt:'#6366f1', accent:'#a5b4fc', bg:'#1e1e46', bgSolid:'#161636', dark:'#a5b4fc'},
+};
+
+const MEETING_THEME = {
+  light: {bg:'#faf5ff', wallTop:'#f3e8ff', wallBot:'#faf5ff', glow:'rgba(139,92,246,0.12)', glowIdle:'rgba(139,92,246,0.04)',
+    badge:'#f3e8ff', badgeText:'#7c3aed', table:'#ede9fe', tableStroke:'rgba(139,92,246,0.2)',
+    projBg:'#f5f3ff', projIdle:'#faf8ff', projStroke:'rgba(139,92,246,0.18)',
+    barColors:['#e9d5ff','#d8b4fe','#c084fc','#a855f7','#9333ea','#a855f7','#c084fc','#d8b4fe'],
+    ledActive:'#8b5cf6', ledIdle:'#c4b5fd', ledGlow:'rgba(139,92,246,0.15)', ledGlowIdle:'rgba(139,92,246,0.06)',
+    border:'rgba(168,85,247,'},
+  dark: {bg:'#1e1528', wallTop:'#271c35', wallBot:'#1e1528', glow:'rgba(139,92,246,0.2)', glowIdle:'rgba(139,92,246,0.08)',
+    badge:'#2d1f42', badgeText:'#c4b5fd', table:'#2d1f42', tableStroke:'rgba(139,92,246,0.3)',
+    projBg:'#251a38', projIdle:'#1e1528', projStroke:'rgba(139,92,246,0.25)',
+    barColors:['#4c1d95','#5b21b6','#6d28d9','#7c3aed','#8b5cf6','#7c3aed','#6d28d9','#5b21b6'],
+    ledActive:'#a78bfa', ledIdle:'#6d28d9', ledGlow:'rgba(139,92,246,0.25)', ledGlowIdle:'rgba(139,92,246,0.1)',
+    border:'rgba(168,85,247,'},
+};
+
+const SERVER_THEME = {
+  light: {bg:'#f0fdfa', wallTop:'#ccfbf1', wallBot:'#f0fdfa', glow:'rgba(20,184,166,0.08)',
+    badge:'#ccfbf1', badgeText:'#0f766e', rackBg:'#e6fffa', rackStroke:'rgba(20,184,166,0.2)',
+    barActive:'rgba(20,184,166,0.5)', barMid:'rgba(20,184,166,0.3)', barOff:'rgba(0,0,0,0.04)',
+    ledOn:'#14b8a6', ledOff:'rgba(20,184,166,0.15)', ledGlow:'rgba(20,184,166,0.15)',
+    mainLedGlow:'rgba(20,184,166,0.1)', mainLed:'#14b8a6', border:'rgba(20,184,166,'},
+  dark: {bg:'#0f1f1d', wallTop:'#14302b', wallBot:'#0f1f1d', glow:'rgba(20,184,166,0.15)',
+    badge:'#14302b', badgeText:'#5eead4', rackBg:'#132e28', rackStroke:'rgba(20,184,166,0.3)',
+    barActive:'rgba(20,184,166,0.6)', barMid:'rgba(20,184,166,0.4)', barOff:'rgba(255,255,255,0.04)',
+    ledOn:'#2dd4bf', ledOff:'rgba(20,184,166,0.25)', ledGlow:'rgba(20,184,166,0.25)',
+    mainLedGlow:'rgba(20,184,166,0.2)', mainLed:'#2dd4bf', border:'rgba(20,184,166,'},
+};
+
+function getStatusThemes() { return isDarkMode() ? STATUS_THEMES_DARK : STATUS_THEMES; }
+function getAgentPalette(id) { return isDarkMode() ? (PALETTES_DARK[id]||PALETTES_DARK.raven) : (PALETTES[id]||PALETTES.raven); }
+function getCanvasBg() { return isDarkMode() ? '#1c1c1e' : '#f5f5f7'; }
+function getMeetingTheme() { return isDarkMode() ? MEETING_THEME.dark : MEETING_THEME.light; }
+function getServerTheme() { return isDarkMode() ? SERVER_THEME.dark : SERVER_THEME.light; }
 
 const FRAMES = [
   [[0,1,1,1,0],[1,2,1,2,1],[0,1,1,1,0],[1,3,3,3,1],[0,3,3,3,0],[0,1,0,1,0],[1,0,0,0,1]],
@@ -997,7 +1199,7 @@ class OfficeMap {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Background
-    ctx.fillStyle = '#f5f5f7';
+    ctx.fillStyle = getCanvasBg();
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 1. Draw rooms first
@@ -1053,8 +1255,8 @@ class OfficeMap {
     const {ctx, CW:W, CH:H, tick, S} = this;
     const {x, y} = this._cellO(col, row);
     const a = agentMap[id]||{};
-    const th = STATUS_THEMES[a.status||'offline'];
-    const pal = PALETTES[id]||PALETTES.raven;
+    const th = getStatusThemes()[a.status||'offline'];
+    const pal = getAgentPalette(id);
     const gap = 4;
 
     // Room card with rounded corners
@@ -1124,9 +1326,9 @@ class OfficeMap {
     // Task board
     if (a.currentTask) {
       const bx=x+gap+10, by=y+wallH+8, bw=W-gap*2-20, bh=H*0.15;
-      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.fillStyle = isDarkMode() ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.8)';
       this._roundRect(ctx, bx, by, bw, bh, 6); ctx.fill();
-      ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 0.5;
+      ctx.strokeStyle = isDarkMode() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'; ctx.lineWidth = 0.5;
       this._roundRect(ctx, bx, by, bw, bh, 6); ctx.stroke();
       ctx.fillStyle = th.label; ctx.font = `500 ${Math.max(9,S+2)}px Inter,-apple-system,sans-serif`;
       ctx.textBaseline='top';
@@ -1135,12 +1337,12 @@ class OfficeMap {
 
     // Desk
     const dw=W*0.36, dh=H*0.09, dx2=x+W*0.08, dy2=y+H*0.63;
-    ctx.fillStyle = 'rgba(0,0,0,0.04)';
+    ctx.fillStyle = isDarkMode() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
     this._roundRect(ctx, dx2, dy2, dw, dh, 4); ctx.fill();
 
     // Monitor
     const mw=dw*0.45, mh=dh*1.2, mx=dx2+(dw-mw)/2, my=dy2-mh-2;
-    ctx.fillStyle = a.status==='busy' ? pal.bg : a.status==='idle' ? pal.bgSolid : 'rgba(0,0,0,0.06)';
+    ctx.fillStyle = a.status==='busy' ? pal.bg : a.status==='idle' ? pal.bgSolid : isDarkMode() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
     this._roundRect(ctx, mx, my, mw, mh, 3); ctx.fill();
     // Screen flicker for busy
     if (a.status==='busy') {
@@ -1148,7 +1350,7 @@ class OfficeMap {
       ctx.fillStyle = `rgba(255,255,255,${flicker})`;
       this._roundRect(ctx, mx+1, my+1, mw-2, mh-2, 2); ctx.fill();
     }
-    ctx.strokeStyle = a.status==='busy' ? pal.accent+'66' : 'rgba(0,0,0,0.08)'; ctx.lineWidth=0.5;
+    ctx.strokeStyle = a.status==='busy' ? pal.accent+'66' : isDarkMode() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; ctx.lineWidth=0.5;
     this._roundRect(ctx, mx, my, mw, mh, 3); ctx.stroke();
     // Screen glow
     if (a.status==='busy') {
@@ -1156,7 +1358,7 @@ class OfficeMap {
       ctx.fillStyle = pal.accent+'15'; ctx.fill();
     }
     // Stand
-    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    ctx.fillStyle = isDarkMode() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     ctx.fillRect(mx+mw/2-2, my+mh, 4, 4);
 
     // LED — always animated with ring pulse
@@ -1180,60 +1382,60 @@ class OfficeMap {
     const {x, y} = this._cellO(col, row);
     const gap = 4;
     const busyN = Object.values(agentMap).filter(a=>a.status==='busy').length;
+    const mt = getMeetingTheme();
 
     ctx.save();
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.clip();
-    ctx.fillStyle = '#faf5ff'; ctx.fillRect(x,y,W,H);
+    ctx.fillStyle = mt.bg; ctx.fillRect(x,y,W,H);
     const wg = ctx.createLinearGradient(x,y,x,y+H*0.32);
-    wg.addColorStop(0,'#f3e8ff'); wg.addColorStop(1,'#faf5ff');
+    wg.addColorStop(0, mt.wallTop); wg.addColorStop(1, mt.wallBot);
     ctx.fillStyle = wg; ctx.fillRect(x,y,W,H*0.32);
     // Ambient glow
     const mg = ctx.createRadialGradient(x+W/2,y+H/2,0,x+W/2,y+H/2,W*0.5);
-    mg.addColorStop(0, busyN>0?'rgba(139,92,246,0.12)':'rgba(139,92,246,0.04)');
+    mg.addColorStop(0, busyN>0 ? mt.glow : mt.glowIdle);
     mg.addColorStop(1,'transparent');
     ctx.fillStyle = mg; ctx.fillRect(x,y,W,H);
     ctx.restore();
 
     // Breathing border
     const mb = 0.15 + 0.15*Math.sin(tick*0.03);
-    ctx.strokeStyle = `rgba(168,85,247,${mb})`; ctx.lineWidth=1+0.5*Math.sin(tick*0.03);
+    ctx.strokeStyle = mt.border+mb+')'; ctx.lineWidth=1+0.5*Math.sin(tick*0.03);
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.stroke();
 
     // Badge
     const bw=90, bx=x+(W-bw)/2;
-    ctx.fillStyle = '#f3e8ff';
+    ctx.fillStyle = mt.badge;
     this._roundRect(ctx, bx, y+gap+8, bw, 22, 8); ctx.fill();
-    ctx.fillStyle = '#7c3aed';
+    ctx.fillStyle = mt.badgeText;
     ctx.font = `700 ${Math.max(11,this.S+4)}px Inter,-apple-system,sans-serif`;
     ctx.textBaseline='middle'; ctx.textAlign='center';
     ctx.fillText('MEETING', x+W/2, y+gap+19); ctx.textAlign='left';
 
     // Table with shimmer
     const tw=W*0.45, th2=H*0.22, tx=x+(W-tw)/2, ty=y+H*0.42;
-    ctx.fillStyle = '#ede9fe';
+    ctx.fillStyle = mt.table;
     this._roundRect(ctx, tx, ty, tw, th2, 10); ctx.fill();
     // Table shimmer
     const shimX = tx + (tick*0.8 % (tw+40)) - 20;
     ctx.save(); this._roundRect(ctx, tx, ty, tw, th2, 10); ctx.clip();
     const shim = ctx.createLinearGradient(shimX-15,0,shimX+15,0);
-    shim.addColorStop(0,'transparent'); shim.addColorStop(0.5,'rgba(255,255,255,0.4)'); shim.addColorStop(1,'transparent');
+    shim.addColorStop(0,'transparent'); shim.addColorStop(0.5, isDarkMode()?'rgba(255,255,255,0.15)':'rgba(255,255,255,0.4)'); shim.addColorStop(1,'transparent');
     ctx.fillStyle = shim; ctx.fillRect(tx,ty,tw,th2);
     ctx.restore();
-    ctx.strokeStyle = 'rgba(139,92,246,0.2)'; ctx.lineWidth=0.5;
+    ctx.strokeStyle = mt.tableStroke; ctx.lineWidth=0.5;
     this._roundRect(ctx, tx, ty, tw, th2, 10); ctx.stroke();
 
     // Projector — always show, more animated when busy
     const sx=x+W*0.15, sy=y+H*0.06, sw=W*0.7, sh=H*0.22;
-    ctx.fillStyle = busyN>0?'#f5f3ff':'#faf8ff';
+    ctx.fillStyle = busyN>0 ? mt.projBg : mt.projIdle;
     this._roundRect(ctx, sx, sy, sw, sh, 8); ctx.fill();
-    ctx.strokeStyle = 'rgba(139,92,246,0.18)'; ctx.lineWidth=0.5;
+    ctx.strokeStyle = mt.projStroke; ctx.lineWidth=0.5;
     this._roundRect(ctx, sx, sy, sw, sh, 8); ctx.stroke();
     const bars=8, barW=(sw-14)/bars;
-    const cols=['#e9d5ff','#d8b4fe','#c084fc','#a855f7','#9333ea','#a855f7','#c084fc','#d8b4fe'];
     for (let i=0;i<bars;i++) {
       const speed = busyN>0 ? 0.06 : 0.02;
       const bh=sh*0.6*(0.2+0.8*Math.abs(Math.sin(tick*speed+i*0.7)));
-      ctx.fillStyle=cols[i];
+      ctx.fillStyle=mt.barColors[i];
       this._roundRect(ctx, sx+7+i*barW, sy+sh-bh-4, barW-2, bh, 3); ctx.fill();
     }
 
@@ -1241,9 +1443,9 @@ class OfficeMap {
     const lx2=x+W-gap-14, ly2=y+gap+14;
     const p2=busyN>0?0.7+0.3*Math.sin(tick*0.1):0.85+0.15*Math.sin(tick*0.04);
     ctx.beginPath(); ctx.arc(lx2,ly2,8+2*Math.sin(tick*0.05),0,Math.PI*2);
-    ctx.fillStyle = busyN>0?'rgba(139,92,246,0.15)':'rgba(139,92,246,0.06)'; ctx.fill();
+    ctx.fillStyle = busyN>0 ? mt.ledGlow : mt.ledGlowIdle; ctx.fill();
     ctx.beginPath(); ctx.arc(lx2,ly2,4.5*p2,0,Math.PI*2);
-    ctx.fillStyle = busyN>0?'#8b5cf6':'#c4b5fd'; ctx.fill();
+    ctx.fillStyle = busyN>0 ? mt.ledActive : mt.ledIdle; ctx.fill();
     ctx.beginPath(); ctx.arc(lx2,ly2,2*p2,0,Math.PI*2);
     ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
   }
@@ -1252,29 +1454,30 @@ class OfficeMap {
     const {ctx, CW:W, CH:H, tick} = this;
     const {x, y} = this._cellO(col, row);
     const gap = 4;
+    const st = getServerTheme();
 
     ctx.save();
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.clip();
-    ctx.fillStyle = '#f0fdfa'; ctx.fillRect(x,y,W,H);
+    ctx.fillStyle = st.bg; ctx.fillRect(x,y,W,H);
     const wg = ctx.createLinearGradient(x,y,x,y+H*0.3);
-    wg.addColorStop(0,'#ccfbf1'); wg.addColorStop(1,'#f0fdfa');
+    wg.addColorStop(0, st.wallTop); wg.addColorStop(1, st.wallBot);
     ctx.fillStyle = wg; ctx.fillRect(x,y,W,H*0.3);
     // Ambient glow
     const sg = ctx.createRadialGradient(x+W/2,y+H/2,0,x+W/2,y+H/2,W*0.5);
-    sg.addColorStop(0, 'rgba(20,184,166,0.08)'); sg.addColorStop(1,'transparent');
+    sg.addColorStop(0, st.glow); sg.addColorStop(1,'transparent');
     ctx.fillStyle = sg; ctx.fillRect(x,y,W,H);
     ctx.restore();
 
     // Breathing border
     const sb = 0.12 + 0.12*Math.sin(tick*0.025);
-    ctx.strokeStyle = `rgba(20,184,166,${sb})`; ctx.lineWidth=1+0.4*Math.sin(tick*0.025);
+    ctx.strokeStyle = st.border+sb+')'; ctx.lineWidth=1+0.4*Math.sin(tick*0.025);
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.stroke();
 
     // Badge
     const bw=90, bx=x+(W-bw)/2;
-    ctx.fillStyle = '#ccfbf1';
+    ctx.fillStyle = st.badge;
     this._roundRect(ctx, bx, y+gap+8, bw, 22, 8); ctx.fill();
-    ctx.fillStyle = '#0f766e';
+    ctx.fillStyle = st.badgeText;
     ctx.font = `700 ${Math.max(11,this.S+4)}px Inter,-apple-system,sans-serif`;
     ctx.textBaseline='middle'; ctx.textAlign='center';
     ctx.fillText('SERVERS', x+W/2, y+gap+19); ctx.textAlign='left';
@@ -1284,9 +1487,9 @@ class OfficeMap {
     const sx=x+(W-ncols*(rw+8))/2, sy=y+H*0.38;
     for (let c=0;c<ncols;c++) {
       const rx=sx+c*(rw+8);
-      ctx.fillStyle = '#e6fffa';
+      ctx.fillStyle = st.rackBg;
       this._roundRect(ctx, rx, sy, rw, rh, 6); ctx.fill();
-      ctx.strokeStyle = 'rgba(20,184,166,0.2)'; ctx.lineWidth=0.5;
+      ctx.strokeStyle = st.rackStroke; ctx.lineWidth=0.5;
       this._roundRect(ctx, rx, sy, rw, rh, 6); ctx.stroke();
       for (let r=0;r<6;r++) {
         const ly=sy+5+r*(rh/6);
@@ -1296,20 +1499,20 @@ class OfficeMap {
         if (on) {
           const barFill = 0.3+0.5*Math.abs(Math.sin(tick*0.03+c*2+r));
           const bg = ctx.createLinearGradient(rx+3,0,rx+rw-3,0);
-          bg.addColorStop(0,'rgba(20,184,166,0.5)');
-          bg.addColorStop(barFill,'rgba(20,184,166,0.3)');
-          bg.addColorStop(barFill,'rgba(0,0,0,0.04)');
-          bg.addColorStop(1,'rgba(0,0,0,0.04)');
+          bg.addColorStop(0, st.barActive);
+          bg.addColorStop(barFill, st.barMid);
+          bg.addColorStop(barFill, st.barOff);
+          bg.addColorStop(1, st.barOff);
           ctx.fillStyle = bg;
         } else {
-          ctx.fillStyle = 'rgba(0,0,0,0.04)';
+          ctx.fillStyle = st.barOff;
         }
         this._roundRect(ctx, rx+3, ly, rw-6, 3.5, 1.5); ctx.fill();
         // LED dot
         const ledOn = on && phase<25;
         ctx.beginPath(); ctx.arc(rx+rw-5,ly+1.75,2,0,Math.PI*2);
-        ctx.fillStyle = ledOn?'#14b8a6':'rgba(20,184,166,0.15)'; ctx.fill();
-        if (ledOn) { ctx.beginPath(); ctx.arc(rx+rw-5,ly+1.75,4,0,Math.PI*2); ctx.fillStyle='rgba(20,184,166,0.15)'; ctx.fill(); }
+        ctx.fillStyle = ledOn ? st.ledOn : st.ledOff; ctx.fill();
+        if (ledOn) { ctx.beginPath(); ctx.arc(rx+rw-5,ly+1.75,4,0,Math.PI*2); ctx.fillStyle=st.ledGlow; ctx.fill(); }
       }
     }
 
@@ -1317,30 +1520,31 @@ class OfficeMap {
     const slx=x+W-gap-14, sly=y+gap+14;
     const sp=0.8+0.2*Math.sin(tick*0.06);
     ctx.beginPath(); ctx.arc(slx,sly,8+Math.sin(tick*0.04)*2,0,Math.PI*2);
-    ctx.fillStyle = 'rgba(20,184,166,0.1)'; ctx.fill();
+    ctx.fillStyle = st.mainLedGlow; ctx.fill();
     ctx.beginPath(); ctx.arc(slx,sly,4.5*sp,0,Math.PI*2);
-    ctx.fillStyle = '#14b8a6'; ctx.fill();
+    ctx.fillStyle = st.mainLed; ctx.fill();
     ctx.beginPath(); ctx.arc(slx,sly,2*sp,0,Math.PI*2);
     ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
   }
 
   _drawChar(cx, cy, id, status, dir, frameIdx=0) {
     const {ctx, S, tick} = this;
-    const pal = PALETTES[id]||PALETTES.raven;
+    const pal = getAgentPalette(id);
     const frame = FRAMES[frameIdx%FRAMES.length];
     const alpha = status==='offline'?0.25:status==='inactive'?0.55:1;
     const PW=5*S, PH=7*S, px=cx-PW/2, py=cy-PH;
+    const dk = isDarkMode();
 
     ctx.save(); ctx.globalAlpha=alpha;
     if (dir===-1) { ctx.translate(px*2+PW,0); ctx.scale(-1,1); }
 
     // Shadow
     ctx.beginPath(); ctx.ellipse(cx,cy+2,PW*0.35,S*0.6,0,0,Math.PI*2);
-    ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fill();
+    ctx.fillStyle = dk ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.08)'; ctx.fill();
 
     // Pixels
     for (let r=0;r<frame.length;r++) for (let c=0;c<frame[r].length;c++) {
-      if (frame[r][c]) { ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(px+c*S+0.5,py+r*S+0.5,S,S); }
+      if (frame[r][c]) { ctx.fillStyle = dk ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.06)'; ctx.fillRect(px+c*S+0.5,py+r*S+0.5,S,S); }
     }
     for (let r=0;r<frame.length;r++) for (let c=0;c<frame[r].length;c++) {
       const p=frame[r][c]; if(!p) continue;
@@ -1454,9 +1658,10 @@ async function selectAgent(id) {
   document.getElementById('dp-model').textContent=a.model||'';
 
   const sb=document.getElementById('dp-status-badge'), st=a.status||'offline';
+  const dk=isDarkMode();
   sb.textContent=st;
-  sb.style.background = st==='busy'?'rgba(0,122,255,0.08)':st==='idle'?'rgba(52,199,89,0.08)':st==='inactive'?'rgba(255,149,0,0.08)':'rgba(0,0,0,0.04)';
-  sb.style.color = st==='busy'?'#007aff':st==='idle'?'#34c759':st==='inactive'?'#ff9500':'#8e8e93';
+  sb.style.background = st==='busy'?(dk?'rgba(10,132,255,0.15)':'rgba(0,122,255,0.08)'):st==='idle'?(dk?'rgba(48,209,88,0.15)':'rgba(52,199,89,0.08)'):st==='inactive'?(dk?'rgba(255,159,10,0.15)':'rgba(255,149,0,0.08)'):(dk?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)');
+  sb.style.color = st==='busy'?'var(--blue)':st==='idle'?'var(--green)':st==='inactive'?'var(--orange)':'var(--text-tertiary)';
 
   document.getElementById('task-ok').style.display='none';
   document.getElementById('task-err').style.display='none';
@@ -1522,7 +1727,7 @@ function renderDetail() {
       <div class="model-status" id="model-status"></div>
 
       <div class="sec">Current Task</div>
-      <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;background:rgba(0,0,0,0.02);padding:12px;border-radius:var(--radius-xs);word-break:break-word">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;background:${isDarkMode()?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)'};padding:12px;border-radius:var(--radius-xs);word-break:break-word">
         ${a.currentTask?esc(a.currentTask):'<em style="color:var(--text-tertiary)">No active task</em>'}
       </div>`;
   } else if (curTab==='messages') {
@@ -1622,7 +1827,7 @@ async function fetchProviders() {
 const PROVIDER_COLORS = {
   anthropic: '#d97706', openai: '#10a37f', google: '#4285f4', groq: '#f55036',
   mistral: '#ff7000', cohere: '#39594d', deepseek: '#4d6bfe', openrouter: '#6366f1',
-  bedrock: '#ff9900', vertex: '#4285f4', azure: '#0078d4', ollama: '#ffffff',
+  bedrock: '#ff9900', vertex: '#4285f4', azure: '#0078d4', ollama: '#8e8e93',
 };
 
 function getProviderColor(name) {
@@ -2011,7 +2216,7 @@ function renderChannelsStats(ch) {
 function renderSessions(se) {
   const el=document.getElementById('se-info');
   if(!se.length){el.innerHTML='<div style="color:var(--text-tertiary);font-size:11px">No sessions</div>';return;}
-  el.innerHTML=se.slice(0,10).map(s=>`<div class="ch-row"><div class="ch-dot" style="background:${PALETTES[s.agent]?PALETTES[s.agent].body:'#c7c7cc'}"></div><span class="ch-name">${s.agent}</span><span class="ch-detail">${s.age||'--'}</span></div>`).join('');
+  el.innerHTML=se.slice(0,10).map(s=>`<div class="ch-row"><div class="ch-dot" style="background:${PALETTES[s.agent]?PALETTES[s.agent].body:(isDarkMode()?'#48484a':'#c7c7cc')}"></div><span class="ch-name">${s.agent}</span><span class="ch-detail">${s.age||'--'}</span></div>`).join('');
 }
 
 function addLog(entry) {
