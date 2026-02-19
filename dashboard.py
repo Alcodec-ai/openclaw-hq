@@ -738,6 +738,54 @@ def api_gateway_start():
     return jsonify({'ok': True, 'output': output[:500]})
 
 
+@app.route('/api/browse-dirs')
+def api_browse_dirs():
+    """List subdirectories of a given path for the directory picker."""
+    path = request.args.get('path', '').strip() or '/'
+    target = Path(path)
+    if not target.exists() or not target.is_dir():
+        return jsonify({'error': f'Path does not exist: {path}'}), 400
+    dirs = []
+    try:
+        for entry in target.iterdir():
+            if not entry.is_dir():
+                continue
+            if entry.name.startswith('.'):
+                continue
+            try:
+                # Test readability
+                list(entry.iterdir())
+                dirs.append(entry.name)
+            except PermissionError:
+                pass
+    except PermissionError:
+        return jsonify({'error': f'Permission denied: {path}'}), 403
+    dirs.sort(key=str.lower)
+    parent = str(target.parent) if str(target) != '/' else None
+    return jsonify({
+        'current': str(target),
+        'parent': parent,
+        'dirs': dirs,
+    })
+
+
+@app.route('/api/mkdir', methods=['POST'])
+def api_mkdir():
+    """Create a new directory."""
+    data = request.get_json() or {}
+    path = data.get('path', '').strip()
+    if not path:
+        return jsonify({'error': 'path required'}), 400
+    target = Path(path)
+    try:
+        target.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        return jsonify({'error': f'Permission denied: {path}'}), 403
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    return jsonify({'ok': True, 'path': str(target)})
+
+
 @app.route('/api/md-backup/status')
 def api_md_backup_status():
     """Return current md_backup config and last backup info."""
