@@ -823,7 +823,8 @@ body {
         </div>
         <div class="add-provider-row">
           <span class="add-provider-label">Models</span>
-          <input class="provider-input" id="new-provider-models" placeholder="model-1, model-2 (comma separated)">
+          <input class="provider-input" id="new-provider-models" list="all-models-datalist" placeholder="model-1, model-2 (comma separated)">
+          <datalist id="all-models-datalist"></datalist>
         </div>
         <div class="add-provider-row" style="justify-content:flex-end">
           <button class="btn-action primary" onclick="addProvider()">Add Provider</button>
@@ -919,7 +920,11 @@ setInterval(updateClock, 1000); updateClock();
 
 /* Fetch available models */
 async function fetchAvailableModels() {
-  try { availableModels = await (await fetch('/api/models/available')).json(); } catch(e) {}
+  try {
+    availableModels = await (await fetch('/api/models/available')).json();
+    const dl = document.getElementById('all-models-datalist');
+    if (dl) dl.innerHTML = availableModels.map(m => `<option value="${m}">`).join('');
+  } catch(e) {}
 }
 
 /* OfficeMap — integrated particles + rooms */
@@ -1674,8 +1679,13 @@ function renderProviders() {
             `).join('')}
           </div>
           <div style="display:flex;gap:4px;margin-top:6px">
-            <input class="provider-input" id="add-model-${esc(name)}" placeholder="Add model..." style="font-family:inherit"
-              onkeydown="if(event.key==='Enter')addProviderModel('${esc(name)}')">
+            <select class="setting-select" id="add-model-${esc(name)}" style="flex:1;min-width:0;font-size:11px"
+              onchange="document.getElementById('add-model-custom-${esc(name)}').style.display=this.value==='__custom__'?'block':'none'">
+              <option value="">Select model...</option>
+              ${availableModels.filter(m => !models.includes(m)).map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('')}
+              <option value="__custom__">Custom...</option>
+            </select>
+            <input class="provider-input" id="add-model-custom-${esc(name)}" placeholder="Custom model ID..." style="display:none;font-family:inherit">
             <button class="btn-action secondary" style="font-size:10px;padding:4px 8px" onclick="addProviderModel('${esc(name)}')">+</button>
           </div>
         </div>
@@ -1763,8 +1773,9 @@ async function deleteProvider(name) {
 }
 
 async function addProviderModel(name) {
-  const input = document.getElementById('add-model-' + name);
-  const model = input.value.trim();
+  const select = document.getElementById('add-model-' + name);
+  const customInput = document.getElementById('add-model-custom-' + name);
+  const model = select.value === '__custom__' ? customInput.value.trim() : select.value.trim();
   if (!model || !providersData || !providersData[name]) return;
 
   const models = [...(providersData[name].models || []), model];
@@ -1775,7 +1786,9 @@ async function addProviderModel(name) {
     });
     const d = await r.json();
     if (d.ok) {
-      input.value = '';
+      select.value = '';
+      customInput.value = '';
+      customInput.style.display = 'none';
       showToast('Model added', 'success');
       fetchProviders();
       fetchAvailableModels();
