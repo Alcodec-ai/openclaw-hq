@@ -295,6 +295,8 @@ body {
   font-size: 10px; color: var(--text-tertiary); margin-top: 4px;
 }
 #gpu-card.hidden { display: none; }
+.temp-bar .sys-bar-fill { background: linear-gradient(90deg, #34c759, #ff9500, #ff3b30); }
+.fan-bar .sys-bar-fill { background: linear-gradient(90deg, #5ac8fa, #007aff); }
 
 #canvas-wrap { flex: 1; position: relative; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; margin: 0 14px; }
 #office { position: absolute; inset: 0; display: block; z-index: 2; cursor: pointer; }
@@ -1302,7 +1304,7 @@ body {
       <div class="sys-stat-card">
         <div class="sys-stat-header">
           <span>CPU</span>
-          <span class="sys-stat-icon">&#x1F4BB;</span>
+          <span class="sys-stat-icon">💻</span>
         </div>
         <div class="sys-stat-value" id="sys-cpu">0%</div>
         <div class="sys-stat-bar"><div class="sys-bar-fill" id="sys-cpu-bar" style="width:0%"></div></div>
@@ -1310,7 +1312,7 @@ body {
       <div class="sys-stat-card">
         <div class="sys-stat-header">
           <span>RAM</span>
-          <span class="sys-stat-icon">&#x1F4BE;</span>
+          <span class="sys-stat-icon">💾</span>
         </div>
         <div class="sys-stat-value" id="sys-ram">0/0 GB</div>
         <div class="sys-stat-bar"><div class="sys-bar-fill" id="sys-ram-bar" style="width:0%"></div></div>
@@ -1318,11 +1320,27 @@ body {
       <div class="sys-stat-card" id="gpu-card" style="display:none">
         <div class="sys-stat-header">
           <span>GPU</span>
-          <span class="sys-stat-icon">&#x1F3AE;</span>
+          <span class="sys-stat-icon">🎮</span>
         </div>
         <div class="sys-stat-value" id="sys-gpu">--</div>
         <div class="sys-stat-bar"><div class="sys-bar-fill" id="sys-gpu-bar" style="width:0%"></div></div>
         <div class="sys-stat-sub" id="sys-gpu-mem"></div>
+      </div>
+      <div class="sys-stat-card" id="temp-card" style="display:none">
+        <div class="sys-stat-header">
+          <span>Temp</span>
+          <span class="sys-stat-icon">🌡️</span>
+        </div>
+        <div class="sys-stat-value" id="sys-temp">--°C</div>
+        <div class="sys-stat-bar temp-bar"><div class="sys-bar-fill" id="sys-temp-bar" style="width:0%"></div></div>
+      </div>
+      <div class="sys-stat-card" id="fan-card" style="display:none">
+        <div class="sys-stat-header">
+          <span>Fan</span>
+          <span class="sys-stat-icon">🌀</span>
+        </div>
+        <div class="sys-stat-value" id="sys-fan">--%</div>
+        <div class="sys-stat-bar fan-bar"><div class="sys-bar-fill" id="sys-fan-bar" style="width:0%"></div></div>
       </div>
     </div>
     
@@ -3780,6 +3798,19 @@ async function fetchSysStats() {
         document.getElementById('sys-gpu-bar').style.width = d.gpu_memory_percent + '%';
         document.getElementById('sys-gpu-mem').textContent = d.gpu_name + ' \u00B7 ' + 
           (d.gpu_memory_used_mb/1024).toFixed(1) + '/' + (d.gpu_memory_total_mb/1024).toFixed(1) + ' GB';
+      }
+      // Temperature
+      if (d.cpu_temp > 0) {
+        document.getElementById('temp-card').style.display = 'block';
+        document.getElementById('sys-temp').textContent = d.cpu_temp.toFixed(0) + '°C';
+        const tempPct = Math.min(100, (d.cpu_temp / 100) * 100);
+        document.getElementById('sys-temp-bar').style.width = tempPct + '%';
+      }
+      // Fan
+      if (d.fan_speed > 0) {
+        document.getElementById('fan-card').style.display = 'block';
+        document.getElementById('sys-fan').textContent = d.fan_speed + '%';
+        document.getElementById('sys-fan-bar').style.width = d.fan_speed + '%';
       }
     }
   } catch(e) { console.error(e); }

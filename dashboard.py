@@ -260,9 +260,11 @@ def api_status():
 def api_system_stats():
     import subprocess
     import os
+    import platform
     
     stats = {
         'cpu': 0,
+        'cpu_temp': 0,
         'ram_used_gb': 0,
         'ram_total_gb': 0,
         'ram_percent': 0,
@@ -272,44 +274,155 @@ def api_system_stats():
         'gpu_memory_total_mb': 0,
         'gpu_memory_percent': 0,
         'gpu_util': 0,
+        'gpu_temp': 0,
+        'fan_speed': 0,
+        'os': platform.system(),
     }
     
-    # CPU & RAM via psutil or /proc
-    try:
-        if os.path.exists('/proc/meminfo'):
-            with open('/proc/meminfo') as f:
-                for line in f:
-                    if line.startswith('MemTotal:'):
-                        stats['ram_total_gb'] = int(line.split()[1]) / 1024 / 1024
-                    elif line.startswith('MemAvailable:'):
-                        avail = int(line.split()[1]) / 1024 / 1024
-                        stats['ram_used_gb'] = stats['ram_total_gb'] - avail
-                        stats['ram_percent'] = round(stats['ram_used_gb'] / stats['ram_total_gb'] * 100, 1)
-                    elif line.startswith('MemFree:'):
-                        pass  # handled by MemAvailable
-        # CPU
-        if os.path.exists('/proc/loadavg'):
-            with open('/proc/loadavg') as f:
-                load = f.read().split()[0]
-                stats['cpu'] = float(load)
-    except Exception:
-        pass
+    # Detect OS
+    is_linux = os.path.exists('/proc/meminfo')
+    is_macos = platform.system() == 'Darwin'
     
-    # GPU via nvidia-smi
-    try:
-        result = subprocess.run(['nvidia-smi', '--query-gpu=name,memory.used,memory.total,utilization.gpu', '--format=csv,noheader,nounits'], 
-                              capture_output=True, text=True, timeout=5)
-        if result.returncode == 0:
-            parts = result.stdout.strip().split(',')
-            if len(parts) >= 4:
-                stats['gpu_available'] = True
-                stats['gpu_name'] = parts[0].strip()
-                stats['gpu_memory_used_mb'] = int(parts[1].strip())
-                stats['gpu_memory_total_mb'] = int(parts[2].strip())
-                stats['gpu_memory_percent'] = round(stats['gpu_memory_used_mb'] / stats['gpu_memory_total_mb'] * 100, 1)
-                stats['gpu_util'] = int(parts[3].strip())
-    except Exception:
-        pass
+    # CPU & RAM
+    if is_linux:
+        try:
+            if os.path.exists('/proc/meminfo'):
+                with open('/proc/meminfo') as f:
+                    for line in f:
+                        if line.startswith('MemTotal:'):
+                            stats['ram_total_gb'] = int(line.split()[1]) / 1024 / 1024
+                        elif line.startswith('MemAvailable:'):
+                            avail = int(line.split()[1]) / 1024 / 1024
+                            stats['ram_used_gb'] = stats['ram_total_gb'] - avail
+                            stats['ram_percent'] = round(stats['ram_used_gb'] / stats['ram_total_gb'] * 100, 1)
+            # CPU load
+            if os.path.exists('/proc/loadavg'):
+                with open('/proc/loadavg') as f:
+                    load = f.read().split()[0]
+                    stats['cpu'] = float(load)
+        except Exception:
+            pass
+    
+    elif is_macos:
+        try:
+            # MacOS RAM via vm_stat
+            vm = subprocess.run(['vm_stat'], capture_output=True, text=True)
+            lines = vm.stdout.strip().split('\n')
+            free = active = wired = 0
+            for line in lines:
+                if 'Pages free:' in line:
+                    free = int(line.split(':')[1].strip().rstrip('.'))
+                elif 'Pages active:' in line:
+                    active = int(line.split(':')[1].strip().rstrip('.'))
+                elif 'Pages wired:' in line:
+                    wired = int(line.split(':')[1].strip().rstrip('.'))
+            page_size = 4096
+            stats['ram_total_gb'] = (free + active + wired) * page_size / 1024 / 1024 / 1024
+            stats['ram_used_gb'] = (active + wired) * page_size / 1024 / 1024 / 1024
+            stats['ram_percent'] = round(stats['ram_used_gb'] / stats['ram_total_gb'] * 100, 1) if stats['ram_total_gb'] > 0 else 0
+            # MacOS CPU via sysctl
+            cpuload = subprocess.run(['sysctl', '-n', 'hw.loadavg'], capture_output=True, text=True)
+            if cpuload.returncode == 0:
+                stats['cpu'] = float(cpuload.stdout.strip())
+        except Exception:
+            pass
+    
+    # Temperature (Linux)
+    if is_linux:
+        try:
+            # Try thermal_zone
+            for i in range(5):
+                temp_file = f'/sys/class/thermal/thermal_zone{i}/temp'
+                if os.path.exists(temp_file):
+                    with open(temp_file) as f:
+                        temp = int(f.read().strip()) / 1000
+                        if temp > 0:
+                            stats['cpu_temp'] = temp
+                            break
+        except Exception:
+            pass
+        
+        # Try hwmon for more accurate temps
+        try:
+            for root, dirs, files in os.walk('/sys/class/hwmon'):
+                for f in files:
+                    if f == 'temp1_input':
+                        with open(os.path.join(root, f)) as tf:
+                            temp = int(tf.read().strip()) / 1000
+                            if temp > 0 and temp < 150:
+                                stats['cpu_temp'] = temp
+        except Exception:
+            pass
+    
+    # Temperature (macOS)
+    if is_macos:
+        try:
+            # Use osx-cpu-temp or powermetrics
+            result = subprocess.run(['osx-cpu-temp'], capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                temp = result.stdout.strip().replace('°C', '').replace('C', '')
+                stats['cpu_temp'] = float(temp)
+        except Exception:
+            pass
+            # Fallback: try sysctl
+            try:
+                result = subprocess.run(['sysctl', '-n', 'machdep.cpu.brand_string'], capture_output=True, text=True)
+            except:
+                pass
+    
+    # GPU via nvidia-smi (Linux)
+    if is_linux:
+        try:
+            result = subprocess.run(['nvidia-smi', '--query-gpu=name,temperature.gpu,fan.speed,memory.used,memory.total,utilization.gpu', '--format=csv,noheader,nounits'], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                parts = result.stdout.strip().split(',')
+                if len(parts) >= 4:
+                    stats['gpu_available'] = True
+                    stats['gpu_name'] = parts[0].strip()
+                    stats['gpu_temp'] = int(parts[1].strip()) if parts[1].strip().isdigit() else 0
+                    fan = parts[2].strip().replace('%', '')
+                    stats['fan_speed'] = int(fan) if fan.isdigit() else 0
+                    stats['gpu_memory_used_mb'] = int(parts[3].strip())
+                    stats['gpu_memory_total_mb'] = int(parts[4].strip())
+                    stats['gpu_memory_percent'] = round(stats['gpu_memory_used_mb'] / stats['gpu_memory_total_mb'] * 100, 1)
+                    stats['gpu_util'] = int(parts[5].strip())
+        except Exception:
+            pass
+    
+    # GPU via nvidia-smi (macOS with eGPU)
+    if is_macos:
+        try:
+            result = subprocess.run(['nvidia-smi', '--query-gpu=name,temperature.gpu,fan.speed,memory.used,memory.total,utilization.gpu', '--format=csv,noheader,nounits'], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                parts = result.stdout.strip().split(',')
+                if len(parts) >= 4:
+                    stats['gpu_available'] = True
+                    stats['gpu_name'] = parts[0].strip()
+                    stats['gpu_temp'] = int(parts[1].strip()) if parts[1].strip().isdigit() else 0
+                    fan = parts[2].strip().replace('%', '')
+                    stats['fan_speed'] = int(fan) if fan.isdigit() else 0
+                    stats['gpu_memory_used_mb'] = int(parts[3].strip())
+                    stats['gpu_memory_total_mb'] = int(parts[4].strip())
+                    stats['gpu_memory_percent'] = round(stats['gpu_memory_used_mb'] / stats['gpu_memory_total_mb'] * 100, 1)
+                    stats['gpu_util'] = int(parts[5].strip())
+        except Exception:
+            pass
+    
+    # Fan speed (Linux - generic)
+    if is_linux and stats['fan_speed'] == 0:
+        try:
+            for root, dirs, files in os.walk('/sys/class/hwmon'):
+                for f in files:
+                    if 'fan' in f and '_input' in f:
+                        with open(os.path.join(root, f)) as ff:
+                            fan = int(ff.read().strip())
+                            if fan > 0:
+                                stats['fan_speed'] = fan
+                                break
+        except Exception:
+            pass
     
     return jsonify(stats)
 
