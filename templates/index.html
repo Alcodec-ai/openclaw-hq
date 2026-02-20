@@ -231,12 +231,12 @@ body {
 }
 
 #float-stats {
-  display: flex; gap: 8px; padding: 12px 14px;
+  display: flex; gap: 6px; padding: 6px 10px;
   flex-shrink: 0; background: var(--bg);
 }
 .fstat {
   flex: 1; background: var(--bg-white); border-radius: var(--radius);
-  padding: 14px 16px; box-shadow: var(--shadow-sm);
+  padding: 8px 10px; box-shadow: var(--shadow-sm);
   transition: all 0.3s cubic-bezier(0.25,0.1,0.25,1); border: 0.5px solid var(--border);
   position: relative; overflow: hidden;
 }
@@ -250,14 +250,14 @@ body {
 .fstat:hover { box-shadow: var(--shadow-md); transform: translateY(-2px) scale(1.01); }
 @keyframes shimmer { 0%{background-position:100% 100%} 50%{background-position:0 0} 100%{background-position:100% 100%} }
 .fstat-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
-.fstat-row { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
+.fstat-row { display: flex; align-items: baseline; gap: 6px; margin-top: 2px; }
 .fstat-value {
-  font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;
+  font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;
   transition: transform 0.3s, color 0.3s;
 }
 .fstat-value.counting { transform: scale(1.15); color: var(--blue); }
 .fstat-unit { font-size: 11px; color: var(--text-tertiary); }
-.fstat-bar { height: 4px; background: rgba(0,0,0,0.04); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.fstat-bar { height: 3px; background: rgba(0,0,0,0.04); border-radius: 2px; margin-top: 4px; overflow: hidden; }
 .fstat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.25,0.1,0.25,1); }
 .fstat.pulse { animation: statPulse 0.6s ease; }
 @keyframes statPulse {
@@ -266,12 +266,12 @@ body {
 
 /* ── SYSTEM STATS PANEL ── */
 .sys-stats-panel {
-  display: flex; gap: 8px; padding: 8px 12px;
+  display: flex; gap: 6px; padding: 4px 10px;
   background: linear-gradient(135deg, var(--bg) 0%, rgba(0,122,255,0.03) 100%);
 }
 .sys-stat-card {
   flex: 1; background: var(--bg-white); border-radius: 10px;
-  padding: 8px 10px; box-shadow: var(--shadow-sm);
+  padding: 4px 8px; box-shadow: var(--shadow-sm);
   border: 0.5px solid var(--border);
   min-width: 80px;
 }
@@ -282,8 +282,8 @@ body {
 }
 .sys-stat-icon { font-size: 12px; }
 .sys-stat-value {
-  font-size: 14px; font-weight: 700; color: var(--text);
-  margin: 4px 0;
+  font-size: 12px; font-weight: 700; color: var(--text);
+  margin: 2px 0;
 }
 .sys-stat-bar {
   height: 4px; background: rgba(0,0,0,0.05); border-radius: 2px; overflow: hidden;
@@ -997,8 +997,8 @@ body {
 /* ── HERO BANNER ── */
 .hero-banner {
   position: relative; overflow: hidden;
-  padding: 24px 20px; margin: 0 14px 0; flex-shrink: 0;
-  border-radius: var(--radius); min-height: 90px;
+  padding: 14px 16px; margin: 0 14px 0; flex-shrink: 0;
+  border-radius: var(--radius); min-height: 56px;
   background: linear-gradient(-45deg, #007aff, #5856d6, #af52de, #ff2d55, #ff9500, #34c759);
   background-size: 400% 400%;
   animation: heroGradient 12s ease infinite;
@@ -1050,7 +1050,7 @@ body {
 /* ── ACTIVITY TICKER ── */
 .activity-ticker {
   position: relative; overflow: hidden; flex-shrink: 0;
-  height: 32px; background: var(--bg-white);
+  height: 24px; background: var(--bg-white);
   border-top: 0.5px solid var(--border);
   border-bottom: 0.5px solid var(--border);
 }
@@ -2236,7 +2236,34 @@ class OfficeMap {
         }
       }
 
-    // 3. Draw characters on top of everything
+    // 3. Energy lines between busy agents
+    const busySprites = Object.entries(this.sprites).filter(([id])=>(agentMap[id]||{}).status==='busy');
+    if (busySprites.length>=2) {
+      for (let i=0;i<busySprites.length;i++) for (let j=i+1;j<busySprites.length;j++) {
+        const [,s1]=busySprites[i], [,s2]=busySprites[j];
+        const dx=s2.x-s1.x, dy=s2.y-s1.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if (dist<this.canvas.width*0.6) {
+          const fade=1-dist/(this.canvas.width*0.6);
+          const pulse=0.12+0.08*Math.sin(this.tick*0.05);
+          // Dashed energy line
+          ctx.save(); ctx.setLineDash([4,6]);
+          ctx.lineDashOffset = -this.tick*0.8;
+          ctx.strokeStyle=`rgba(0,122,255,${pulse*fade})`;
+          ctx.lineWidth=1.5*fade;
+          ctx.beginPath(); ctx.moveTo(s1.x,s1.y); ctx.lineTo(s2.x,s2.y); ctx.stroke();
+          ctx.setLineDash([]);
+          // Traveling data dot
+          const t=(this.tick*0.015)%1;
+          const dotX=s1.x+dx*t, dotY=s1.y+dy*t;
+          ctx.beginPath(); ctx.arc(dotX,dotY,2.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(0,122,255,${0.5*fade})`; ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+
+    // 4. Draw characters on top of everything
     Object.entries(this.sprites).forEach(([id,sp]) => {
       const status = (agentMap[id]||{}).status||'offline';
       const bobY = Math.sin(this.tick*(status==='busy'?0.12:status==='idle'?0.06:0.03))*(status==='busy'?4:status==='idle'?2.5:1.5);
@@ -2244,6 +2271,26 @@ class OfficeMap {
       const frame = status==='busy' ? (Math.floor(this.tick/15)%2) : 0;
       this._drawChar(sp.x+bobX, sp.y+bobY, id, status, sp.dir, frame);
     });
+
+    // 5. Footstep dust for walking (busy) agents
+    Object.entries(this.sprites).forEach(([id,sp]) => {
+      if ((agentMap[id]||{}).status==='busy' && Math.floor(this.tick/15)%2===0 && this.tick%8===0) {
+        if (!this._dustParticles) this._dustParticles = [];
+        this._dustParticles.push({
+          x:sp.x, y:sp.y+2, vx:(Math.random()-0.5)*0.6, vy:-Math.random()*0.3-0.1,
+          life:20, maxLife:20, r:1.5+Math.random()
+        });
+      }
+    });
+    if (this._dustParticles) {
+      this._dustParticles = this._dustParticles.filter(d=>{
+        d.x+=d.vx; d.y+=d.vy; d.life--;
+        const da=d.life/d.maxLife*0.3;
+        ctx.beginPath(); ctx.arc(d.x,d.y,d.r*d.life/d.maxLife,0,Math.PI*2);
+        ctx.fillStyle=isDarkMode()?`rgba(200,200,200,${da})`:`rgba(120,120,120,${da})`; ctx.fill();
+        return d.life>0;
+      });
+    }
   }
 
   _drawRoom(col, row, id) {
@@ -2344,6 +2391,17 @@ class OfficeMap {
       const flicker = 0.15+0.1*Math.sin(tick*0.2);
       ctx.fillStyle = `rgba(255,255,255,${flicker})`;
       this._roundRect(ctx, mx+1, my+1, mw-2, mh-2, 2); ctx.fill();
+      // Scrolling code lines on monitor
+      ctx.save();
+      this._roundRect(ctx, mx+1, my+1, mw-2, mh-2, 2); ctx.clip();
+      const lnH=1.5, lnGap=2.5;
+      for (let li=0;li<5;li++) {
+        const lny = my+1.5+li*(lnH+lnGap)+((tick*0.4)%(lnH+lnGap));
+        const lnw = (mw-4)*(0.3+0.6*Math.abs(Math.sin(tick*0.02+li*1.7)));
+        ctx.fillStyle = pal.accent+'66';
+        ctx.fillRect(mx+2, lny, lnw, lnH);
+      }
+      ctx.restore();
     }
     ctx.strokeStyle = a.status==='busy' ? pal.accent+'66' : isDarkMode() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; ctx.lineWidth=0.5;
     this._roundRect(ctx, mx, my, mw, mh, 3); ctx.stroke();
@@ -2355,6 +2413,32 @@ class OfficeMap {
     // Stand
     ctx.fillStyle = isDarkMode() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     ctx.fillRect(mx+mw/2-2, my+mh, 4, 4);
+
+    // Coffee mug on desk for idle agents
+    if (a.status==='idle') {
+      const cupX=dx2+dw+S*0.2, cupY=dy2-S*0.7, cupW=S*1, cupH=S*0.8;
+      ctx.fillStyle = isDarkMode()?'rgba(180,140,100,0.45)':'rgba(139,90,43,0.3)';
+      ctx.fillRect(cupX,cupY,cupW,cupH);
+      ctx.strokeStyle = isDarkMode()?'rgba(180,140,100,0.45)':'rgba(139,90,43,0.3)';
+      ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.arc(cupX+cupW+S*0.12,cupY+cupH*0.4,S*0.2,-Math.PI/2,Math.PI/2); ctx.stroke();
+      for (let si=0;si<2;si++) {
+        const stX=cupX+cupW*0.3+si*cupW*0.4;
+        const stP=tick*0.06+si*2;
+        ctx.strokeStyle = isDarkMode()?'rgba(200,200,200,0.15)':'rgba(0,0,0,0.06)';
+        ctx.lineWidth=0.6;
+        ctx.beginPath(); ctx.moveTo(stX,cupY);
+        ctx.quadraticCurveTo(stX+Math.sin(stP)*S*0.25,cupY-S*0.4,stX,cupY-S*0.8);
+        ctx.stroke();
+      }
+    }
+
+    // Small plant on desk for all agents
+    const plX=dx2+dw-S*0.5, plY=dy2-S*0.3;
+    ctx.fillStyle = isDarkMode()?'rgba(60,90,60,0.35)':'rgba(34,139,34,0.2)';
+    ctx.beginPath(); ctx.arc(plX,plY-S*0.3,S*0.35,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = isDarkMode()?'rgba(100,70,40,0.3)':'rgba(139,90,43,0.15)';
+    ctx.fillRect(plX-S*0.15,plY,S*0.3,S*0.25);
 
     // LED — always animated with ring pulse
     const lx=x+W-gap-14, ly=y+gap+14;
@@ -2549,23 +2633,96 @@ class OfficeMap {
       ctx.fillRect(px+c*S,py+r*S,S,S);
     }
 
-    // Busy dots — bouncing thought bubbles
-    if (status==='busy') for (let i=0;i<3;i++) {
-      const bounce = Math.abs(Math.sin(tick*0.15+i*1.8))*S*1.2;
-      const dotR = S*0.4 + Math.sin(tick*0.1+i)*S*0.1;
-      ctx.fillStyle = pal.accent;
-      ctx.beginPath(); ctx.arc(px+(1+i)*S+S/2, py-S*1.5-bounce, dotR, 0, Math.PI*2); ctx.fill();
-      // Dot glow
-      ctx.beginPath(); ctx.arc(px+(1+i)*S+S/2, py-S*1.5-bounce, dotR*2.5, 0, Math.PI*2);
-      ctx.fillStyle = pal.accent+'22'; ctx.fill();
+    // ── Status aura under character ──
+    if (status!=='offline') {
+      const auraR = PW*0.6 + Math.sin(tick*0.04)*S;
+      const auraA = status==='busy' ? 0.15+0.05*Math.sin(tick*0.06) : 0.08;
+      const aura = ctx.createRadialGradient(cx,cy,0,cx,cy,auraR);
+      aura.addColorStop(0, pal.accent+Math.round(auraA*255).toString(16).padStart(2,'0'));
+      aura.addColorStop(1,'transparent');
+      ctx.fillStyle = aura;
+      ctx.beginPath(); ctx.arc(cx,cy,auraR,0,Math.PI*2); ctx.fill();
     }
-    // Idle sparkle
-    if (status==='idle' && tick%40<8) {
-      const sx=cx+S*2, sy=cy-PH-S;
-      const sp=Math.sin(tick*0.3)*S*0.4+S*0.5;
-      ctx.strokeStyle=pal.accent+'88'; ctx.lineWidth=1.2;
-      ctx.beginPath(); ctx.moveTo(sx,sy-sp); ctx.lineTo(sx,sy+sp); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(sx-sp,sy); ctx.lineTo(sx+sp,sy); ctx.stroke();
+
+    // ── BUSY: thought dots + orbiting particles + floating code symbols ──
+    if (status==='busy') {
+      // Bouncing thought bubbles
+      for (let i=0;i<3;i++) {
+        const bounce = Math.abs(Math.sin(tick*0.15+i*1.8))*S*1.2;
+        const dotR = S*0.4 + Math.sin(tick*0.1+i)*S*0.1;
+        ctx.fillStyle = pal.accent;
+        ctx.beginPath(); ctx.arc(px+(1+i)*S+S/2, py-S*1.5-bounce, dotR, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(px+(1+i)*S+S/2, py-S*1.5-bounce, dotR*2.5, 0, Math.PI*2);
+        ctx.fillStyle = pal.accent+'22'; ctx.fill();
+      }
+      // Orbiting energy particles
+      for (let i=0;i<4;i++) {
+        const angle = tick*0.06 + i*Math.PI/2;
+        const orbitR = PW*0.55 + Math.sin(tick*0.03)*S*0.3;
+        const ox = cx + Math.cos(angle)*orbitR;
+        const oy = cy - PH*0.45 + Math.sin(angle)*orbitR*0.4;
+        const oR = S*0.22+Math.sin(tick*0.12+i)*S*0.08;
+        ctx.beginPath(); ctx.arc(ox,oy,oR,0,Math.PI*2);
+        ctx.fillStyle = pal.accent; ctx.fill();
+        const tx = cx + Math.cos(angle-0.5)*orbitR;
+        const ty = cy - PH*0.45 + Math.sin(angle-0.5)*orbitR*0.4;
+        ctx.beginPath(); ctx.arc(tx,ty,oR*0.5,0,Math.PI*2);
+        ctx.fillStyle = pal.accent+'44'; ctx.fill();
+      }
+      // Floating code symbols rising up
+      const syms = ['{','}','<','>','/',';','=','()'];
+      for (let i=0;i<3;i++) {
+        const floatY = ((tick*0.8+i*40)%80);
+        const fa = floatY<60 ? 0.35 : 0.35*(1-(floatY-60)/20);
+        const fx = cx - PW*0.3 + i*PW*0.3 + Math.sin(tick*0.04+i*2)*S;
+        const fy = py - floatY*0.5;
+        ctx.fillStyle = pal.accent+Math.round(fa*255).toString(16).padStart(2,'0');
+        ctx.font = `600 ${Math.max(7,S-1)}px monospace`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(syms[(i+Math.floor(tick/60))%syms.length], fx, fy);
+      }
+      ctx.textAlign='left';
+    }
+
+    // ── IDLE: sparkle cross + floating steam wisps ──
+    if (status==='idle') {
+      if (tick%40<8) {
+        const sx=cx+S*2, sy=cy-PH-S;
+        const sp=Math.sin(tick*0.3)*S*0.4+S*0.5;
+        ctx.strokeStyle=pal.accent+'88'; ctx.lineWidth=1.2;
+        ctx.beginPath(); ctx.moveTo(sx,sy-sp); ctx.lineTo(sx,sy+sp); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(sx-sp,sy); ctx.lineTo(sx+sp,sy); ctx.stroke();
+      }
+      // Gentle floating wisps
+      for (let i=0;i<3;i++) {
+        const wy = ((tick*0.4+i*22)%45);
+        const wa = wy<30 ? 0.22 : 0.22*(1-(wy-30)/15);
+        const wx = cx + Math.sin(tick*0.025+i*2.5)*S*0.7;
+        const wyPos = cy - PH - S*0.3 - wy*0.35;
+        const wr = S*0.18 + wy*0.015;
+        ctx.beginPath(); ctx.arc(wx,wyPos,wr,0,Math.PI*2);
+        ctx.fillStyle = pal.accent+Math.round(wa*255).toString(16).padStart(2,'0');
+        ctx.fill();
+      }
+    }
+
+    // ── OFFLINE/INACTIVE: floating Zzz ──
+    if (status==='offline' || status==='inactive') {
+      const savedAlpha = ctx.globalAlpha;
+      ctx.globalAlpha = status==='offline' ? 0.5 : 0.7;
+      const zChars = ['Z','z','z'];
+      for (let i=0;i<3;i++) {
+        const zy = ((tick*0.3+i*18)%42);
+        const za = zy<28 ? 0.5 : 0.5*(1-(zy-28)/14);
+        const zx = cx + S*(0.3+i*0.7) + Math.sin(tick*0.02+i)*S*0.3;
+        const zyP = py - S*0.3 - zy*0.4;
+        ctx.fillStyle = pal.body+Math.round(za*255).toString(16).padStart(2,'0');
+        ctx.font = `700 ${Math.max(7,S-i*2)}px Inter,-apple-system,sans-serif`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(zChars[i], zx, zyP);
+      }
+      ctx.textAlign='left';
+      ctx.globalAlpha = savedAlpha;
     }
 
     // Name
