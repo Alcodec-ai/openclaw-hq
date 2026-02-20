@@ -1213,6 +1213,10 @@ body {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       Calendar
     </button>
+    <button class="nav-btn" id="nav-cron" onclick="switchView('cron')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Cron
+    </button>
   </div>
   <div class="topbar-right">
     <span id="topbar-meta"></span>
@@ -1309,6 +1313,47 @@ body {
     </div>
     <div class="cal-grid-wrap">
       <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </div>
+
+  <!-- CRON VIEW -->
+  <div id="view-cron" class="view-container">
+    <div class="section-header">
+      <h2>Scheduled Tasks (Cron)</h2>
+      <button class="btn-action primary" onclick="openCronModal()">+ New Cron Job</button>
+    </div>
+    <div id="cron-list"></div>
+  </div>
+</div>
+
+<!-- CRON MODAL -->
+<div class="modal-overlay" id="cron-modal" onclick="if(event.target===this)closeCronModal()">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span>Add Cron Job</span>
+      <button onclick="closeCronModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <label>Agent</label>
+      <select id="cron-agent">
+        <option value="dona">Dona</option>
+        <option value="nova">Nova</option>
+        <option value="raven">Raven</option>
+        <option value="jack">Jack</option>
+        <option value="tom">Tom</option>
+        <option value="joey">Joey (main)</option>
+      </select>
+      <label>Name</label>
+      <input type="text" id="cron-name" placeholder="e.g., Daily news summary">
+      <label>Schedule (cron)</label>
+      <input type="text" id="cron-schedule" placeholder="30 8 * * *">
+      <small style="color:#888">Format: minute hour day month weekday</small>
+      <label>Message</label>
+      <textarea id="cron-message" placeholder="What should the agent do?"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action secondary" onclick="closeCronModal()">Cancel</button>
+      <button class="btn-action primary" onclick="saveCronJob()">Save</button>
     </div>
   </div>
 </div>
@@ -3660,6 +3705,79 @@ initHeroParticles();
   document.getElementById('task-form').style.display=curTab==='task'?'block':'none';
 })();
 setInterval(fetchStatus,10000); setInterval(fetchAgents,10000); setInterval(fetchSys,30000);
+
+// ── CRON FUNCTIONS ──
+async function fetchCronJobs() {
+  try {
+    const resp = await fetch('/api/cron');
+    const jobs = await resp.json();
+    const container = document.getElementById('cron-list');
+    if (!jobs || jobs.length === 0) {
+      container.innerHTML = '<p style="color:#888;padding:20px">No cron jobs. Click "+ New Cron Job" to add one.</p>';
+      return;
+    }
+    let html = '<div class="card-grid">';
+    for (const job of jobs) {
+      const enabled = job.enabled !== false;
+      const state = job.state || {};
+      html += `<div class="card ${enabled?'':'card-disabled'}">
+        <div class="card-header">
+          <strong>${job.name}</strong>
+          <span class="badge ${enabled?'badge-ok':'badge-off'}">${enabled?'Active':'Disabled'}</span>
+        </div>
+        <div class="card-body">
+          <p><strong>Agent:</strong> ${job.agentId}</p>
+          <p><strong>Schedule:</strong> ${job.schedule?.expr || job.schedule}</p>
+          <p><strong>Message:</strong> ${job.payload?.message || '-'}</p>
+          <p><small>Next: ${state.nextRunAtMs ? new Date(state.nextRunAtMs).toLocaleString('tr-TR'):'N/A'}</small></p>
+        </div>
+        <div class="card-footer">
+          <button class="btn-sm" onclick="toggleCron('${job.id}')">${enabled?'Disable':'Enable'}</button>
+          <button class="btn-sm danger" onclick="deleteCron('${job.id}')">Delete</button>
+        </div>
+      </div>`;
+    }
+    container.innerHTML = html + '</div>';
+  } catch(e) { console.error(e); }
+}
+function openCronModal() { document.getElementById('cron-modal').style.display='flex'; }
+function closeCronModal() { document.getElementById('cron-modal').style.display='none'; }
+async function saveCronJob() {
+  const agent = document.getElementById('cron-agent').value;
+  const name = document.getElementById('cron-name').value;
+  const schedule = document.getElementById('cron-schedule').value;
+  const message = document.getElementById('cron-message').value;
+  if (!agent || !name || !schedule) { alert('Please fill all fields'); return; }
+  try {
+    const resp = await fetch('/api/cron', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({agent, name, schedule, message})
+    });
+    if (resp.ok) { closeCronModal(); fetchCronJobs(); }
+    else { alert('Error creating cron job'); }
+  } catch(e) { alert(e); }
+}
+async function toggleCron(id) {
+  try {
+    await fetch(`/api/cron/${id}/toggle`, {method:'POST'});
+    fetchCronJobs();
+  } catch(e) { alert(e); }
+}
+async function deleteCron(id) {
+  if(!confirm('Delete this cron job?')) return;
+  try {
+    await fetch(`/api/cron/${id}/delete`, {method:'POST'});
+    fetchCronJobs();
+  } catch(e) { alert(e); }
+}
+
+// Override switchView to load cron
+const _origSwitchView = switchView;
+switchView = function(name) {
+  _origSwitchView(name);
+  if (name === 'cron') fetchCronJobs();
+};
 </script>
 </body>
 </html>
