@@ -22,6 +22,7 @@ AGENTS_DIR = Path.home() / '.openclaw' / 'agents'
 HQ_DIR = Path.home() / '.openclaw' / 'hq'
 TASKS_PATH = HQ_DIR / 'tasks.json'
 CALENDAR_PATH = HQ_DIR / 'calendar.json'
+HQ_SETTINGS_PATH = HQ_DIR / 'settings.json'
 
 PROFILE_FILES = ['IDENTITY.md', 'SOUL.md', 'MEMORY.md', 'TOOLS.md']
 
@@ -82,6 +83,27 @@ def load_calendar():
 def save_calendar(data):
     _ensure_hq()
     CALENDAR_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+HQ_SETTINGS_DEFAULTS = {
+    'greetingName': 'Commander',
+    'welcomeMessage': '',
+}
+
+
+def load_hq_settings():
+    _ensure_hq()
+    try:
+        data = json.loads(HQ_SETTINGS_PATH.read_text())
+        merged = {**HQ_SETTINGS_DEFAULTS, **data}
+        return merged
+    except Exception:
+        return dict(HQ_SETTINGS_DEFAULTS)
+
+
+def save_hq_settings(data):
+    _ensure_hq()
+    HQ_SETTINGS_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 
 def run_cmd(cmd, timeout=10):
@@ -1138,6 +1160,24 @@ def api_agent_profile_save(agent_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     return jsonify({'ok': True, 'filename': filename})
+
+
+## ── HQ SETTINGS ENDPOINTS ──
+
+@app.route('/api/hq/settings')
+def api_hq_settings():
+    return jsonify(load_hq_settings())
+
+
+@app.route('/api/hq/settings', methods=['POST'])
+def api_hq_settings_save():
+    body = request.get_json() or {}
+    data = load_hq_settings()
+    for key in ('greetingName', 'welcomeMessage'):
+        if key in body:
+            data[key] = str(body[key]).strip()
+    save_hq_settings(data)
+    return jsonify(data)
 
 
 def _parse_log_line(line):

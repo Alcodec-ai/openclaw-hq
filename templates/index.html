@@ -1369,6 +1369,29 @@ body {
   </div>
   <div id="idr-body">
 
+    <!-- HQ Personalization -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F44B;</span> Personalization</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Greeting Name</div>
+          <div class="setting-sublabel">Hero banner'da gorunen isim</div>
+        </div>
+        <input class="setting-input" id="hq-greeting-name" placeholder="Commander" style="width:140px">
+      </div>
+      <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:8px">
+        <div>
+          <div class="setting-label">Welcome Message</div>
+          <div class="setting-sublabel">Bos birakirsan otomatik durum mesaji gosterilir</div>
+        </div>
+        <input class="setting-input" id="hq-welcome-msg" placeholder="e.g. Welcome to HQ!" style="width:100%">
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <button class="btn-action primary" onclick="saveHqSettings()">Save</button>
+      </div>
+      <div class="settings-status" id="hq-settings-status"></div>
+    </div>
+
     <!-- Gateway Control -->
     <div class="settings-group">
       <div class="sg-title"><span class="sg-icon">&#x26A1;</span> Gateway</div>
@@ -2454,6 +2477,7 @@ async function fetchSettings() {
     renderSettingsPanel();
     fetchProviders();
     fetchBackupStatus();
+    fetchHqSettings();
   } catch(e) {}
 }
 
@@ -3508,6 +3532,33 @@ function initHeroParticles() {
   draw();
 }
 
+/* ── HQ SETTINGS ── */
+let hqSettings = { greetingName: 'Commander', welcomeMessage: '' };
+
+async function fetchHqSettings() {
+  try {
+    hqSettings = await (await fetch('/api/hq/settings')).json();
+    const nameInput = document.getElementById('hq-greeting-name');
+    const msgInput = document.getElementById('hq-welcome-msg');
+    if (nameInput) nameInput.value = hqSettings.greetingName || '';
+    if (msgInput) msgInput.value = hqSettings.welcomeMessage || '';
+  } catch(e) {}
+}
+
+async function saveHqSettings() {
+  const name = document.getElementById('hq-greeting-name').value.trim();
+  const msg = document.getElementById('hq-welcome-msg').value.trim();
+  try {
+    const r = await fetch('/api/hq/settings', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ greetingName: name || 'Commander', welcomeMessage: msg })
+    });
+    hqSettings = await r.json();
+    showToast('Settings saved', 'success');
+    updateHero(Object.values(agentMap));
+  } catch(e) { showToast('Failed to save settings', 'error'); }
+}
+
 /* ── HERO STATUS UPDATE ── */
 function updateHero(agents) {
   const active = agents.filter(a => a.status === 'busy' || a.status === 'idle').length;
@@ -3517,8 +3568,10 @@ function updateHero(agents) {
   const now = new Date();
   const hour = now.getHours();
   let greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-  if (titleEl) titleEl.textContent = `${greeting}, Commander`;
-  if (subEl) subEl.textContent = `${active}/${total} agents active \u2022 ${now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}`;
+  const name = hqSettings.greetingName || 'Commander';
+  if (titleEl) titleEl.textContent = `${greeting}, ${name}`;
+  const customMsg = hqSettings.welcomeMessage;
+  if (subEl) subEl.textContent = customMsg || `${active}/${total} agents active \u2022 ${now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}`;
 }
 
 /* ── ACTIVITY TICKER ── */
@@ -3600,6 +3653,7 @@ document.getElementById('task-form').style.display='none';
 initHeroParticles();
 
 (async()=>{
+  await fetchHqSettings();
   await fetchStatus(); await fetchAgents(); fetchSys(); fetchLogs(); startSSE();
   fetchAvailableModels();
   fetchAvailablePlatforms();
