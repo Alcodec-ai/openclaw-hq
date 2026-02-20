@@ -19,6 +19,12 @@ CONFIG_PATH = Path.home() / '.openclaw' / 'openclaw.json'
 LOG_DIR = Path('/tmp/openclaw')
 AGENTS_DIR = Path.home() / '.openclaw' / 'agents'
 
+HQ_DIR = Path.home() / '.openclaw' / 'hq'
+TASKS_PATH = HQ_DIR / 'tasks.json'
+CALENDAR_PATH = HQ_DIR / 'calendar.json'
+
+PROFILE_FILES = ['IDENTITY.md', 'SOUL.md', 'MEMORY.md', 'TOOLS.md']
+
 _backup_timer = None
 _backup_lock = threading.Lock()
 
@@ -46,6 +52,36 @@ def load_config():
 
 def save_config(cfg):
     CONFIG_PATH.write_text(json.dumps(cfg, indent=2, ensure_ascii=False))
+
+
+def _ensure_hq():
+    HQ_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def load_tasks():
+    _ensure_hq()
+    try:
+        return json.loads(TASKS_PATH.read_text())
+    except Exception:
+        return {'tasks': [], 'nextId': 1}
+
+
+def save_tasks(data):
+    _ensure_hq()
+    TASKS_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def load_calendar():
+    _ensure_hq()
+    try:
+        return json.loads(CALENDAR_PATH.read_text())
+    except Exception:
+        return {'events': [], 'nextId': 1}
+
+
+def save_calendar(data):
+    _ensure_hq()
+    CALENDAR_PATH.write_text(json.dumps(data, indent=2, ensure_ascii=False))
 
 
 def run_cmd(cmd, timeout=10):
@@ -906,6 +942,202 @@ def api_task():
         timeout=60,
     )
     return jsonify({'output': output[:2000], 'ok': True})
+
+
+## ── TASK MANAGER ENDPOINTS ──
+
+@app.route('/api/tasks')
+def api_tasks():
+    data = load_tasks()
+    tasks = data.get('tasks', [])
+    agent = request.args.get('agent', '')
+    status = request.args.get('status', '')
+    priority = request.args.get('priority', '')
+    if agent:
+        tasks = [t for t in tasks if t.get('assignedTo') == agent]
+    if status:
+        tasks = [t for t in tasks if t.get('status') == status]
+    if priority:
+        tasks = [t for t in tasks if t.get('priority') == priority]
+    return jsonify(tasks)
+
+
+@app.route('/api/tasks', methods=['POST'])
+def api_tasks_create():
+    body = request.get_json() or {}
+    title = body.get('title', '').strip()
+    if not title:
+        return jsonify({'error': 'title required'}), 400
+    data = load_tasks()
+    tid = f"t_{data['nextId']}"
+    now = datetime.now().isoformat(timespec='seconds')
+    task = {
+        'id': tid,
+        'title': title,
+        'description': body.get('description', '').strip(),
+        'assignedTo': body.get('assignedTo', ''),
+        'createdBy': body.get('createdBy', 'user'),
+        'priority': body.get('priority', 'medium'),
+        'status': 'pending',
+        'createdAt': now,
+        'updatedAt': now,
+        'dueDate': body.get('dueDate') or None,
+        'completedAt': None,
+    }
+    data['tasks'].append(task)
+    data['nextId'] += 1
+    save_tasks(data)
+    return jsonify(task)
+
+
+@app.route('/api/tasks/<tid>/update', methods=['POST'])
+def api_tasks_update(tid):
+    body = request.get_json() or {}
+    data = load_tasks()
+    task = next((t for t in data['tasks'] if t['id'] == tid), None)
+    if not task:
+        return jsonify({'error': 'task not found'}), 404
+    for key in ('title', 'description', 'assignedTo', 'priority', 'status', 'dueDate'):
+        if key in body:
+            task[key] = body[key]
+    now = datetime.now().isoformat(timespec='seconds')
+    task['updatedAt'] = now
+    if task.get('status') == 'completed' and not task.get('completedAt'):
+        task['completedAt'] = now
+    elif task.get('status') != 'completed':
+        task['completedAt'] = None
+    save_tasks(data)
+    return jsonify(task)
+
+
+@app.route('/api/tasks/<tid>/delete', methods=['POST'])
+def api_tasks_delete(tid):
+    data = load_tasks()
+    before = len(data['tasks'])
+    data['tasks'] = [t for t in data['tasks'] if t['id'] != tid]
+    if len(data['tasks']) == before:
+        return jsonify({'error': 'task not found'}), 404
+    save_tasks(data)
+    return jsonify({'ok': True})
+
+
+@app.route('/api/tasks/stats')
+def api_tasks_stats():
+    data = load_tasks()
+    tasks = data.get('tasks', [])
+    stats = {'total': len(tasks), 'pending': 0, 'in_progress': 0, 'completed': 0, 'byAgent': {}}
+    for t in tasks:
+        s = t.get('status', 'pending')
+        if s in stats:
+            stats[s] += 1
+        agent = t.get('assignedTo', '')
+        if agent:
+            if agent not in stats['byAgent']:
+                stats['byAgent'][agent] = {'total': 0, 'pending': 0, 'in_progress': 0, 'completed': 0}
+            stats['byAgent'][agent]['total'] += 1
+            if s in stats['byAgent'][agent]:
+                stats['byAgent'][agent][s] += 1
+    return jsonify(stats)
+
+
+## ── CALENDAR ENDPOINTS ──
+
+@app.route('/api/calendar')
+def api_calendar():
+    data = load_calendar()
+    events = data.get('events', [])
+    month = request.args.get('month', '')
+    agent = request.args.get('agent', '')
+    if month:
+        events = [e for e in events if e.get('date', '').startswith(month)]
+    if agent:
+        events = [e for e in events if e.get('agentId') in (agent, 'all')]
+    return jsonify(events)
+
+
+@app.route('/api/calendar', methods=['POST'])
+def api_calendar_create():
+    body = request.get_json() or {}
+    title = body.get('title', '').strip()
+    date = body.get('date', '').strip()
+    if not title or not date:
+        return jsonify({'error': 'title and date required'}), 400
+    data = load_calendar()
+    eid = f"e_{data['nextId']}"
+    now = datetime.now().isoformat(timespec='seconds')
+    event = {
+        'id': eid,
+        'title': title,
+        'description': body.get('description', '').strip(),
+        'date': date,
+        'time': body.get('time', '').strip() or '00:00',
+        'agentId': body.get('agentId', 'all'),
+        'type': body.get('type', 'reminder'),
+        'createdBy': body.get('createdBy', 'user'),
+        'createdAt': now,
+    }
+    data['events'].append(event)
+    data['nextId'] += 1
+    save_calendar(data)
+    return jsonify(event)
+
+
+@app.route('/api/calendar/<eid>/update', methods=['POST'])
+def api_calendar_update(eid):
+    body = request.get_json() or {}
+    data = load_calendar()
+    event = next((e for e in data['events'] if e['id'] == eid), None)
+    if not event:
+        return jsonify({'error': 'event not found'}), 404
+    for key in ('title', 'description', 'date', 'time', 'agentId', 'type'):
+        if key in body:
+            event[key] = body[key]
+    save_calendar(data)
+    return jsonify(event)
+
+
+@app.route('/api/calendar/<eid>/delete', methods=['POST'])
+def api_calendar_delete(eid):
+    data = load_calendar()
+    before = len(data['events'])
+    data['events'] = [e for e in data['events'] if e['id'] != eid]
+    if len(data['events']) == before:
+        return jsonify({'error': 'event not found'}), 404
+    save_calendar(data)
+    return jsonify({'ok': True})
+
+
+## ── AGENT PROFILE ENDPOINTS ──
+
+@app.route('/api/agent/<agent_id>/profile')
+def api_agent_profile(agent_id):
+    agent_dir = AGENTS_DIR / agent_id / 'agent'
+    result = {}
+    for fname in PROFILE_FILES:
+        fpath = agent_dir / fname
+        try:
+            result[fname] = fpath.read_text()
+        except Exception:
+            result[fname] = ''
+    return jsonify(result)
+
+
+@app.route('/api/agent/<agent_id>/profile', methods=['POST'])
+def api_agent_profile_save(agent_id):
+    body = request.get_json() or {}
+    filename = body.get('filename', '')
+    content = body.get('content', '')
+    if filename not in PROFILE_FILES:
+        return jsonify({'error': 'invalid filename'}), 400
+    agent_dir = AGENTS_DIR / agent_id / 'agent'
+    if not agent_dir.is_dir():
+        return jsonify({'error': 'agent directory not found'}), 404
+    fpath = agent_dir / filename
+    try:
+        fpath.write_text(content)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    return jsonify({'ok': True, 'filename': filename})
 
 
 def _parse_log_line(line):

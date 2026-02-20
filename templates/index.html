@@ -822,6 +822,240 @@ body {
 }
 
 [data-theme="dark"] .dir-overlay { background: rgba(0,0,0,0.5); }
+
+/* ── NAV BUTTONS ── */
+.nav-btns { display: flex; gap: 4px; margin-left: 8px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(0,0,0,0.04); border: none; color: var(--text-secondary);
+  padding: 6px 12px; border-radius: var(--radius-xs);
+  cursor: pointer; font-size: 11px; font-family: inherit; font-weight: 500;
+  transition: all 0.2s;
+}
+.nav-btn:hover { background: rgba(0,0,0,0.07); color: var(--text); }
+.nav-btn.active { background: var(--blue); color: white; }
+[data-theme="dark"] .nav-btn { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .nav-btn:hover { background: rgba(255,255,255,0.08); }
+[data-theme="dark"] .nav-btn.active { background: var(--blue); color: white; }
+
+/* ── VIEW CONTAINERS ── */
+.view-container { display: none; flex-direction: column; height: 100%; }
+.view-container.active { display: flex; }
+#view-office.active { display: flex; flex-direction: column; height: 100%; }
+
+/* ── TASK MANAGER ── */
+.task-filters {
+  display: flex; gap: 6px; padding: 12px 14px; flex-shrink: 0;
+  flex-wrap: wrap; align-items: center;
+}
+.filter-pill {
+  padding: 5px 12px; border-radius: 16px; font-size: 11px; font-weight: 500;
+  background: rgba(0,0,0,0.04); color: var(--text-secondary);
+  border: none; cursor: pointer; transition: all 0.15s; font-family: inherit;
+}
+.filter-pill:hover { background: rgba(0,0,0,0.07); }
+.filter-pill.active { background: var(--blue); color: white; }
+.filter-sep { width: 1px; height: 20px; background: var(--border-strong); margin: 0 4px; }
+[data-theme="dark"] .filter-pill { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .filter-pill:hover { background: rgba(255,255,255,0.08); }
+[data-theme="dark"] .filter-pill.active { background: var(--blue); color: white; }
+
+.task-content { flex: 1; overflow-y: auto; padding: 0 14px 14px; }
+
+.task-section-hdr {
+  display: flex; align-items: center; gap: 8px; margin: 12px 0 8px;
+  cursor: pointer; user-select: none;
+}
+.task-section-hdr .tsh-icon { font-size: 10px; color: var(--text-tertiary); transition: transform 0.2s; }
+.task-section-hdr .tsh-icon.collapsed { transform: rotate(-90deg); }
+.task-section-hdr .tsh-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.task-section-hdr .tsh-count { font-size: 10px; color: var(--text-tertiary); font-weight: 600; }
+
+.task-card {
+  background: var(--bg-white); border-radius: var(--radius-sm); padding: 14px 16px;
+  box-shadow: var(--shadow-sm); border: 0.5px solid var(--border);
+  margin-bottom: 8px; transition: all 0.2s; cursor: default;
+}
+.task-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.task-card-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.task-card-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.task-card-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; }
+.task-card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.priority-badge {
+  font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.priority-badge.urgent { background: rgba(255,59,48,0.1); color: var(--red); }
+.priority-badge.high { background: rgba(255,149,0,0.1); color: var(--orange); }
+.priority-badge.medium { background: rgba(0,122,255,0.08); color: var(--blue); }
+.priority-badge.low { background: rgba(0,0,0,0.04); color: var(--text-tertiary); }
+[data-theme="dark"] .priority-badge.urgent { background: rgba(255,69,58,0.15); }
+[data-theme="dark"] .priority-badge.high { background: rgba(255,159,10,0.15); }
+[data-theme="dark"] .priority-badge.medium { background: rgba(10,132,255,0.12); }
+[data-theme="dark"] .priority-badge.low { background: rgba(255,255,255,0.06); }
+
+.agent-badge-sm {
+  font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 8px;
+  background: rgba(175,82,222,0.08); color: var(--purple);
+}
+[data-theme="dark"] .agent-badge-sm { background: rgba(191,90,242,0.12); }
+
+.due-badge {
+  font-size: 9px; font-weight: 500; padding: 2px 8px; border-radius: 8px;
+  background: rgba(0,0,0,0.03); color: var(--text-tertiary);
+}
+.due-badge.overdue { background: rgba(255,59,48,0.08); color: var(--red); }
+[data-theme="dark"] .due-badge { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .due-badge.overdue { background: rgba(255,69,58,0.12); }
+
+.task-card-actions { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
+.task-action-btn {
+  background: rgba(0,0,0,0.03); border: none; cursor: pointer;
+  font-size: 11px; padding: 4px 8px; border-radius: 6px;
+  color: var(--text-tertiary); transition: all 0.15s; font-family: inherit;
+}
+.task-action-btn:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+.task-action-btn.complete:hover { background: rgba(52,199,89,0.1); color: var(--green); }
+.task-action-btn.delete:hover { background: rgba(255,59,48,0.08); color: var(--red); }
+[data-theme="dark"] .task-action-btn { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .task-action-btn:hover { background: rgba(255,255,255,0.08); }
+
+.task-stats-bar {
+  display: flex; gap: 8px; padding: 12px 14px; flex-shrink: 0;
+  border-top: 0.5px solid var(--border); background: var(--bg);
+}
+.task-stat-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text-secondary);
+}
+.task-stat-num { font-weight: 700; color: var(--text); }
+
+/* ── TASK/CALENDAR MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.25); backdrop-filter: blur(4px);
+}
+.modal-overlay.show { display: flex; align-items: center; justify-content: center; }
+[data-theme="dark"] .modal-overlay { background: rgba(0,0,0,0.5); }
+
+.modal-box {
+  background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-xl);
+  width: 440px; max-height: 80vh; overflow-y: auto;
+  animation: dirModalIn 0.2s ease;
+}
+.modal-box-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 0.5px solid var(--border);
+  font-size: 15px; font-weight: 600;
+}
+.modal-box-hdr button {
+  background: none; border: none; cursor: pointer; color: var(--text-tertiary);
+  font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 6px;
+  transition: all 0.15s;
+}
+.modal-box-hdr button:hover { background: var(--bg-hover); color: var(--text); }
+.modal-body { padding: 16px 20px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label {
+  display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.modal-field input, .modal-field textarea, .modal-field select {
+  width: 100%; padding: 8px 12px; border-radius: var(--radius-xs);
+  background: var(--bg); border: 0.5px solid var(--border-strong);
+  color: var(--text); font-size: 13px; font-family: inherit;
+  outline: none; transition: all 0.2s;
+}
+.modal-field textarea { resize: vertical; min-height: 60px; }
+.modal-field input:focus, .modal-field textarea:focus, .modal-field select:focus {
+  border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+}
+.modal-field select { appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+.modal-row { display: flex; gap: 10px; }
+.modal-row .modal-field { flex: 1; }
+.modal-footer { padding: 0 20px 16px; display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ── CALENDAR ── */
+.cal-header {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; flex-shrink: 0;
+}
+.cal-nav-btn {
+  background: rgba(0,0,0,0.04); border: none; cursor: pointer;
+  width: 32px; height: 32px; border-radius: var(--radius-xs);
+  font-size: 14px; color: var(--text-secondary); transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.cal-nav-btn:hover { background: rgba(0,0,0,0.07); color: var(--text); }
+[data-theme="dark"] .cal-nav-btn { background: rgba(255,255,255,0.05); }
+[data-theme="dark"] .cal-nav-btn:hover { background: rgba(255,255,255,0.08); }
+.cal-month-label { font-size: 17px; font-weight: 700; color: var(--text); flex: 1; }
+
+.cal-grid-wrap { flex: 1; overflow-y: auto; padding: 0 14px 14px; }
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px; width: 100%;
+}
+.cal-day-hdr {
+  text-align: center; font-size: 10px; font-weight: 700;
+  color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 6px 0;
+}
+.cal-day {
+  min-height: 80px; background: var(--bg-white); border-radius: var(--radius-xs);
+  padding: 6px 8px; border: 0.5px solid var(--border); transition: all 0.15s;
+  cursor: default;
+}
+.cal-day:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+.cal-day.other-month { opacity: 0.35; }
+.cal-day.today { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.cal-day-num { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.cal-day.today .cal-day-num { color: var(--blue); font-weight: 800; }
+.cal-event-pill {
+  font-size: 9px; font-weight: 500; padding: 2px 6px; border-radius: 6px;
+  margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.cal-event-pill:hover { opacity: 0.8; }
+.cal-event-pill.meeting { background: rgba(175,82,222,0.12); color: var(--purple); }
+.cal-event-pill.deadline { background: rgba(255,59,48,0.1); color: var(--red); }
+.cal-event-pill.reminder { background: rgba(0,122,255,0.08); color: var(--blue); }
+[data-theme="dark"] .cal-event-pill.meeting { background: rgba(191,90,242,0.18); }
+[data-theme="dark"] .cal-event-pill.deadline { background: rgba(255,69,58,0.15); }
+[data-theme="dark"] .cal-event-pill.reminder { background: rgba(10,132,255,0.12); }
+
+/* ── PROFILE EDITOR ── */
+.profile-section { margin-bottom: 16px; }
+.profile-section-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.profile-section-title { font-size: 12px; font-weight: 700; color: var(--text); }
+.profile-save-btn {
+  padding: 4px 12px; border-radius: 6px; border: none;
+  background: var(--blue); color: white; font-size: 10px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.profile-save-btn:hover { background: #0066d6; }
+.profile-save-btn:disabled { background: #c7c7cc; cursor: not-allowed; }
+.profile-save-btn.saved { background: var(--green); }
+.profile-textarea {
+  width: 100%; min-height: 120px; padding: 10px 12px;
+  background: var(--bg); border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius-xs); color: var(--text);
+  font-size: 11px; font-family: 'SF Mono', 'Menlo', 'Fira Code', monospace;
+  line-height: 1.6; resize: vertical; outline: none; transition: all 0.2s;
+}
+.profile-textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.12); }
+.profile-info {
+  background: var(--bg-white); border-radius: var(--radius-xs); padding: 12px 14px;
+  border: 0.5px solid var(--border); margin-top: 16px;
+}
+.profile-info-row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; color: var(--text-secondary); }
+.profile-info-row .v { color: var(--text); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -842,6 +1076,20 @@ body {
   <div class="topbar-kpis">
     <div class="kpi-pill"><div class="kpi-dot blue"></div><span>Active</span><span class="kpi-val" id="kpi-active">0</span></div>
     <div class="kpi-pill"><div class="kpi-dot green"></div><span>Sessions</span><span class="kpi-val" id="kpi-sessions">0</span></div>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn active" id="nav-office" onclick="switchView('office')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Office
+    </button>
+    <button class="nav-btn" id="nav-tasks" onclick="switchView('tasks')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Tasks
+    </button>
+    <button class="nav-btn" id="nav-calendar" onclick="switchView('calendar')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Calendar
+    </button>
   </div>
   <div class="topbar-right">
     <span id="topbar-meta"></span>
@@ -874,30 +1122,54 @@ body {
 
 <!-- MAIN AREA -->
 <div id="main-area">
-  <div id="float-stats">
-    <div class="fstat">
-      <div class="fstat-label">Active Agents</div>
-      <div class="fstat-row"><span class="fstat-value" id="fs-active">0</span><span class="fstat-unit">/ <span id="fs-total">0</span></span></div>
-      <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-active-bar" style="width:0;background:linear-gradient(90deg,#007aff,#5ac8fa)"></div></div>
+  <!-- OFFICE VIEW (default) -->
+  <div id="view-office" class="view-container active">
+    <div id="float-stats">
+      <div class="fstat">
+        <div class="fstat-label">Active Agents</div>
+        <div class="fstat-row"><span class="fstat-value" id="fs-active">0</span><span class="fstat-unit">/ <span id="fs-total">0</span></span></div>
+        <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-active-bar" style="width:0;background:linear-gradient(90deg,#007aff,#5ac8fa)"></div></div>
+      </div>
+      <div class="fstat">
+        <div class="fstat-label">Total Sessions</div>
+        <div class="fstat-row"><span class="fstat-value" id="fs-sessions">0</span><span class="fstat-unit">sessions</span></div>
+        <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-sess-bar" style="width:0;background:linear-gradient(90deg,#34c759,#30d158)"></div></div>
+      </div>
+      <div class="fstat">
+        <div class="fstat-label">Gateway</div>
+        <div class="fstat-row"><span class="fstat-value" id="fs-gw-status">--</span><span class="fstat-unit" id="fs-gw-uptime"></span></div>
+        <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-gw-bar" style="width:0;background:linear-gradient(90deg,#ff9500,#ffb340)"></div></div>
+      </div>
+      <div class="fstat">
+        <div class="fstat-label">Channels</div>
+        <div class="fstat-row"><span class="fstat-value" id="fs-channels">--</span><span class="fstat-unit" id="fs-ch-detail">running</span></div>
+        <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-ch-bar" style="width:0;background:linear-gradient(90deg,#af52de,#da8fff)"></div></div>
+      </div>
     </div>
-    <div class="fstat">
-      <div class="fstat-label">Total Sessions</div>
-      <div class="fstat-row"><span class="fstat-value" id="fs-sessions">0</span><span class="fstat-unit">sessions</span></div>
-      <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-sess-bar" style="width:0;background:linear-gradient(90deg,#34c759,#30d158)"></div></div>
-    </div>
-    <div class="fstat">
-      <div class="fstat-label">Gateway</div>
-      <div class="fstat-row"><span class="fstat-value" id="fs-gw-status">--</span><span class="fstat-unit" id="fs-gw-uptime"></span></div>
-      <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-gw-bar" style="width:0;background:linear-gradient(90deg,#ff9500,#ffb340)"></div></div>
-    </div>
-    <div class="fstat">
-      <div class="fstat-label">Channels</div>
-      <div class="fstat-row"><span class="fstat-value" id="fs-channels">--</span><span class="fstat-unit" id="fs-ch-detail">running</span></div>
-      <div class="fstat-bar"><div class="fstat-bar-fill" id="fs-ch-bar" style="width:0;background:linear-gradient(90deg,#af52de,#da8fff)"></div></div>
+    <div id="canvas-wrap">
+      <canvas id="office"></canvas>
     </div>
   </div>
-  <div id="canvas-wrap">
-    <canvas id="office"></canvas>
+
+  <!-- TASKS VIEW -->
+  <div id="view-tasks" class="view-container">
+    <div class="task-filters" id="task-filters"></div>
+    <div class="task-content" id="task-content"></div>
+    <div class="task-stats-bar" id="task-stats-bar"></div>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div id="view-calendar" class="view-container">
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="calNavMonth(-1)">&#x276E;</button>
+      <span class="cal-month-label" id="cal-month-label"></span>
+      <button class="cal-nav-btn" onclick="calNavMonth(1)">&#x276F;</button>
+      <div style="flex:1"></div>
+      <button class="btn-action primary" onclick="openCalendarModal()">+ New Event</button>
+    </div>
+    <div class="cal-grid-wrap">
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
   </div>
 </div>
 
@@ -936,6 +1208,7 @@ body {
   <div id="dp-tabs">
     <div class="dtab act" onclick="switchTab('overview')">Overview</div>
     <div class="dtab" onclick="switchTab('messages')">Messages</div>
+    <div class="dtab" onclick="switchTab('profile')">Profile</div>
     <div class="dtab" onclick="switchTab('task')">Send Task</div>
   </div>
   <div id="dp-body"></div>
@@ -1100,6 +1373,53 @@ body {
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- TASK MODAL -->
+<div class="modal-overlay" id="task-modal" onclick="if(event.target===this)closeTaskModal()">
+  <div class="modal-box">
+    <div class="modal-box-hdr"><span>New Task</span><button onclick="closeTaskModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label>Title</label><input id="tm-title" placeholder="Task title..."></div>
+      <div class="modal-field"><label>Description</label><textarea id="tm-desc" placeholder="Optional description..."></textarea></div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Assign To</label><select id="tm-agent"><option value="">Unassigned</option></select></div>
+        <div class="modal-field"><label>Priority</label>
+          <select id="tm-priority"><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="urgent">Urgent</option></select>
+        </div>
+      </div>
+      <div class="modal-field"><label>Due Date</label><input type="date" id="tm-due"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action secondary" onclick="closeTaskModal()">Cancel</button>
+      <button class="btn-action primary" onclick="createTask()">Create Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR MODAL -->
+<div class="modal-overlay" id="cal-modal" onclick="if(event.target===this)closeCalendarModal()">
+  <div class="modal-box">
+    <div class="modal-box-hdr"><span>New Event</span><button onclick="closeCalendarModal()">&times;</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label>Title</label><input id="cm-title" placeholder="Event title..."></div>
+      <div class="modal-field"><label>Description</label><textarea id="cm-desc" placeholder="Optional description..."></textarea></div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Date</label><input type="date" id="cm-date"></div>
+        <div class="modal-field"><label>Time</label><input type="time" id="cm-time" value="09:00"></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Agent</label><select id="cm-agent"><option value="all">All Agents</option></select></div>
+        <div class="modal-field"><label>Type</label>
+          <select id="cm-type"><option value="meeting">Meeting</option><option value="deadline">Deadline</option><option value="reminder" selected>Reminder</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action secondary" onclick="closeCalendarModal()">Cancel</button>
+      <button class="btn-action primary" onclick="createCalEvent()">Create Event</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ── THEME ── */
@@ -1838,10 +2158,11 @@ function closeDetail() {
 
 function switchTab(tab) {
   curTab=tab;
-  const tabs=['overview','messages','task'];
+  const tabs=['overview','messages','profile','task'];
   document.querySelectorAll('.dtab').forEach((el,i)=>el.classList.toggle('act',tabs[i]===tab));
   document.getElementById('task-form').style.display=tab==='task'?'block':'none';
-  renderDetail();
+  if (tab==='profile' && selectedId) loadProfile(selectedId);
+  else renderDetail();
 }
 
 function renderDetail() {
@@ -1891,6 +2212,8 @@ function renderDetail() {
     if (!msgs.length) { body.innerHTML='<div style="color:var(--text-tertiary);font-size:12px;padding:20px;text-align:center">No messages.</div>'; return; }
     body.innerHTML=msgs.map(m=>`<div class="mb ${m.role}"><div>${esc(m.text)}</div><div class="mb-time">${m.role.toUpperCase()} &middot; ${m.timestamp?new Date(m.timestamp).toLocaleTimeString():''}</div></div>`).join('');
     body.scrollTop=body.scrollHeight;
+  } else if (curTab==='profile') {
+    body.innerHTML='<div style="color:var(--text-tertiary);font-size:12px;padding:20px;text-align:center">Loading profile...</div>';
   } else {
     body.innerHTML='<div style="font-size:12px;color:var(--text-tertiary);padding:16px;text-align:center">Type a message below to send to this agent.</div>';
   }
@@ -2582,6 +2905,367 @@ async function createBackupDir() {
   } catch(e) {
     errEl.textContent = 'Network error';
     errEl.style.display = '';
+  }
+}
+
+/* ── VIEW SWITCHING ── */
+let currentView = 'office';
+
+function switchView(name) {
+  currentView = name;
+  document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'tasks') { loadTasks(); loadTaskStats(); }
+  if (name === 'calendar') renderCalendar();
+}
+
+/* ── TASK MANAGER ── */
+let allTasks = [];
+let taskFilterAgent = '';
+let taskFilterStatus = '';
+let taskStats = {};
+let completedCollapsed = true;
+
+function renderTaskFilters() {
+  const agents = Object.values(agentMap);
+  let html = '<button class="filter-pill ' + (!taskFilterAgent ? 'active' : '') + '" onclick="setTaskFilterAgent(\'\')">All Agents</button>';
+  agents.forEach(a => {
+    html += `<button class="filter-pill ${taskFilterAgent === a.id ? 'active' : ''}" onclick="setTaskFilterAgent('${esc(a.id)}')">${esc(a.name)}</button>`;
+  });
+  html += '<div class="filter-sep"></div>';
+  html += '<button class="filter-pill ' + (!taskFilterStatus ? 'active' : '') + '" onclick="setTaskFilterStatus(\'\')">All</button>';
+  ['pending', 'in_progress', 'completed'].forEach(s => {
+    const label = s === 'in_progress' ? 'In Progress' : s.charAt(0).toUpperCase() + s.slice(1);
+    html += `<button class="filter-pill ${taskFilterStatus === s ? 'active' : ''}" onclick="setTaskFilterStatus('${s}')">${label}</button>`;
+  });
+  html += '<div style="flex:1"></div><button class="btn-action primary" onclick="openTaskModal()">+ New Task</button>';
+  document.getElementById('task-filters').innerHTML = html;
+}
+
+function setTaskFilterAgent(a) { taskFilterAgent = a; loadTasks(); }
+function setTaskFilterStatus(s) { taskFilterStatus = s; loadTasks(); }
+
+async function loadTasks() {
+  renderTaskFilters();
+  let url = '/api/tasks?';
+  if (taskFilterAgent) url += 'agent=' + encodeURIComponent(taskFilterAgent) + '&';
+  if (taskFilterStatus) url += 'status=' + encodeURIComponent(taskFilterStatus) + '&';
+  try {
+    allTasks = await (await fetch(url)).json();
+    renderTasks();
+  } catch (e) {}
+}
+
+async function loadTaskStats() {
+  try {
+    taskStats = await (await fetch('/api/tasks/stats')).json();
+    renderTaskStatsBar();
+  } catch (e) {}
+}
+
+function renderTasks() {
+  const pending = allTasks.filter(t => t.status === 'pending');
+  const inProgress = allTasks.filter(t => t.status === 'in_progress');
+  const completed = allTasks.filter(t => t.status === 'completed');
+  let html = '';
+
+  if (pending.length || !taskFilterStatus) {
+    html += taskSectionHtml('Pending', pending.length, false);
+    html += pending.map(taskCardHtml).join('');
+  }
+  if (inProgress.length || !taskFilterStatus) {
+    html += taskSectionHtml('In Progress', inProgress.length, false);
+    html += inProgress.map(taskCardHtml).join('');
+  }
+  if (completed.length || !taskFilterStatus) {
+    html += taskSectionHtml('Completed', completed.length, true);
+    if (!completedCollapsed) html += completed.map(taskCardHtml).join('');
+  }
+
+  if (!allTasks.length) {
+    html = '<div style="text-align:center;padding:60px 20px;color:var(--text-tertiary)"><div style="font-size:32px;margin-bottom:12px">&#x2705;</div><div style="font-size:13px">No tasks yet. Create one to get started.</div></div>';
+  }
+  document.getElementById('task-content').innerHTML = html;
+}
+
+function taskSectionHtml(label, count, collapsible) {
+  const iconClass = collapsible && completedCollapsed ? 'collapsed' : '';
+  const onclick = collapsible ? 'onclick="toggleCompleted()"' : '';
+  return `<div class="task-section-hdr" ${onclick}><span class="tsh-icon ${iconClass}">&#x25BC;</span><span class="tsh-label">${label}</span><span class="tsh-count">${count}</span></div>`;
+}
+
+function toggleCompleted() { completedCollapsed = !completedCollapsed; renderTasks(); }
+
+function taskCardHtml(t) {
+  const a = agentMap[t.assignedTo];
+  const agentName = a ? a.name : (t.assignedTo || 'Unassigned');
+  let dueHtml = '';
+  if (t.dueDate) {
+    const isOverdue = new Date(t.dueDate) < new Date() && t.status !== 'completed';
+    dueHtml = `<span class="due-badge ${isOverdue ? 'overdue' : ''}">${t.dueDate}</span>`;
+  }
+  let actions = '';
+  if (t.status === 'pending') {
+    actions += `<button class="task-action-btn" onclick="updateTaskStatus('${t.id}','in_progress')">&#x25B6; Start</button>`;
+    actions += `<button class="task-action-btn complete" onclick="updateTaskStatus('${t.id}','completed')">&#x2713;</button>`;
+  } else if (t.status === 'in_progress') {
+    actions += `<button class="task-action-btn complete" onclick="updateTaskStatus('${t.id}','completed')">&#x2713; Done</button>`;
+  } else {
+    actions += `<button class="task-action-btn" onclick="updateTaskStatus('${t.id}','pending')">&#x21A9; Reopen</button>`;
+  }
+  actions += `<button class="task-action-btn delete" onclick="deleteTask('${t.id}')">&#x2715;</button>`;
+
+  return `<div class="task-card">
+    <div class="task-card-top">
+      <div class="task-card-title">${esc(t.title)}</div>
+      <div class="task-card-actions">${actions}</div>
+    </div>
+    ${t.description ? `<div class="task-card-desc">${esc(t.description)}</div>` : ''}
+    <div class="task-card-meta">
+      <span class="priority-badge ${t.priority}">${t.priority}</span>
+      <span class="agent-badge-sm">${esc(agentName)}</span>
+      ${dueHtml}
+    </div>
+  </div>`;
+}
+
+function renderTaskStatsBar() {
+  const s = taskStats;
+  document.getElementById('task-stats-bar').innerHTML = `
+    <div class="task-stat-item"><span class="task-stat-num">${s.total || 0}</span> Total</div>
+    <div class="task-stat-item"><span class="task-stat-num" style="color:var(--orange)">${s.pending || 0}</span> Pending</div>
+    <div class="task-stat-item"><span class="task-stat-num" style="color:var(--blue)">${s.in_progress || 0}</span> In Progress</div>
+    <div class="task-stat-item"><span class="task-stat-num" style="color:var(--green)">${s.completed || 0}</span> Completed</div>`;
+}
+
+function openTaskModal() {
+  const sel = document.getElementById('tm-agent');
+  sel.innerHTML = '<option value="">Unassigned</option>';
+  Object.values(agentMap).forEach(a => {
+    sel.innerHTML += `<option value="${esc(a.id)}">${esc(a.name)}</option>`;
+  });
+  document.getElementById('tm-title').value = '';
+  document.getElementById('tm-desc').value = '';
+  document.getElementById('tm-priority').value = 'medium';
+  document.getElementById('tm-due').value = '';
+  document.getElementById('task-modal').classList.add('show');
+}
+
+function closeTaskModal() { document.getElementById('task-modal').classList.remove('show'); }
+
+async function createTask() {
+  const title = document.getElementById('tm-title').value.trim();
+  if (!title) return;
+  try {
+    await fetch('/api/tasks', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        title,
+        description: document.getElementById('tm-desc').value.trim(),
+        assignedTo: document.getElementById('tm-agent').value,
+        priority: document.getElementById('tm-priority').value,
+        dueDate: document.getElementById('tm-due').value || null,
+      })
+    });
+    closeTaskModal();
+    loadTasks(); loadTaskStats();
+    showToast('Task created', 'success');
+  } catch (e) { showToast('Failed to create task', 'error'); }
+}
+
+async function updateTaskStatus(id, status) {
+  try {
+    await fetch(`/api/tasks/${id}/update`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ status })
+    });
+    loadTasks(); loadTaskStats();
+  } catch (e) { showToast('Failed to update task', 'error'); }
+}
+
+async function deleteTask(id) {
+  try {
+    await fetch(`/api/tasks/${id}/delete`, { method: 'POST' });
+    loadTasks(); loadTaskStats();
+    showToast('Task deleted', 'info');
+  } catch (e) { showToast('Failed to delete task', 'error'); }
+}
+
+/* ── CALENDAR ── */
+let calYear, calMonth;
+let calEvents = [];
+
+(function initCalDate() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+})();
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function calNavMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+async function renderCalendar() {
+  const monthStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
+  document.getElementById('cal-month-label').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+
+  try {
+    calEvents = await (await fetch(`/api/calendar?month=${monthStr}`)).json();
+  } catch (e) { calEvents = []; }
+
+  const grid = document.getElementById('cal-grid');
+  let html = DAY_NAMES.map(d => `<div class="cal-day-hdr">${d}</div>`).join('');
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  let startDow = firstDay.getDay() - 1; // Mon=0
+  if (startDow < 0) startDow = 6;
+
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  // Previous month days
+  for (let i = startDow - 1; i >= 0; i--) {
+    const d = daysInPrev - i;
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const isToday = dateStr === todayStr;
+    const dayEvents = calEvents.filter(e => e.date === dateStr);
+    const evHtml = dayEvents.map(e =>
+      `<div class="cal-event-pill ${e.type}" title="${esc(e.title)}${e.time ? ' @ ' + e.time : ''}" onclick="event.stopPropagation();deleteCalEvent('${e.id}')">${esc(e.title)}</div>`
+    ).join('');
+    html += `<div class="cal-day${isToday ? ' today' : ''}"><div class="cal-day-num">${d}</div>${evHtml}</div>`;
+  }
+
+  // Next month padding
+  const totalCells = startDow + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${d}</div></div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function openCalendarModal() {
+  const sel = document.getElementById('cm-agent');
+  sel.innerHTML = '<option value="all">All Agents</option>';
+  Object.values(agentMap).forEach(a => {
+    sel.innerHTML += `<option value="${esc(a.id)}">${esc(a.name)}</option>`;
+  });
+  document.getElementById('cm-title').value = '';
+  document.getElementById('cm-desc').value = '';
+  document.getElementById('cm-date').value = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+  document.getElementById('cm-time').value = '09:00';
+  document.getElementById('cm-type').value = 'reminder';
+  document.getElementById('cal-modal').classList.add('show');
+}
+
+function closeCalendarModal() { document.getElementById('cal-modal').classList.remove('show'); }
+
+async function createCalEvent() {
+  const title = document.getElementById('cm-title').value.trim();
+  const date = document.getElementById('cm-date').value;
+  if (!title || !date) return;
+  try {
+    await fetch('/api/calendar', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        title,
+        description: document.getElementById('cm-desc').value.trim(),
+        date,
+        time: document.getElementById('cm-time').value,
+        agentId: document.getElementById('cm-agent').value,
+        type: document.getElementById('cm-type').value,
+      })
+    });
+    closeCalendarModal();
+    renderCalendar();
+    showToast('Event created', 'success');
+  } catch (e) { showToast('Failed to create event', 'error'); }
+}
+
+async function deleteCalEvent(id) {
+  try {
+    await fetch(`/api/calendar/${id}/delete`, { method: 'POST' });
+    renderCalendar();
+    showToast('Event deleted', 'info');
+  } catch (e) { showToast('Failed to delete event', 'error'); }
+}
+
+/* ── AGENT PROFILE ── */
+let profileData = {};
+
+async function loadProfile(agentId) {
+  const body = document.getElementById('dp-body');
+  body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-tertiary);font-size:12px">Loading profile...</div>';
+  try {
+    profileData = await (await fetch(`/api/agent/${agentId}/profile`)).json();
+    renderProfile(agentId);
+  } catch (e) {
+    body.innerHTML = '<div style="color:var(--red);font-size:12px;padding:20px;text-align:center">Failed to load profile.</div>';
+  }
+}
+
+function renderProfile(agentId) {
+  const body = document.getElementById('dp-body');
+  const d = detailCache || {};
+  const a = agentMap[agentId] || {};
+  const files = ['IDENTITY.md', 'SOUL.md', 'MEMORY.md', 'TOOLS.md'];
+  let html = '';
+
+  files.forEach(fname => {
+    const content = profileData[fname] || '';
+    const escapedContent = esc(content);
+    html += `<div class="profile-section">
+      <div class="profile-section-hdr">
+        <span class="profile-section-title">${fname}</span>
+        <button class="profile-save-btn" id="prof-save-${fname.replace('.','')}" onclick="saveProfile('${agentId}','${fname}')">Save</button>
+      </div>
+      <textarea class="profile-textarea" id="prof-${fname.replace('.','')}">${escapedContent}</textarea>
+    </div>`;
+  });
+
+  html += `<div class="profile-info">
+    <div class="profile-info-row"><span>Model</span><span class="v">${esc(a.model || d.model || 'unknown')}</span></div>
+    <div class="profile-info-row"><span>Sessions</span><span class="v">${d.sessionCount || 0}</span></div>
+    <div class="profile-info-row"><span>Input Tokens</span><span class="v">${((d.tokens||{}).input||0).toLocaleString()}</span></div>
+    <div class="profile-info-row"><span>Output Tokens</span><span class="v">${((d.tokens||{}).output||0).toLocaleString()}</span></div>
+  </div>`;
+
+  body.innerHTML = html;
+}
+
+async function saveProfile(agentId, filename) {
+  const textareaId = 'prof-' + filename.replace('.', '');
+  const btnId = 'prof-save-' + filename.replace('.', '');
+  const content = document.getElementById(textareaId).value;
+  const btn = document.getElementById(btnId);
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    await fetch(`/api/agent/${agentId}/profile`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ filename, content })
+    });
+    btn.textContent = 'Saved!'; btn.classList.add('saved');
+    setTimeout(() => { btn.textContent = 'Save'; btn.classList.remove('saved'); btn.disabled = false; }, 1500);
+  } catch (e) {
+    btn.textContent = 'Error'; btn.disabled = false;
+    showToast('Failed to save ' + filename, 'error');
   }
 }
 
