@@ -1521,6 +1521,130 @@ def events():
     )
 
 
+import getpass as _getpass_mod
+
+
+def _verify_system_password(password):
+    """Verify the current system user's password."""
+    # Use sudo -k to clear cache, then -S to read password from stdin
+    try:
+        subprocess.run(['sudo', '-k'], capture_output=True, timeout=5)
+        proc = subprocess.run(
+            ['sudo', '-S', 'true'],
+            input=password + '\n', capture_output=True, text=True, timeout=10
+        )
+        # Clear sudo cache after verification
+        subprocess.run(['sudo', '-k'], capture_output=True, timeout=5)
+        return proc.returncode == 0
+    except Exception:
+        pass
+    # Fallback: su to root (requires password)
+    try:
+        proc = subprocess.run(
+            ['su', '-c', 'true'],
+            input=password + '\n', capture_output=True, text=True, timeout=10
+        )
+        return proc.returncode == 0
+    except Exception:
+        return False
+
+
+@app.route('/api/agents/add', methods=['POST'])
+def api_agents_add():
+    """Add a new agent."""
+    data = request.get_json() or {}
+    agent_id = data.get('id', '').strip().lower()
+    agent_name = data.get('name', '').strip() or agent_id
+    model = data.get('model', '').strip()
+
+    if not agent_id:
+        return jsonify({'error': 'Agent ID is required'}), 400
+    if not re.match(r'^[a-z][a-z0-9_-]{0,31}$', agent_id):
+        return jsonify({'error': 'ID must start with a letter, only lowercase letters/digits/hyphens/underscores, max 32 chars'}), 400
+
+    cfg = load_config()
+    agents_list = cfg.setdefault('agents', {}).setdefault('list', [])
+
+    if any(a['id'] == agent_id for a in agents_list):
+        return jsonify({'error': f'Agent "{agent_id}" already exists'}), 409
+
+    # Build agent entry
+    workspace = str(Path.home() / '.openclaw' / f'workspace-{agent_id}')
+    agent_dir = str(AGENTS_DIR / agent_id / 'agent')
+    agent_entry = {
+        'id': agent_id,
+        'name': agent_name,
+        'workspace': workspace,
+        'agentDir': agent_dir,
+        'model': {'primary': model} if model else {},
+    }
+    agents_list.append(agent_entry)
+    save_config(cfg)
+
+    # Create agent directory structure
+    agent_base = AGENTS_DIR / agent_id
+    agent_agent_dir = agent_base / 'agent'
+    agent_agent_dir.mkdir(parents=True, exist_ok=True)
+    (agent_base / 'sessions').mkdir(parents=True, exist_ok=True)
+    Path(workspace).mkdir(parents=True, exist_ok=True)
+
+    # Create default profile files
+    for fname in PROFILE_FILES:
+        fpath = agent_agent_dir / fname
+        if not fpath.exists():
+            if fname == 'IDENTITY.md':
+                fpath.write_text(f'# {agent_name}\n\nAgent identity profile.\n')
+            elif fname == 'SOUL.md':
+                fpath.write_text(f'# {agent_name} - Soul\n\nAgent behavior and personality.\n')
+            elif fname == 'MEMORY.md':
+                fpath.write_text(f'# {agent_name} - Memory\n\nPersistent memory store.\n')
+            elif fname == 'TOOLS.md':
+                fpath.write_text(f'# {agent_name} - Tools\n\nAvailable tools and capabilities.\n')
+
+    return jsonify({'ok': True, 'id': agent_id})
+
+
+@app.route('/api/agents/<agent_id>/delete', methods=['POST'])
+def api_agents_delete(agent_id):
+    """Delete an agent. Requires system password."""
+    data = request.get_json() or {}
+    password = data.get('password', '')
+
+    if not password:
+        return jsonify({'error': 'System password is required'}), 401
+
+    if not _verify_system_password(password):
+        return jsonify({'error': 'Invalid password'}), 403
+
+    cfg = load_config()
+    agents_list = cfg.get('agents', {}).get('list', [])
+    agent = next((a for a in agents_list if a['id'] == agent_id), None)
+
+    if not agent:
+        return jsonify({'error': f'Agent "{agent_id}" not found'}), 404
+
+    # Remove from config
+    cfg['agents']['list'] = [a for a in agents_list if a['id'] != agent_id]
+
+    # Remove bindings
+    bindings = cfg.get('bindings', [])
+    cfg['bindings'] = [b for b in bindings if b.get('agentId') != agent_id]
+
+    save_config(cfg)
+
+    # Remove agent directory
+    agent_base = AGENTS_DIR / agent_id
+    if agent_base.exists():
+        shutil.rmtree(agent_base, ignore_errors=True)
+
+    # Remove workspace
+    workspace = agent.get('workspace', '')
+    if workspace and Path(workspace).exists():
+        shutil.rmtree(workspace, ignore_errors=True)
+
+    return jsonify({'ok': True})
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('OPENCLAW_DASH_PORT', 7842))
     _restart_backup_timer()

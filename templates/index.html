@@ -414,7 +414,7 @@ body {
 
 /* ── INFO DRAWER ── */
 #info-drawer {
-  position: fixed; top: var(--topbar-h); right: 0; width: 400px; bottom: 0;
+  position: fixed; top: var(--topbar-h); right: 0; width: 540px; bottom: 0;
   background: var(--bg-panel);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -731,6 +731,52 @@ body {
   font-size: 10px; color: var(--text-tertiary); font-weight: 600;
   text-transform: uppercase; min-width: 55px; flex-shrink: 0;
 }
+
+/* Agent management cards */
+.agent-mgmt-card {
+  padding: 10px 12px; margin-bottom: 8px;
+  background: var(--bg); border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border); transition: all 0.2s;
+}
+.agent-mgmt-card:hover { border-color: var(--border-strong); }
+.agent-mgmt-left {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+.agent-mgmt-avatar {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.agent-mgmt-info { flex: 1; min-width: 0; }
+.agent-mgmt-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.agent-mgmt-model {
+  font-size: 10px; color: var(--text-tertiary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Character style preview strip */
+.csp-strip {
+  display: flex; gap: 6px; overflow-x: auto; padding: 2px 0;
+}
+.csp-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 8px 4px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid transparent; transition: all 0.2s; flex-shrink: 0;
+  background: var(--bg-white);
+}
+.csp-tile:hover { border-color: var(--border-strong); background: var(--bg-hover); }
+.csp-tile.selected {
+  border-color: var(--blue); background: var(--bg-active);
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.12);
+}
+.csp-canvas {
+  display: block; image-rendering: pixelated; image-rendering: crisp-edges;
+  width: 25px; height: 35px;
+}
+.csp-label {
+  font-size: 8px; font-weight: 600; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
+}
+.csp-tile.selected .csp-label { color: var(--blue); }
 
 /* ── DARK MODE OVERRIDES ── */
 [data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
@@ -1553,6 +1599,33 @@ body {
       <div class="settings-status" id="hq-settings-status"></div>
     </div>
 
+    <!-- Agent Management -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F916;</span> Agent Management</div>
+      <div id="agent-mgmt-list"></div>
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Add New Agent</div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">ID</span>
+          <input class="provider-input" id="new-agent-id" placeholder="e.g. alex">
+        </div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">Name</span>
+          <input class="provider-input" id="new-agent-name" placeholder="e.g. Alex (optional)">
+        </div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">Model</span>
+          <select class="setting-select" id="new-agent-model" style="flex:1;min-width:0">
+            <option value="">Select model...</option>
+          </select>
+        </div>
+        <div class="add-provider-row" style="justify-content:flex-end">
+          <button class="btn-action primary" onclick="addAgent()">Add Agent</button>
+        </div>
+      </div>
+      <div class="settings-status" id="agent-mgmt-status"></div>
+    </div>
+
     <!-- Gateway Control -->
     <div class="settings-group">
       <div class="sg-title"><span class="sg-icon">&#x26A1;</span> Gateway</div>
@@ -1757,6 +1830,30 @@ body {
   </div>
 </div>
 
+<!-- DELETE AGENT MODAL -->
+<div class="modal-overlay" id="del-agent-modal" onclick="if(event.target===this)closeDeleteAgentModal()">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-box-hdr"><span>Delete Agent</span><button onclick="closeDeleteAgentModal()">&times;</button></div>
+    <div class="modal-body">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:32px;margin-bottom:8px">&#x26A0;</div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)" id="del-agent-msg">Are you sure?</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px">This will permanently delete the agent, workspace and all data.</div>
+      </div>
+      <input type="hidden" id="del-agent-id">
+      <div class="modal-field">
+        <label>System Password</label>
+        <input type="password" id="del-agent-pw" placeholder="Enter your computer password..." style="width:100%">
+      </div>
+      <div class="settings-status" id="del-agent-status" style="text-align:center"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action secondary" onclick="closeDeleteAgentModal()">Cancel</button>
+      <button class="btn-action danger" id="btn-del-agent-confirm" onclick="confirmDeleteAgent()">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ── THEME ── */
 function getPreferredTheme() {
@@ -1785,11 +1882,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
   if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
 });
 
-const AGENT_CELLS = {
-  kate:{col:0,row:0}, main:{col:1,row:0}, nova:{col:2,row:0},
-  dona:{col:0,row:1},                      tom: {col:2,row:1},
-  jack:{col:0,row:2}, raven:{col:1,row:2},
-};
+// AGENT_CELLS is now computed dynamically by OfficeMap._computeGrid()
 
 /* Pastel room themes per status */
 const STATUS_THEMES = {
@@ -1893,10 +1986,36 @@ function getCanvasBg() { return isDarkMode() ? '#1c1c1e' : '#f5f5f7'; }
 function getMeetingTheme() { return isDarkMode() ? MEETING_THEME.dark : MEETING_THEME.light; }
 function getServerTheme() { return isDarkMode() ? SERVER_THEME.dark : SERVER_THEME.light; }
 
-const FRAMES = [
-  [[0,1,1,1,0],[1,2,1,2,1],[0,1,1,1,0],[1,3,3,3,1],[0,3,3,3,0],[0,1,0,1,0],[1,0,0,0,1]],
-  [[0,1,1,1,0],[1,2,1,2,1],[0,1,1,1,0],[1,3,3,3,1],[0,3,3,3,0],[1,0,1,0,1],[0,1,0,1,0]],
-];
+const CHAR_STYLES = {
+  classic: { name:'Classic', frames:[
+    [[0,1,1,1,0],[1,2,1,2,1],[0,1,1,1,0],[1,3,3,3,1],[0,3,3,3,0],[0,1,0,1,0],[1,0,0,0,1]],
+    [[0,1,1,1,0],[1,2,1,2,1],[0,1,1,1,0],[1,3,3,3,1],[0,3,3,3,0],[1,0,1,0,1],[0,1,0,1,0]],
+  ]},
+  robot: { name:'Robot', frames:[
+    [[4,4,4,4,4],[4,2,4,2,4],[4,4,3,4,4],[0,3,3,3,0],[1,3,3,3,1],[0,1,0,1,0],[0,1,0,1,0]],
+    [[4,4,4,4,4],[4,2,4,2,4],[4,4,3,4,4],[0,3,3,3,0],[1,3,3,3,1],[1,0,1,0,1],[0,1,0,1,0]],
+  ]},
+  cat: { name:'Cat', frames:[
+    [[1,0,0,0,1],[1,1,1,1,1],[1,2,1,2,1],[0,1,3,1,0],[0,3,3,3,0],[0,1,0,1,0],[1,0,0,0,1]],
+    [[1,0,0,0,1],[1,1,1,1,1],[1,2,1,2,1],[0,1,3,1,0],[0,3,3,3,0],[1,0,1,0,1],[0,1,0,1,0]],
+  ]},
+  wizard: { name:'Wizard', frames:[
+    [[0,0,4,0,0],[0,4,4,4,0],[1,1,1,1,1],[0,2,1,2,0],[0,1,1,1,0],[3,3,3,3,3],[0,3,0,3,0]],
+    [[0,0,4,0,0],[0,4,4,4,0],[1,1,1,1,1],[0,2,1,2,0],[0,1,1,1,0],[3,3,3,3,3],[3,0,0,0,3]],
+  ]},
+  ninja: { name:'Ninja', frames:[
+    [[0,1,1,1,0],[1,2,3,2,1],[0,1,1,1,0],[0,3,3,3,0],[3,3,1,3,3],[0,1,0,1,0],[0,1,0,1,0]],
+    [[0,1,1,1,0],[1,2,3,2,1],[0,1,1,1,0],[0,3,3,3,0],[3,3,1,3,3],[1,0,0,0,1],[0,1,0,1,0]],
+  ]},
+};
+const CHAR_STYLE_KEYS = Object.keys(CHAR_STYLES);
+const FRAMES = CHAR_STYLES.classic.frames; // backward compat
+
+// Agent character style preferences (persisted in localStorage)
+let agentCharStyles = {};
+try { agentCharStyles = JSON.parse(localStorage.getItem('openclaw-char-styles')||'{}'); } catch(e) {}
+function saveCharStyles() { localStorage.setItem('openclaw-char-styles', JSON.stringify(agentCharStyles)); }
+function getAgentStyle(id) { return CHAR_STYLES[agentCharStyles[id]] || CHAR_STYLES.classic; }
 
 let agentMap = {};
 let selectedId = null;
@@ -1942,6 +2061,12 @@ class OfficeMap {
     this.sprites = {}; this.tick = 0;
     this.particles = [];
     this.hoveredCell = null;
+    this.agentCells = {};
+    this.meetingCell = {col:1,row:1};
+    this.serverCell = {col:2,row:2};
+    this.gridCols = 3;
+    this.gridRows = 3;
+    this.agentList = [];
     this._resize();
     // Spawn particles AFTER resize so they spread across full canvas
     for (let i = 0; i < 70; i++) this.particles.push(this._spawnParticle());
@@ -1958,11 +2083,72 @@ class OfficeMap {
       r:Math.random()*3+1.8, a:Math.random()*0.30+0.15,
       color: colors[Math.floor(Math.random()*colors.length)] };
   }
+  _computeGrid() {
+    const agents = this.agentList;
+    if (!agents.length) {
+      this.gridCols = 3; this.gridRows = 3;
+      this.meetingCell = {col:1,row:1}; this.serverCell = {col:2,row:2};
+      this.agentCells = {};
+      this.CW = (this.canvas.width||1)/3; this.CH = (this.canvas.height||1)/3;
+      this.S = Math.max(2, Math.floor(Math.min(this.CW, this.CH)/45));
+      return;
+    }
+    const totalCells = agents.length + 2; // +meeting +server
+    const canvasW = this.canvas.width || 1;
+    const canvasH = this.canvas.height || 1;
+    const canvasAR = canvasW / canvasH;
+    // Find best grid: prefer odd x odd for true center, min 3x3
+    let bestCols = 3, bestRows = 3, bestScore = Infinity;
+    for (let c = 3; c <= Math.max(totalCells, 9); c++) {
+      for (let r = 3; r <= Math.max(totalCells, 9); r++) {
+        if (c * r < totalCells) continue;
+        const waste = c * r - totalCells;
+        if (waste > c + r) continue; // skip absurd waste
+        const gridAR = c / r;
+        const arDiff = Math.abs(gridAR - canvasAR);
+        const bothOdd = (c % 2 === 1) && (r % 2 === 1);
+        // Score: aspect ratio match + waste penalty + even-grid penalty
+        const score = arDiff * 2 + waste * 0.4 + (bothOdd ? 0 : 1.5);
+        if (score < bestScore) { bestScore = score; bestCols = c; bestRows = r; }
+      }
+    }
+    this.gridCols = bestCols; this.gridRows = bestRows;
+    // Meeting room: exact center
+    const mc = Math.floor(bestCols / 2), mr = Math.floor(bestRows / 2);
+    this.meetingCell = {col:mc, row:mr};
+    // Server room: bottom-right corner
+    let sc = bestCols - 1, sr = bestRows - 1;
+    if (sc === mc && sr === mr) sc = Math.max(0, sc - 1);
+    this.serverCell = {col:sc, row:sr};
+    // Assign agents around the center: spiral outward from meeting room
+    const used = new Set();
+    used.add(mc+','+mr); used.add(sc+','+sr);
+    const order = [];
+    // Ring-by-ring from center outward
+    for (let ring = 1; ring <= Math.max(bestCols, bestRows); ring++) {
+      for (let dr = -ring; dr <= ring; dr++) {
+        for (let dc = -ring; dc <= ring; dc++) {
+          if (Math.abs(dr) !== ring && Math.abs(dc) !== ring) continue; // only perimeter
+          const cc = mc + dc, rr = mr + dr;
+          if (cc < 0 || cc >= bestCols || rr < 0 || rr >= bestRows) continue;
+          const key = cc+','+rr;
+          if (used.has(key)) continue;
+          used.add(key);
+          order.push({col:cc, row:rr});
+        }
+      }
+    }
+    this.agentCells = {};
+    for (let i = 0; i < agents.length && i < order.length; i++) {
+      this.agentCells[agents[i].id] = order[i];
+    }
+    this.CW = canvasW / bestCols; this.CH = canvasH / bestRows;
+    this.S = Math.max(2, Math.floor(Math.min(this.CW, this.CH)/45));
+  }
   _resize() {
     const a = this.canvas.parentElement;
     this.canvas.width = a.clientWidth; this.canvas.height = a.clientHeight;
-    this.CW = a.clientWidth/3; this.CH = a.clientHeight/3;
-    this.S = Math.max(2, Math.floor(Math.min(this.CW, this.CH)/45));
+    this._computeGrid();
     Object.values(this.sprites).forEach(sp => { if (sp.tx!==undefined){sp.x=sp.tx;sp.y=sp.ty;} });
     // Redistribute particles across new canvas size
     this.particles.forEach(p => {
@@ -1972,20 +2158,20 @@ class OfficeMap {
   }
   _cellO(c,r) { return {x:c*this.CW, y:r*this.CH}; }
   _home(id) {
-    const c = AGENT_CELLS[id]; if (!c) return null;
+    const c = this.agentCells[id]; if (!c) return null;
     const o = this._cellO(c.col,c.row);
     return {x:o.x+this.CW*0.55, y:o.y+this.CH*0.75};
   }
   _cellAt(px, py) {
     const col = Math.floor(px / this.CW), row = Math.floor(py / this.CH);
-    if (col < 0 || col > 2 || row < 0 || row > 2) return null;
+    if (col < 0 || col >= this.gridCols || row < 0 || row >= this.gridRows) return null;
     return {col, row};
   }
   _onClick(e) {
     const rect = this.canvas.getBoundingClientRect();
     const cell = this._cellAt(e.clientX - rect.left, e.clientY - rect.top);
     if (!cell) return;
-    const id = Object.keys(AGENT_CELLS).find(k => AGENT_CELLS[k].col===cell.col && AGENT_CELLS[k].row===cell.row);
+    const id = Object.keys(this.agentCells).find(k => this.agentCells[k].col===cell.col && this.agentCells[k].row===cell.row);
     if (id) selectAgent(id);
   }
   _onHover(e) {
@@ -1993,6 +2179,9 @@ class OfficeMap {
     this.hoveredCell = this._cellAt(e.clientX - rect.left, e.clientY - rect.top);
   }
   update(agents) {
+    const changed = agents.length !== this.agentList.length || agents.some((a,i) => a.id !== (this.agentList[i]||{}).id);
+    this.agentList = agents;
+    if (changed) this._computeGrid();
     agents.forEach(a => {
       if (!this.sprites[a.id]) { const h=this._home(a.id)||{x:0,y:0}; this.sprites[a.id]={x:h.x,y:h.y,dir:1}; }
       else { const h=this._home(a.id); if(h){this.sprites[a.id].x=h.x;this.sprites[a.id].y=h.y;} }
@@ -2009,10 +2198,10 @@ class OfficeMap {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 1. Draw rooms first
-    for (let r=0;r<3;r++) for (let c=0;c<3;c++) {
-      if (c===1&&r===1) { this._drawMeeting(c,r); continue; }
-      if (c===2&&r===2) { this._drawServer(c,r); continue; }
-      const id = Object.keys(AGENT_CELLS).find(k=>AGENT_CELLS[k].col===c&&AGENT_CELLS[k].row===r);
+    for (let r=0;r<this.gridRows;r++) for (let c=0;c<this.gridCols;c++) {
+      if (this.meetingCell && c===this.meetingCell.col && r===this.meetingCell.row) { this._drawMeeting(c,r); continue; }
+      if (this.serverCell && c===this.serverCell.col && r===this.serverCell.row) { this._drawServer(c,r); continue; }
+      const id = Object.keys(this.agentCells).find(k=>this.agentCells[k].col===c&&this.agentCells[k].row===r);
       if (id) this._drawRoom(c,r,id);
     }
 
@@ -2336,7 +2525,8 @@ class OfficeMap {
   _drawChar(cx, cy, id, status, dir, frameIdx=0) {
     const {ctx, S, tick} = this;
     const pal = getAgentPalette(id);
-    const frame = FRAMES[frameIdx%FRAMES.length];
+    const style = getAgentStyle(id);
+    const frame = style.frames[frameIdx % style.frames.length];
     const alpha = status==='offline'?0.25:status==='inactive'?0.55:1;
     const PW=5*S, PH=7*S, px=cx-PW/2, py=cy-PH;
     const dk = isDarkMode();
@@ -2348,13 +2538,14 @@ class OfficeMap {
     ctx.beginPath(); ctx.ellipse(cx,cy+2,PW*0.35,S*0.6,0,0,Math.PI*2);
     ctx.fillStyle = dk ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.08)'; ctx.fill();
 
-    // Pixels
+    // Pixels - shadow layer
     for (let r=0;r<frame.length;r++) for (let c=0;c<frame[r].length;c++) {
       if (frame[r][c]) { ctx.fillStyle = dk ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.06)'; ctx.fillRect(px+c*S+0.5,py+r*S+0.5,S,S); }
     }
+    // Pixels - color layer
     for (let r=0;r<frame.length;r++) for (let c=0;c<frame[r].length;c++) {
       const p=frame[r][c]; if(!p) continue;
-      ctx.fillStyle = p===2?pal.eye:p===3?pal.shirt:pal.body;
+      ctx.fillStyle = p===2?pal.eye:p===3?pal.shirt:p===4?pal.accent:pal.body;
       ctx.fillRect(px+c*S,py+r*S,S,S);
     }
 
@@ -2681,6 +2872,7 @@ async function fetchSettings() {
   try {
     settingsData = await (await fetch('/api/settings')).json();
     renderSettingsPanel();
+    renderAgentMgmt();
     fetchProviders();
     fetchBackupStatus();
     fetchHqSettings();
@@ -2888,6 +3080,152 @@ async function removeProviderModel(name, model) {
       fetchAvailableModels();
     } else throw new Error(d.error);
   } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+/* ── AGENT MANAGEMENT ── */
+function _drawCharPreview(canvas, styleKey, agentId) {
+  const style = CHAR_STYLES[styleKey]; if (!style) return;
+  const pal = getAgentPalette(agentId);
+  const frame = style.frames[0];
+  const ps = 5; // pixel scale
+  canvas.width = 5 * ps; canvas.height = 7 * ps;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let r = 0; r < frame.length; r++) {
+    for (let c = 0; c < frame[r].length; c++) {
+      const p = frame[r][c]; if (!p) continue;
+      ctx.fillStyle = p===2 ? pal.eye : p===3 ? pal.shirt : p===4 ? pal.accent : pal.body;
+      ctx.fillRect(c*ps, r*ps, ps, ps);
+    }
+  }
+}
+
+function renderAgentMgmt() {
+  const el = document.getElementById('agent-mgmt-list');
+  if (!el) return;
+  const agents = Object.values(agentMap);
+  if (!agents.length) {
+    el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px;padding:4px 0">No agents configured</div>';
+    return;
+  }
+  el.innerHTML = agents.map(a => {
+    const pal = (typeof PALETTES !== 'undefined' ? PALETTES[a.id] : null) || {body:'#8e8e93',shirt:'#636366'};
+    const curStyle = agentCharStyles[a.id] || 'classic';
+    const tiles = CHAR_STYLE_KEYS.map(k => `
+      <div class="csp-tile${k===curStyle?' selected':''}" onclick="setAgentCharStyle('${esc(a.id)}','${k}')" title="${CHAR_STYLES[k].name}">
+        <canvas class="csp-canvas" data-style="${k}" data-agent="${esc(a.id)}"></canvas>
+        <span class="csp-label">${CHAR_STYLES[k].name}</span>
+      </div>`).join('');
+    return `
+    <div class="agent-mgmt-card">
+      <div class="agent-mgmt-left">
+        <div class="agent-mgmt-avatar" style="background:linear-gradient(135deg,${pal.body},${pal.shirt})">${esc(a.id.substring(0,2).toUpperCase())}</div>
+        <div class="agent-mgmt-info">
+          <div class="agent-mgmt-name">${esc(a.name || a.id)}</div>
+          <div class="agent-mgmt-model">${esc((a.model||'').split('/').pop() || 'no model')}</div>
+        </div>
+        <button class="btn-icon danger" onclick="openDeleteAgentModal('${esc(a.id)}','${esc(a.name||a.id)}')" title="Delete agent">&#x1F5D1;</button>
+      </div>
+      <div class="csp-strip">${tiles}</div>
+    </div>`;
+  }).join('');
+
+  // Draw all preview canvases
+  requestAnimationFrame(() => {
+    el.querySelectorAll('.csp-canvas').forEach(c => {
+      _drawCharPreview(c, c.dataset.style, c.dataset.agent);
+    });
+  });
+
+  // Populate new-agent model dropdown
+  const modelSel = document.getElementById('new-agent-model');
+  if (modelSel) {
+    const current = modelSel.value;
+    modelSel.innerHTML = '<option value="">Select model...</option>' +
+      availableModels.map(m => `<option value="${esc(m)}" ${m===current?'selected':''}>${esc(m)}</option>`).join('');
+  }
+}
+
+function setAgentCharStyle(id, style) {
+  agentCharStyles[id] = style;
+  saveCharStyles();
+  renderAgentMgmt();
+}
+
+async function addAgent() {
+  const idEl = document.getElementById('new-agent-id');
+  const nameEl = document.getElementById('new-agent-name');
+  const modelEl = document.getElementById('new-agent-model');
+  const id = idEl.value.trim().toLowerCase();
+  const name = nameEl.value.trim();
+  const model = modelEl.value;
+
+  if (!id) { showToast('Agent ID is required', 'error'); return; }
+
+  try {
+    const r = await fetch('/api/agents/add', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ id, name: name || id, model })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      showToast('Agent "' + id + '" created', 'success');
+      idEl.value = ''; nameEl.value = ''; modelEl.value = '';
+      fetchAgents();
+      setTimeout(renderAgentMgmt, 500);
+    } else {
+      showToast(d.error || 'Failed to add agent', 'error');
+    }
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+function openDeleteAgentModal(id, name) {
+  document.getElementById('del-agent-id').value = id;
+  document.getElementById('del-agent-msg').textContent = '"' + name + '" will be permanently deleted.';
+  document.getElementById('del-agent-pw').value = '';
+  document.getElementById('del-agent-status').textContent = '';
+  const m = document.getElementById('del-agent-modal');
+  m.style.display = 'flex'; m.style.alignItems = 'center'; m.style.justifyContent = 'center';
+}
+
+function closeDeleteAgentModal() {
+  document.getElementById('del-agent-modal').style.display = 'none';
+  document.getElementById('del-agent-pw').value = '';
+}
+
+async function confirmDeleteAgent() {
+  const id = document.getElementById('del-agent-id').value;
+  const pw = document.getElementById('del-agent-pw').value;
+  const statusEl = document.getElementById('del-agent-status');
+  const btn = document.getElementById('btn-del-agent-confirm');
+
+  if (!pw) { statusEl.textContent = 'Password required'; statusEl.style.color = 'var(--red)'; return; }
+
+  btn.disabled = true; btn.textContent = 'Deleting...';
+  statusEl.textContent = '';
+
+  try {
+    const r = await fetch('/api/agents/' + encodeURIComponent(id) + '/delete', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ password: pw })
+    });
+    const d = await r.json();
+    if (d.ok) {
+      showToast('Agent "' + id + '" deleted', 'info');
+      closeDeleteAgentModal();
+      delete agentMap[id];
+      fetchAgents();
+      setTimeout(renderAgentMgmt, 500);
+    } else {
+      statusEl.textContent = d.error || 'Failed';
+      statusEl.style.color = 'var(--red)';
+    }
+  } catch(e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Delete';
+  }
 }
 
 function renderSettingsPanel() {
@@ -3856,7 +4194,7 @@ async function fetchAgents() {
   try {
     const agents=await(await fetch('/api/agents')).json();
     agents.forEach(a=>{a.status=calcStatus(a.lastActivity);agentMap[a.id]=a;});
-    office.update(agents); renderSidebar(agents);
+    office.update(agents); renderSidebar(agents); renderAgentMgmt();
     if (selectedId&&curTab==='overview') renderDetail();
     // Animated updates
     updateHero(agents);
