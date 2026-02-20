@@ -2227,9 +2227,8 @@ function renderSidebar(agents) {
   document.getElementById('ss-off').textContent = counts.offline;
   document.getElementById('kpi-active').textContent = counts.busy+counts.idle;
   document.getElementById('kpi-sessions').textContent = totalSessions;
-  document.getElementById('fs-active').textContent = counts.busy+counts.idle;
+  // fs-active and fs-sessions are set via animateCounter in fetchAgents
   document.getElementById('fs-total').textContent = agents.length;
-  document.getElementById('fs-sessions').textContent = totalSessions;
   const pct = agents.length?Math.round((counts.busy+counts.idle)/agents.length*100):0;
   document.getElementById('fs-active-bar').style.width = pct+'%';
   document.getElementById('fs-sess-bar').style.width = Math.min(100,totalSessions*5)+'%';
@@ -3051,8 +3050,10 @@ async function createBackupDir() {
 /* ── VIEW SWITCHING ── */
 let currentView = 'office';
 
+let _viewSwitching = false;
 function switchView(name) {
-  if (name === currentView) return;
+  if (name === currentView || _viewSwitching) return;
+  _viewSwitching = true;
   const oldView = document.getElementById('view-' + currentView);
   const newView = document.getElementById('view-' + name);
   currentView = name;
@@ -3063,14 +3064,17 @@ function switchView(name) {
   if (oldView) {
     oldView.classList.remove('active');
     oldView.classList.add('view-exit');
-    setTimeout(() => oldView.classList.remove('view-exit'), 250);
   }
 
-  // Enter animation on new view (slight delay for overlap)
+  // Enter animation on new view after exit completes
   setTimeout(() => {
-    document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.view-container').forEach(el => {
+      el.classList.remove('active');
+      el.classList.remove('view-exit');
+    });
     newView.classList.add('active');
-  }, 120);
+    _viewSwitching = false;
+  }, 150);
 
   if (name === 'tasks') { loadTasks(); loadTaskStats(); }
   if (name === 'calendar') renderCalendar();
@@ -3324,7 +3328,9 @@ function openCalendarModal() {
   });
   document.getElementById('cm-title').value = '';
   document.getElementById('cm-desc').value = '';
-  document.getElementById('cm-date').value = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+  const maxDay = new Date(calYear, calMonth + 1, 0).getDate();
+  const defaultDay = Math.min(new Date().getDate(), maxDay);
+  document.getElementById('cm-date').value = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(defaultDay).padStart(2, '0')}`;
   document.getElementById('cm-time').value = '09:00';
   document.getElementById('cm-type').value = 'reminder';
   document.getElementById('cal-modal').classList.add('show');
@@ -3562,10 +3568,14 @@ async function fetchAgents() {
     const totalSessions = agents.reduce((s,a)=>s+a.activeSessions,0);
     const fsActive = document.getElementById('fs-active');
     const fsSessions = document.getElementById('fs-sessions');
+    const prevActive = parseInt(fsActive?.textContent) || 0;
+    const prevSessions = parseInt(fsSessions?.textContent) || 0;
     if (fsActive) animateCounter(fsActive, activeCount);
     if (fsSessions) animateCounter(fsSessions, totalSessions);
-    // Pulse effect on stat cards when values change
-    document.querySelectorAll('.fstat').forEach(el => pulseStatCard(el));
+    // Pulse only when values change
+    if (prevActive !== activeCount || prevSessions !== totalSessions) {
+      document.querySelectorAll('.fstat').forEach(el => pulseStatCard(el));
+    }
   } catch(e){}
 }
 
