@@ -264,6 +264,38 @@ body {
   0%{box-shadow:var(--shadow-sm)} 50%{box-shadow:0 0 20px rgba(0,122,255,0.2)} 100%{box-shadow:var(--shadow-sm)}
 }
 
+/* ── SYSTEM STATS PANEL ── */
+.sys-stats-panel {
+  display: flex; gap: 12px; padding: 12px 14px;
+  background: linear-gradient(135deg, var(--bg) 0%, rgba(0,122,255,0.03) 100%);
+}
+.sys-stat-card {
+  flex: 1; background: var(--bg-white); border-radius: var(--radius);
+  padding: 12px 14px; box-shadow: var(--shadow-sm);
+  border: 0.5px solid var(--border);
+}
+.sys-stat-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: var(--text-tertiary); text-transform: uppercase;
+  letter-spacing: 0.5px; font-weight: 600;
+}
+.sys-stat-icon { font-size: 14px; }
+.sys-stat-value {
+  font-size: 18px; font-weight: 700; color: var(--text);
+  margin: 6px 0;
+}
+.sys-stat-bar {
+  height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;
+}
+.sys-bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--blue), #5ac8fa);
+  border-radius: 3px; transition: width 0.5s ease;
+}
+.sys-stat-sub {
+  font-size: 10px; color: var(--text-tertiary); margin-top: 4px;
+}
+#gpu-card.hidden { display: none; }
+
 #canvas-wrap { flex: 1; position: relative; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; margin: 0 14px; }
 #office { position: absolute; inset: 0; display: block; z-index: 2; cursor: pointer; }
 
@@ -1255,7 +1287,7 @@ body {
     <div class="hero-banner">
       <canvas class="hero-particles" id="hero-particles"></canvas>
       <div class="hero-content">
-        <div class="hero-icon">&#x1F99E;</div>
+        <div class="hero-icon">🦞</div>
         <div class="hero-text">
           <div class="hero-title" id="hero-title">OpenClaw HQ</div>
           <div class="hero-sub" id="hero-sub">Loading system status...</div>
@@ -1264,6 +1296,36 @@ body {
       </div>
       <div class="hero-wave"><svg viewBox="0 0 1200 20" preserveAspectRatio="none"><path d="M0,10 C200,20 400,0 600,10 C800,20 1000,0 1200,10 L1200,20 L0,20 Z"/></svg></div>
     </div>
+    
+    <!-- SYSTEM STATS PANEL -->
+    <div class="sys-stats-panel" id="sys-stats-panel" style="display:none">
+      <div class="sys-stat-card">
+        <div class="sys-stat-header">
+          <span>CPU</span>
+          <span class="sys-stat-icon">&#x1F4BB;</span>
+        </div>
+        <div class="sys-stat-value" id="sys-cpu">0%</div>
+        <div class="sys-stat-bar"><div class="sys-bar-fill" id="sys-cpu-bar" style="width:0%"></div></div>
+      </div>
+      <div class="sys-stat-card">
+        <div class="sys-stat-header">
+          <span>RAM</span>
+          <span class="sys-stat-icon">&#x1F4BE;</span>
+        </div>
+        <div class="sys-stat-value" id="sys-ram">0/0 GB</div>
+        <div class="sys-stat-bar"><div class="sys-bar-fill" id="sys-ram-bar" style="width:0%"></div></div>
+      </div>
+      <div class="sys-stat-card" id="gpu-card" style="display:none">
+        <div class="sys-stat-header">
+          <span>GPU</span>
+          <span class="sys-stat-icon">&#x1F3AE;</span>
+        </div>
+        <div class="sys-stat-value" id="sys-gpu">--</div>
+        <div class="sys-stat-bar"><div class="sys-bar-fill" id="sys-gpu-bar" style="width:0%"></div></div>
+        <div class="sys-stat-sub" id="sys-gpu-mem"></div>
+      </div>
+    </div>
+    
     <!-- ACTIVITY TICKER -->
     <div class="activity-ticker">
       <div class="ticker-track" id="ticker-track"></div>
@@ -1572,7 +1634,19 @@ body {
 
     <!-- Live Logs -->
     <div class="settings-group">
-      <div class="sg-title"><span class="sg-icon">&#x1F4DC;</span> Live Logs</div>
+      <div class="sg-title">
+        <span class="sg-icon">📝</span> Live Logs
+        <div style="flex:1"></div>
+        <select id="log-filter-level" style="font-size:11px;padding:4px 8px;margin-right:8px" onchange="filterLogs()">
+          <option value="">All Levels</option>
+          <option value="INFO">INFO</option>
+          <option value="WARN">WARN</option>
+          <option value="ERROR">ERROR</option>
+        </select>
+        <select id="log-filter-agent" style="font-size:11px;padding:4px 8px" onchange="filterLogs()">
+          <option value="">All Agents</option>
+        </select>
+      </div>
       <div id="log-wrap"></div>
     </div>
 
@@ -2395,6 +2469,14 @@ function renderDetail() {
         <div class="info-row"><span>Input</span><span class="v">${(tok.input||0).toLocaleString()}</span></div>
         <div class="info-row"><span>Output</span><span class="v">${(tok.output||0).toLocaleString()}</span></div>
       </div>
+      
+      <div class="sec">Quick Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="btn-action secondary" style="font-size:11px;padding:6px 12px" onclick="restartAgent('${selectedId}')">Restart</button>
+        <button class="btn-action secondary" style="font-size:11px;padding:6px 12px" onclick="clearAgentSessions('${selectedId}')">Clear Sessions</button>
+        <button class="btn-action secondary" style="font-size:11px;padding:6px 12px" onclick="toggleAgentHeartbeat('${selectedId}')">Toggle Heartbeat</button>
+      </div>
+      
       <div class="sec">Last Activity</div>
       <div class="info-row"><span>Time</span><span class="v">${a.lastActivity?new Date(a.lastActivity).toLocaleTimeString():'--'}</span></div>
       <div class="sec">Model</div>
@@ -2483,6 +2565,31 @@ async function changePlatform(platform) {
     status.textContent = 'Failed: ' + e.message;
     status.style.color = 'var(--red)';
   }
+}
+
+/* QUICK ACTIONS */
+async function restartAgent(agentId) {
+  if (!confirm('Restart this agent? Current sessions will be lost.')) return;
+  try {
+    const r = await fetch('/api/gateway/restart', {method:'POST'});
+    if (r.ok) {
+      alert('Gateway restart initiated. Agents will reload.');
+      setTimeout(() => { fetchAgents(); fetchStatus(); }, 3000);
+    }
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function clearAgentSessions(agentId) {
+  if (!confirm('Clear all sessions for this agent?')) return;
+  try {
+    const sessionsFile = '/home/kate/.openclaw/agents/' + agentId + '/sessions/sessions.json';
+    // This would need backend support - for now just show message
+    alert('Session clearing requires backend support. Use CLI: rm ~/.openclaw/agents/' + agentId + '/sessions/*.jsonl');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function toggleAgentHeartbeat(agentId) {
+  alert('Heartbeat toggle requires backend support. Use: openclaw cron add --agent ' + agentId + ' --every 30m');
 }
 
 /* SETTINGS DRAWER */
@@ -3653,6 +3760,31 @@ async function fetchStatus() {
   } catch(e){}
 }
 
+async function fetchSysStats() {
+  try {
+    const panel = document.getElementById('sys-stats-panel');
+    const d = await (await fetch('/api/system/stats')).json();
+    if (d) {
+      panel.style.display = 'flex';
+      // CPU
+      const cpuVal = d.cpu ? (d.cpu * 100 / 16).toFixed(0) : 0;
+      document.getElementById('sys-cpu').textContent = cpuVal + '%';
+      document.getElementById('sys-cpu-bar').style.width = Math.min(cpuVal, 100) + '%';
+      // RAM
+      document.getElementById('sys-ram').textContent = d.ram_used_gb.toFixed(1) + '/' + d.ram_total_gb.toFixed(1) + ' GB';
+      document.getElementById('sys-ram-bar').style.width = d.ram_percent + '%';
+      // GPU
+      if (d.gpu_available) {
+        document.getElementById('gpu-card').style.display = 'block';
+        document.getElementById('sys-gpu').textContent = d.gpu_util + '%';
+        document.getElementById('sys-gpu-bar').style.width = d.gpu_memory_percent + '%';
+        document.getElementById('sys-gpu-mem').textContent = d.gpu_name + ' \u00B7 ' + 
+          (d.gpu_memory_used_mb/1024).toFixed(1) + '/' + (d.gpu_memory_total_mb/1024).toFixed(1) + ' GB';
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
 async function fetchAgents() {
   try {
     const agents=await(await fetch('/api/agents')).json();
@@ -3684,7 +3816,29 @@ async function fetchSys() {
   } catch(e){}
 }
 
-async function fetchLogs() { try{const logs=await(await fetch('/api/logs/recent')).json();logs.forEach(addLog);}catch(e){} }
+let logFilterLevel = '';
+let logFilterAgent = '';
+let allLogs = [];
+
+async function fetchLogs() { 
+  try{
+    const logs=await(await fetch('/api/logs/recent')).json();
+    allLogs = logs;
+    filterLogs();
+  }catch(e){} 
+}
+
+function filterLogs() {
+  logFilterLevel = document.getElementById('log-filter-level').value;
+  logFilterAgent = document.getElementById('log-filter-agent').value;
+  const wrap = document.getElementById('log-wrap');
+  wrap.innerHTML = '';
+  allLogs.filter(l => {
+    if (logFilterLevel && !l.level?.includes(logFilterLevel)) return false;
+    if (logFilterAgent && !l.agent?.includes(logFilterAgent)) return false;
+    return true;
+  }).forEach(addLog);
+}
 
 function startSSE() {
   const es=new EventSource('/events');
@@ -3700,11 +3854,12 @@ initHeroParticles();
 (async()=>{
   await fetchHqSettings();
   await fetchStatus(); await fetchAgents(); fetchSys(); fetchLogs(); startSSE();
+  await fetchSysStats();
   fetchAvailableModels();
   fetchAvailablePlatforms();
   document.getElementById('task-form').style.display=curTab==='task'?'block':'none';
 })();
-setInterval(fetchStatus,10000); setInterval(fetchAgents,10000); setInterval(fetchSys,30000);
+setInterval(fetchStatus,10000); setInterval(fetchAgents,10000); setInterval(fetchSys,30000); setInterval(fetchSysStats,10000);
 
 // ── CRON FUNCTIONS ──
 async function fetchCronJobs() {

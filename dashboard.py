@@ -256,6 +256,64 @@ def api_status():
     })
 
 
+@app.route('/api/system/stats')
+def api_system_stats():
+    import subprocess
+    import os
+    
+    stats = {
+        'cpu': 0,
+        'ram_used_gb': 0,
+        'ram_total_gb': 0,
+        'ram_percent': 0,
+        'gpu_available': False,
+        'gpu_name': None,
+        'gpu_memory_used_mb': 0,
+        'gpu_memory_total_mb': 0,
+        'gpu_memory_percent': 0,
+        'gpu_util': 0,
+    }
+    
+    # CPU & RAM via psutil or /proc
+    try:
+        if os.path.exists('/proc/meminfo'):
+            with open('/proc/meminfo') as f:
+                for line in f:
+                    if line.startswith('MemTotal:'):
+                        stats['ram_total_gb'] = int(line.split()[1]) / 1024 / 1024
+                    elif line.startswith('MemAvailable:'):
+                        avail = int(line.split()[1]) / 1024 / 1024
+                        stats['ram_used_gb'] = stats['ram_total_gb'] - avail
+                        stats['ram_percent'] = round(stats['ram_used_gb'] / stats['ram_total_gb'] * 100, 1)
+                    elif line.startswith('MemFree:'):
+                        pass  # handled by MemAvailable
+        # CPU
+        if os.path.exists('/proc/loadavg'):
+            with open('/proc/loadavg') as f:
+                load = f.read().split()[0]
+                stats['cpu'] = float(load)
+    except Exception:
+        pass
+    
+    # GPU via nvidia-smi
+    try:
+        result = subprocess.run(['nvidia-smi', '--query-gpu=name,memory.used,memory.total,utilization.gpu', '--format=csv,noheader,nounits'], 
+                              capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            parts = result.stdout.strip().split(',')
+            if len(parts) >= 4:
+                stats['gpu_available'] = True
+                stats['gpu_name'] = parts[0].strip()
+                stats['gpu_memory_used_mb'] = int(parts[1].strip())
+                stats['gpu_memory_total_mb'] = int(parts[2].strip())
+                stats['gpu_memory_percent'] = round(stats['gpu_memory_used_mb'] / stats['gpu_memory_total_mb'] * 100, 1)
+                stats['gpu_util'] = int(parts[3].strip())
+    except Exception:
+        pass
+    
+    return jsonify(stats)
+
+
 @app.route('/api/agents')
 def api_agents():
     cfg = load_config()
@@ -323,6 +381,16 @@ def api_agents():
 
         binding = next((b for b in bindings if b.get('agentId') == agent_id), None)
         platform = binding.get('channel', '') if binding else ''
+        
+        # Get token stats from sessions
+        total_input = 0
+        total_output = 0
+        try:
+            for sess in sessions_data.values():
+                total_input += sess.get('inputTokens', 0)
+                total_output += sess.get('outputTokens', 0)
+        except:
+            pass
 
         result.append({
             'id': agent_id,
@@ -332,6 +400,7 @@ def api_agents():
             'lastActivity': last_activity.isoformat() if last_activity else None,
             'activeSessions': active_sessions,
             'currentTask': current_task,
+            'tokens': {'input': total_input, 'output': total_output, 'total': total_input + total_output},
         })
 
     return jsonify(result)
