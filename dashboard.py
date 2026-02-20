@@ -1183,6 +1183,7 @@ def api_tasks_create():
         'createdBy': body.get('createdBy', 'user'),
         'priority': body.get('priority', 'medium'),
         'status': 'pending',
+        'hours': body.get('hours', 0),
         'createdAt': now,
         'updatedAt': now,
         'dueDate': body.get('dueDate') or None,
@@ -1201,7 +1202,7 @@ def api_tasks_update(tid):
     task = next((t for t in data['tasks'] if t['id'] == tid), None)
     if not task:
         return jsonify({'error': 'task not found'}), 404
-    for key in ('title', 'description', 'assignedTo', 'priority', 'status', 'dueDate'):
+    for key in ('title', 'description', 'assignedTo', 'priority', 'status', 'dueDate', 'hours'):
         if key in body:
             task[key] = body[key]
     now = datetime.now().isoformat(timespec='seconds')
