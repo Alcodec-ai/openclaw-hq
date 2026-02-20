@@ -1200,6 +1200,90 @@ def _parse_log_line(line):
         return None
 
 
+## ── CRON JOBS ENDPOINTS ──
+
+def load_cron_jobs():
+    cron_file = Path.home() / '.openclaw' / 'cron' / 'jobs.json'
+    if cron_file.exists():
+        try:
+            return json.loads(cron_file.read_text())
+        except Exception:
+            pass
+    return {'version': 1, 'jobs': []}
+
+
+def save_cron_jobs(data):
+    cron_file = Path.home() / '.openclaw' / 'cron' / 'jobs.json'
+    cron_file.parent.mkdir(parents=True, exist_ok=True)
+    cron_file.write_text(json.dumps(data, indent=2))
+
+
+@app.route('/api/cron')
+def api_cron_list():
+    data = load_cron_jobs()
+    agent = request.args.get('agent', '')
+    jobs = data.get('jobs', [])
+    if agent:
+        jobs = [j for j in jobs if j.get('agentId') == agent]
+    # Clean sensitive data
+    for job in jobs:
+        job.pop('payload', None)
+    return jsonify(jobs)
+
+
+@app.route('/api/cron', methods=['POST'])
+def api_cron_create():
+    body = request.get_json() or {}
+    agent = body.get('agent', '').strip()
+    name = body.get('name', '').strip()
+    schedule = body.get('schedule', '').strip()  # cron expression like "30 8 * * *"
+    message = body.get('message', '').strip()
+    enabled = body.get('enabled', True)
+    if not agent or not name or not schedule:
+        return jsonify({'error': 'agent, name, and schedule required'}), 400
+    
+    data = load_cron_jobs()
+    job_id = f"cron_{data.get('nextId', len(data['jobs']) + 1)}"
+    now = datetime.now().isoformat(timespec='seconds')
+    job = {
+        'id': job_id,
+        'agentId': agent,
+        'name': name,
+        'schedule': schedule,
+        'message': message,
+        'enabled': enabled,
+        'createdAt': now,
+        'nextRun': schedule,  # cron expression
+    }
+    data['jobs'].append(job)
+    if 'nextId' not in data:
+        data['nextId'] = len(data['jobs']) + 1
+    save_cron_jobs(data)
+    return jsonify(job)
+
+
+@app.route('/api/cron/<job_id>/toggle', methods=['POST'])
+def api_cron_toggle(job_id):
+    data = load_cron_jobs()
+    job = next((j for j in data['jobs'] if j['id'] == job_id), None)
+    if not job:
+        return jsonify({'error': 'job not found'}), 404
+    job['enabled'] = not job.get('enabled', True)
+    save_cron_jobs(data)
+    return jsonify({'ok': True, 'enabled': job['enabled']})
+
+
+@app.route('/api/cron/<job_id>/delete', methods=['POST'])
+def api_cron_delete(job_id):
+    data = load_cron_jobs()
+    before = len(data['jobs'])
+    data['jobs'] = [j for j in data['jobs'] if j['id'] != job_id]
+    if len(data['jobs']) == before:
+        return jsonify({'error': 'job not found'}), 404
+    save_cron_jobs(data)
+    return jsonify({'ok': True})
+
+
 @app.route('/api/logs/recent')
 def api_logs_recent():
     log_file = today_log()

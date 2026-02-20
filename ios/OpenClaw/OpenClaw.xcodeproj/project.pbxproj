@@ -1,0 +1,559 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* OpenClawApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* OpenClawApp.swift */; };
+		A10000000000000000000002 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* AppState.swift */; };
+		A10000000000000000000003 /* Agent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* Agent.swift */; };
+		A10000000000000000000004 /* AgentDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* AgentDetail.swift */; };
+		A10000000000000000000005 /* GatewayStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* GatewayStatus.swift */; };
+		A10000000000000000000006 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* LogEntry.swift */; };
+		A10000000000000000000007 /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* Provider.swift */; };
+		A10000000000000000000008 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* Channel.swift */; };
+		A10000000000000000000009 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* Settings.swift */; };
+		A1000000000000000000000A /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000A /* Session.swift */; };
+		A1000000000000000000000B /* BackupStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000B /* BackupStatus.swift */; };
+		A1000000000000000000000C /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000C /* APIClient.swift */; };
+		A1000000000000000000000D /* SSEClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000D /* SSEClient.swift */; };
+		A1000000000000000000000E /* AgentListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000E /* AgentListViewModel.swift */; };
+		A1000000000000000000000F /* AgentDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000F /* AgentDetailViewModel.swift */; };
+		A10000000000000000000010 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* SettingsViewModel.swift */; };
+		A10000000000000000000011 /* LogsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* LogsViewModel.swift */; };
+		A10000000000000000000012 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* RootTabView.swift */; };
+		A10000000000000000000013 /* AgentListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* AgentListView.swift */; };
+		A10000000000000000000014 /* AgentRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* AgentRowView.swift */; };
+		A10000000000000000000015 /* AgentDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* AgentDetailView.swift */; };
+		A10000000000000000000016 /* MessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* MessageBubbleView.swift */; };
+		A10000000000000000000017 /* TokenUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* TokenUsageView.swift */; };
+		A10000000000000000000018 /* SendTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000018 /* SendTaskView.swift */; };
+		A10000000000000000000019 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* SettingsView.swift */; };
+		A1000000000000000000001A /* GatewayControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001A /* GatewayControlView.swift */; };
+		A1000000000000000000001B /* DefaultModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001B /* DefaultModelView.swift */; };
+		A1000000000000000000001C /* ProvidersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001C /* ProvidersView.swift */; };
+		A1000000000000000000001D /* ProviderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001D /* ProviderDetailView.swift */; };
+		A1000000000000000000001E /* ChannelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001E /* ChannelsView.swift */; };
+		A1000000000000000000001F /* ChannelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001F /* ChannelDetailView.swift */; };
+		A10000000000000000000020 /* BackupSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000020 /* BackupSettingsView.swift */; };
+		A10000000000000000000021 /* ServerURLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000021 /* ServerURLView.swift */; };
+		A10000000000000000000022 /* LogsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* LogsView.swift */; };
+		A10000000000000000000023 /* LogEntryRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000023 /* LogEntryRowView.swift */; };
+		A10000000000000000000024 /* AgentStatusCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000024 /* AgentStatusCalculator.swift */; };
+		A10000000000000000000025 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000025 /* UserDefaultsKeys.swift */; };
+		A10000000000000000000026 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000026 /* Assets.xcassets */; };
+		A10000000000000000000027 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000027 /* Preview Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B10000000000000000000001 /* OpenClawApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawApp.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* Agent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agent.swift; sourceTree = "<group>"; };
+		B10000000000000000000004 /* AgentDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDetail.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* GatewayStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayStatus.swift; sourceTree = "<group>"; };
+		B10000000000000000000006 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		B10000000000000000000007 /* Provider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Provider.swift; sourceTree = "<group>"; };
+		B10000000000000000000008 /* Channel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Channel.swift; sourceTree = "<group>"; };
+		B10000000000000000000009 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		B1000000000000000000000A /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		B1000000000000000000000B /* BackupStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupStatus.swift; sourceTree = "<group>"; };
+		B1000000000000000000000C /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		B1000000000000000000000D /* SSEClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSEClient.swift; sourceTree = "<group>"; };
+		B1000000000000000000000E /* AgentListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentListViewModel.swift; sourceTree = "<group>"; };
+		B1000000000000000000000F /* AgentDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDetailViewModel.swift; sourceTree = "<group>"; };
+		B10000000000000000000010 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		B10000000000000000000011 /* LogsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsViewModel.swift; sourceTree = "<group>"; };
+		B10000000000000000000012 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* AgentListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentListView.swift; sourceTree = "<group>"; };
+		B10000000000000000000014 /* AgentRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRowView.swift; sourceTree = "<group>"; };
+		B10000000000000000000015 /* AgentDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000016 /* MessageBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubbleView.swift; sourceTree = "<group>"; };
+		B10000000000000000000017 /* TokenUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenUsageView.swift; sourceTree = "<group>"; };
+		B10000000000000000000018 /* SendTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendTaskView.swift; sourceTree = "<group>"; };
+		B10000000000000000000019 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001A /* GatewayControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayControlView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001B /* DefaultModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModelView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001C /* ProvidersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvidersView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001D /* ProviderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderDetailView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001E /* ChannelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001F /* ChannelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000020 /* BackupSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsView.swift; sourceTree = "<group>"; };
+		B10000000000000000000021 /* ServerURLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerURLView.swift; sourceTree = "<group>"; };
+		B10000000000000000000022 /* LogsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogsView.swift; sourceTree = "<group>"; };
+		B10000000000000000000023 /* LogEntryRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntryRowView.swift; sourceTree = "<group>"; };
+		B10000000000000000000024 /* AgentStatusCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentStatusCalculator.swift; sourceTree = "<group>"; };
+		B10000000000000000000025 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
+		B10000000000000000000026 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B10000000000000000000027 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C10000000000000000000001 /* OpenClaw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenClaw.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D10000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E10000000000000000000001 /* = */ = {
+			isa = PBXGroup;
+			children = (
+				E10000000000000000000002 /* OpenClaw */,
+				E10000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E10000000000000000000002 /* OpenClaw */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000001 /* OpenClawApp.swift */,
+				B10000000000000000000002 /* AppState.swift */,
+				E10000000000000000000004 /* Models */,
+				E10000000000000000000005 /* Networking */,
+				E10000000000000000000006 /* ViewModels */,
+				E10000000000000000000007 /* Views */,
+				E1000000000000000000000D /* Utilities */,
+				B10000000000000000000026 /* Assets.xcassets */,
+				E1000000000000000000000E /* Preview Content */,
+			);
+			path = OpenClaw;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C10000000000000000000001 /* OpenClaw.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000003 /* Agent.swift */,
+				B10000000000000000000004 /* AgentDetail.swift */,
+				B10000000000000000000005 /* GatewayStatus.swift */,
+				B10000000000000000000006 /* LogEntry.swift */,
+				B10000000000000000000007 /* Provider.swift */,
+				B10000000000000000000008 /* Channel.swift */,
+				B10000000000000000000009 /* Settings.swift */,
+				B1000000000000000000000A /* Session.swift */,
+				B1000000000000000000000B /* BackupStatus.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000005 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000000C /* APIClient.swift */,
+				B1000000000000000000000D /* SSEClient.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000006 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000000E /* AgentListViewModel.swift */,
+				B1000000000000000000000F /* AgentDetailViewModel.swift */,
+				B10000000000000000000010 /* SettingsViewModel.swift */,
+				B10000000000000000000011 /* LogsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000007 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000012 /* RootTabView.swift */,
+				E10000000000000000000008 /* Agents */,
+				E10000000000000000000009 /* Settings */,
+				E1000000000000000000000C /* Logs */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000008 /* Agents */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000013 /* AgentListView.swift */,
+				B10000000000000000000014 /* AgentRowView.swift */,
+				B10000000000000000000015 /* AgentDetailView.swift */,
+				B10000000000000000000016 /* MessageBubbleView.swift */,
+				B10000000000000000000017 /* TokenUsageView.swift */,
+				B10000000000000000000018 /* SendTaskView.swift */,
+			);
+			path = Agents;
+			sourceTree = "<group>";
+		};
+		E10000000000000000000009 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000019 /* SettingsView.swift */,
+				B1000000000000000000001A /* GatewayControlView.swift */,
+				B1000000000000000000001B /* DefaultModelView.swift */,
+				B1000000000000000000001C /* ProvidersView.swift */,
+				B1000000000000000000001D /* ProviderDetailView.swift */,
+				B1000000000000000000001E /* ChannelsView.swift */,
+				B1000000000000000000001F /* ChannelDetailView.swift */,
+				B10000000000000000000020 /* BackupSettingsView.swift */,
+				B10000000000000000000021 /* ServerURLView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000000C /* Logs */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000022 /* LogsView.swift */,
+				B10000000000000000000023 /* LogEntryRowView.swift */,
+			);
+			path = Logs;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000000D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000024 /* AgentStatusCalculator.swift */,
+				B10000000000000000000025 /* UserDefaultsKeys.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		E1000000000000000000000E /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000027 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F10000000000000000000001 /* OpenClaw */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F10000000000000000000004 /* Build configuration list for PBXNativeTarget "OpenClaw" */;
+			buildPhases = (
+				F10000000000000000000002 /* Sources */,
+				D10000000000000000000001 /* Frameworks */,
+				F10000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenClaw;
+			productName = OpenClaw;
+			productReference = C10000000000000000000001 /* OpenClaw.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F10000000000000000000005 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					F10000000000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = F10000000000000000000006 /* Build configuration list for PBXProject "OpenClaw" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E10000000000000000000001 /* = */;
+			productRefGroup = E10000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F10000000000000000000001 /* OpenClaw */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F10000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000027 /* Preview Assets.xcassets in Resources */,
+				A10000000000000000000026 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F10000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* OpenClawApp.swift in Sources */,
+				A10000000000000000000002 /* AppState.swift in Sources */,
+				A10000000000000000000003 /* Agent.swift in Sources */,
+				A10000000000000000000004 /* AgentDetail.swift in Sources */,
+				A10000000000000000000005 /* GatewayStatus.swift in Sources */,
+				A10000000000000000000006 /* LogEntry.swift in Sources */,
+				A10000000000000000000007 /* Provider.swift in Sources */,
+				A10000000000000000000008 /* Channel.swift in Sources */,
+				A10000000000000000000009 /* Settings.swift in Sources */,
+				A1000000000000000000000A /* Session.swift in Sources */,
+				A1000000000000000000000B /* BackupStatus.swift in Sources */,
+				A1000000000000000000000C /* APIClient.swift in Sources */,
+				A1000000000000000000000D /* SSEClient.swift in Sources */,
+				A1000000000000000000000E /* AgentListViewModel.swift in Sources */,
+				A1000000000000000000000F /* AgentDetailViewModel.swift in Sources */,
+				A10000000000000000000010 /* SettingsViewModel.swift in Sources */,
+				A10000000000000000000011 /* LogsViewModel.swift in Sources */,
+				A10000000000000000000012 /* RootTabView.swift in Sources */,
+				A10000000000000000000013 /* AgentListView.swift in Sources */,
+				A10000000000000000000014 /* AgentRowView.swift in Sources */,
+				A10000000000000000000015 /* AgentDetailView.swift in Sources */,
+				A10000000000000000000016 /* MessageBubbleView.swift in Sources */,
+				A10000000000000000000017 /* TokenUsageView.swift in Sources */,
+				A10000000000000000000018 /* SendTaskView.swift in Sources */,
+				A10000000000000000000019 /* SettingsView.swift in Sources */,
+				A1000000000000000000001A /* GatewayControlView.swift in Sources */,
+				A1000000000000000000001B /* DefaultModelView.swift in Sources */,
+				A1000000000000000000001C /* ProvidersView.swift in Sources */,
+				A1000000000000000000001D /* ProviderDetailView.swift in Sources */,
+				A1000000000000000000001E /* ChannelsView.swift in Sources */,
+				A1000000000000000000001F /* ChannelDetailView.swift in Sources */,
+				A10000000000000000000020 /* BackupSettingsView.swift in Sources */,
+				A10000000000000000000021 /* ServerURLView.swift in Sources */,
+				A10000000000000000000022 /* LogsView.swift in Sources */,
+				A10000000000000000000023 /* LogEntryRowView.swift in Sources */,
+				A10000000000000000000024 /* AgentStatusCalculator.swift in Sources */,
+				A10000000000000000000025 /* UserDefaultsKeys.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F10000000000000000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F10000000000000000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F10000000000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"OpenClaw/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpenClaw/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenClaw;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "OpenClaw needs LAN access to connect to the dashboard server";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openclaw.hq;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F1000000000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"OpenClaw/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpenClaw/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenClaw;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "OpenClaw needs LAN access to connect to the dashboard server";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.openclaw.hq;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F10000000000000000000006 /* Build configuration list for PBXProject "OpenClaw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F10000000000000000000007 /* Debug */,
+				F10000000000000000000008 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F10000000000000000000004 /* Build configuration list for PBXNativeTarget "OpenClaw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F10000000000000000000009 /* Debug */,
+				F1000000000000000000000A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F10000000000000000000005 /* Project object */;
+}
