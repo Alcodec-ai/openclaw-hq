@@ -2407,11 +2407,9 @@ class OfficeMap {
         agentId: a.id, fromX: home.x, fromY: home.y,
         toX: mx + Math.cos(angle) * radius, toY: my + Math.sin(angle) * radius * 0.6,
         progress: 0, speed: 0.006 + Math.random() * 0.003,
-        type: 'meeting', returning: false, returnDelay: durationTicks || 300
+        type: 'meeting', returning: false
       });
     });
-    clearTimeout(this.meetingTimer);
-    this.meetingTimer = setTimeout(() => this.endMeeting(), (durationTicks || 300) * 16);
   }
 
   endMeeting() {
@@ -2444,6 +2442,12 @@ class OfficeMap {
       }
       if (t >= 1) {
         if (!m.returning) {
+          // Meeting type: stay at destination until endMeeting() is called
+          if (m.type === 'meeting') {
+            m.progress = 1;
+            return true;
+          }
+          // Visit type: auto-return after delay
           m.returnDelay--;
           if (m.returnDelay <= 0) {
             m.returning = true; m.progress = 0;
