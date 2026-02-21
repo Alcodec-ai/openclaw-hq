@@ -2136,6 +2136,9 @@ class OfficeMap {
     this.sprites = {}; this.tick = 0;
     this.particles = [];
     this.hoveredCell = null;
+    this.movements = []; // {agentId, fromX, fromY, toX, toY, progress, speed, type:'visit'|'meeting', returnDelay}
+    this.meetingMode = false;
+    this.meetingTimer = null;
     this.agentCells = {};
     this.meetingCell = {col:1,row:1};
     this.serverCell = {col:2,row:2};
@@ -2246,6 +2249,12 @@ class OfficeMap {
     const rect = this.canvas.getBoundingClientRect();
     const cell = this._cellAt(e.clientX - rect.left, e.clientY - rect.top);
     if (!cell) return;
+    // Click on meeting room triggers meeting
+    if (this.meetingCell && cell.col === this.meetingCell.col && cell.row === this.meetingCell.row) {
+      if (!this.meetingMode) { this.triggerMeeting(250); showToast('Meeting started!', 'info'); }
+      else { this.endMeeting(); showToast('Meeting ended', 'info'); }
+      return;
+    }
     const id = Object.keys(this.agentCells).find(k => this.agentCells[k].col===cell.col && this.agentCells[k].row===cell.row);
     if (id) selectAgent(id);
   }
@@ -2258,8 +2267,96 @@ class OfficeMap {
     this.agentList = agents;
     if (changed) this._computeGrid();
     agents.forEach(a => {
+      const isMoving = this.movements.some(m => m.agentId === a.id);
       if (!this.sprites[a.id]) { const h=this._home(a.id)||{x:0,y:0}; this.sprites[a.id]={x:h.x,y:h.y,dir:1}; }
-      else { const h=this._home(a.id); if(h){this.sprites[a.id].x=h.x;this.sprites[a.id].y=h.y;} }
+      else if (!isMoving) { const h=this._home(a.id); if(h){this.sprites[a.id].x=h.x;this.sprites[a.id].y=h.y;} }
+    });
+  }
+
+  // Sine-curve movement: agent visits another agent's room
+  triggerVisit(fromId, toId) {
+    const fromHome = this._home(fromId);
+    const toHome = this._home(toId);
+    if (!fromHome || !toHome) return;
+    // Remove existing movement for this agent
+    this.movements = this.movements.filter(m => m.agentId !== fromId);
+    this.movements.push({
+      agentId: fromId, fromX: fromHome.x, fromY: fromHome.y,
+      toX: toHome.x, toY: toHome.y, progress: 0, speed: 0.008,
+      type: 'visit', returning: false, returnDelay: 120
+    });
+  }
+
+  // All agents go to meeting room
+  triggerMeeting(durationTicks) {
+    if (this.meetingMode) return;
+    this.meetingMode = true;
+    const mc = this.meetingCell;
+    if (!mc) return;
+    const meetPos = this._cellO(mc.col, mc.row);
+    const mx = meetPos.x + this.CW * 0.5;
+    const my = meetPos.y + this.CH * 0.7;
+    this.agentList.forEach((a, i) => {
+      const home = this._home(a.id);
+      if (!home) return;
+      this.movements = this.movements.filter(m => m.agentId !== a.id);
+      // Offset positions around meeting table
+      const angle = (i / Math.max(1, this.agentList.length)) * Math.PI * 2;
+      const radius = Math.min(this.CW, this.CH) * 0.25;
+      this.movements.push({
+        agentId: a.id, fromX: home.x, fromY: home.y,
+        toX: mx + Math.cos(angle) * radius, toY: my + Math.sin(angle) * radius * 0.6,
+        progress: 0, speed: 0.006 + Math.random() * 0.003,
+        type: 'meeting', returning: false, returnDelay: durationTicks || 300
+      });
+    });
+    clearTimeout(this.meetingTimer);
+    this.meetingTimer = setTimeout(() => this.endMeeting(), (durationTicks || 300) * 16);
+  }
+
+  endMeeting() {
+    this.meetingMode = false;
+    this.movements.forEach(m => {
+      if (m.type === 'meeting' && !m.returning) {
+        m.returning = true; m.progress = 0;
+        const tmp = m.fromX; m.fromX = m.toX; m.toX = tmp;
+        const tmp2 = m.fromY; m.fromY = m.toY; m.toY = tmp2;
+      }
+    });
+  }
+
+  _updateMovements() {
+    this.movements = this.movements.filter(m => {
+      m.progress += m.speed;
+      const t = Math.min(1, m.progress);
+      // Sine-curve interpolation
+      const easeT = t;
+      const sineOffset = Math.sin(t * Math.PI * 2.5) * 15;
+      const dx = m.toX - m.fromX, dy = m.toY - m.fromY;
+      // Perpendicular direction for sine offset
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      const px = -dy/dist, py = dx/dist;
+      const sp = this.sprites[m.agentId];
+      if (sp) {
+        sp.x = m.fromX + dx * easeT + px * sineOffset * (1 - t);
+        sp.y = m.fromY + dy * easeT + py * sineOffset * (1 - t);
+        sp.dir = dx > 0 ? 1 : -1;
+      }
+      if (t >= 1) {
+        if (!m.returning) {
+          m.returnDelay--;
+          if (m.returnDelay <= 0) {
+            m.returning = true; m.progress = 0;
+            const tmp = m.fromX; m.fromX = m.toX; m.toX = tmp;
+            const tmp2 = m.fromY; m.fromY = m.toY; m.toY = tmp2;
+          }
+          return true;
+        }
+        // Returned home, remove
+        if (sp) { const h = this._home(m.agentId); if(h){sp.x=h.x;sp.y=h.y;} }
+        return false;
+      }
+      return true;
     });
   }
   _loop() { const f=()=>{this.tick++;this._render();requestAnimationFrame(f);}; requestAnimationFrame(f); }
@@ -2337,6 +2434,38 @@ class OfficeMap {
         }
       }
     }
+
+    // 3.5 Update movements (sine-curve paths)
+    this._updateMovements();
+
+    // 3.6 Draw movement trails
+    this.movements.forEach(m => {
+      if (m.progress > 0 && m.progress < 1) {
+        const sp = this.sprites[m.agentId];
+        if (!sp) return;
+        const pal = getAgentPalette(m.agentId);
+        ctx.save();
+        ctx.setLineDash([3,5]);
+        ctx.lineDashOffset = -this.tick * 0.5;
+        ctx.strokeStyle = pal.accent + '44';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        // Draw sine-curve trail
+        const dx = m.toX - m.fromX, dy = m.toY - m.fromY;
+        const dist = Math.sqrt(dx*dx+dy*dy) || 1;
+        const px = -dy/dist, py = dx/dist;
+        for (let s=0; s<=20; s++) {
+          const st = s/20;
+          const so = Math.sin(st*Math.PI*2.5)*15*(1-st);
+          const sx = m.fromX + dx*st + px*so;
+          const sy = m.fromY + dy*st + py*so;
+          if (s===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+    });
 
     // 4. Draw characters on top of everything
     Object.entries(this.sprites).forEach(([id,sp]) => {
@@ -2592,6 +2721,27 @@ class OfficeMap {
       ctx.fillStyle=mt.barColors[i];
       this._roundRect(ctx, sx+7+i*barW, sy+sh-bh-4, barW-2, bh, 3); ctx.fill();
     }
+
+    // Sine wave energy field
+    ctx.save();
+    this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.clip();
+    const waveColors = this.meetingMode
+      ? ['rgba(175,82,222,0.35)','rgba(88,86,214,0.25)','rgba(0,122,255,0.2)']
+      : ['rgba(175,82,222,0.12)','rgba(88,86,214,0.08)','rgba(0,122,255,0.06)'];
+    waveColors.forEach((wc, wi) => {
+      ctx.beginPath();
+      const waveY = y + H * 0.55 + wi * 8;
+      const amp = (this.meetingMode ? 12 : 6) + wi * 3;
+      const freq = 0.025 + wi * 0.008;
+      const spd = (this.meetingMode ? 0.06 : 0.03) * (1 + wi * 0.3);
+      ctx.moveTo(x, waveY);
+      for (let wx = 0; wx <= W; wx += 2) {
+        ctx.lineTo(x + wx, waveY + Math.sin(wx * freq + tick * spd + wi * 1.2) * amp);
+      }
+      ctx.lineTo(x + W, y + H); ctx.lineTo(x, y + H); ctx.closePath();
+      ctx.fillStyle = wc; ctx.fill();
+    });
+    ctx.restore();
 
     // LED with ring
     const lx2=x+W-gap-14, ly2=y+gap+14;
@@ -4063,12 +4213,21 @@ async function saveTask() {
         body: JSON.stringify(payload)
       });
       showToast('Task updated', 'success');
+      // Trigger visit animation if agent changed
+      if (payload.assignedTo && selectedId && payload.assignedTo !== selectedId) {
+        office.triggerVisit(selectedId, payload.assignedTo);
+      }
     } else {
       await fetch('/api/tasks', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
       });
       showToast('Task created', 'success');
+      // Trigger visit animation: first available agent visits assigned agent
+      if (payload.assignedTo) {
+        const otherAgent = Object.keys(agentMap).find(id => id !== payload.assignedTo);
+        if (otherAgent) office.triggerVisit(otherAgent, payload.assignedTo);
+      }
     }
     closeTaskModal();
     loadTasks(); loadTaskStats();
