@@ -2402,19 +2402,20 @@ class OfficeMap {
     ctx.lineWidth = isHovered ? 2.5 : 0.8 + breathe * 1.2;
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.stroke();
 
-    // Name badge
-    const badgeW = Math.min(W*0.5, 100), badgeH = 24;
-    const badgeX = x+(W-badgeW)/2, badgeY = y+gap+8;
+    // Name badge — top-left corner
+    const nameText = (a.name || id).toUpperCase();
+    ctx.font = `700 ${Math.max(10,S+3)}px Inter,-apple-system,sans-serif`;
+    const nameMetrics = ctx.measureText(nameText);
+    const badgeW = nameMetrics.width + 16, badgeH = 20;
+    const badgeX = x+gap+6, badgeY = y+gap+6;
     ctx.fillStyle = pal.bg+'dd';
-    this._roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 8); ctx.fill();
+    this._roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 6); ctx.fill();
     ctx.strokeStyle = pal.accent+'66'; ctx.lineWidth = 0.5;
-    this._roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 8); ctx.stroke();
+    this._roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 6); ctx.stroke();
 
     ctx.fillStyle = pal.dark;
-    ctx.font = `700 ${Math.max(11,S+4)}px Inter,-apple-system,sans-serif`;
-    ctx.textBaseline='middle'; ctx.textAlign='center';
-    ctx.fillText(id.toUpperCase(), x+W/2, badgeY+badgeH/2);
-    ctx.textAlign='left';
+    ctx.textBaseline='middle'; ctx.textAlign='left';
+    ctx.fillText(nameText, badgeX+8, badgeY+badgeH/2);
 
     // Model
     const mdl = (a.model||'').split('/').pop().substring(0,16);
