@@ -1837,13 +1837,14 @@ body {
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- TASK MODAL -->
+<!-- TASK MODAL (Create & Edit) -->
 <div class="modal-overlay" id="task-modal" onclick="if(event.target===this)closeTaskModal()">
   <div class="modal-box">
-    <div class="modal-box-hdr"><span>New Task</span><button onclick="closeTaskModal()">&times;</button></div>
+    <div class="modal-box-hdr"><span id="tm-modal-title">New Task</span><button onclick="closeTaskModal()">&times;</button></div>
+    <input type="hidden" id="tm-id" value="">
     <div class="modal-body">
       <div class="modal-field"><label>Title</label><input id="tm-title" placeholder="Task title..."></div>
-      <div class="modal-field"><label>Description</label><textarea id="tm-desc" placeholder="Optional description..."></textarea></div>
+      <div class="modal-field"><label>Description</label><textarea id="tm-desc" placeholder="Optional description..." rows="3"></textarea></div>
       <div class="modal-row">
         <div class="modal-field"><label>Assign To</label><select id="tm-agent"><option value="">Unassigned</option></select></div>
         <div class="modal-field"><label>Priority</label>
@@ -1854,10 +1855,19 @@ body {
         <div class="modal-field"><label>Due Date</label><input type="date" id="tm-due"></div>
         <div class="modal-field"><label>Estimated Hours</label><input type="number" id="tm-hours" min="0" max="999" step="0.5" placeholder="0"></div>
       </div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Status</label>
+          <select id="tm-status">
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-action secondary" onclick="closeTaskModal()">Cancel</button>
-      <button class="btn-action primary" onclick="createTask()">Create Task</button>
+      <button class="btn-action primary" id="tm-submit-btn" onclick="saveTask()">Create Task</button>
     </div>
   </div>
 </div>
@@ -3952,13 +3962,14 @@ function taskCardHtml(t) {
     dueHtml = `<span class="due-badge ${isOverdue ? 'overdue' : ''}">${t.dueDate}</span>`;
   }
   let actions = '';
+  actions += `<button class="task-action-btn" onclick="openEditTaskModal('${t.id}')" title="Edit">&#x270E;</button>`;
   if (t.status === 'pending') {
-    actions += `<button class="task-action-btn" onclick="updateTaskStatus('${t.id}','in_progress')">&#x25B6; Start</button>`;
+    actions += `<button class="task-action-btn" onclick="updateTaskStatus('${t.id}','in_progress')">&#x25B6;</button>`;
     actions += `<button class="task-action-btn complete" onclick="updateTaskStatus('${t.id}','completed')">&#x2713;</button>`;
   } else if (t.status === 'in_progress') {
-    actions += `<button class="task-action-btn complete" onclick="updateTaskStatus('${t.id}','completed')">&#x2713; Done</button>`;
+    actions += `<button class="task-action-btn complete" onclick="updateTaskStatus('${t.id}','completed')">&#x2713;</button>`;
   } else {
-    actions += `<button class="task-action-btn" onclick="updateTaskStatus('${t.id}','pending')">&#x21A9; Reopen</button>`;
+    actions += `<button class="task-action-btn" onclick="updateTaskStatus('${t.id}','pending')">&#x21A9;</button>`;
   }
   actions += `<button class="task-action-btn delete" onclick="deleteTask('${t.id}')">&#x2715;</button>`;
 
@@ -3986,41 +3997,78 @@ function renderTaskStatsBar() {
     <div class="task-stat-item"><span class="task-stat-num" style="color:var(--green)">${s.completed || 0}</span> Completed</div>`;
 }
 
-function openTaskModal() {
+function _populateAgentSelect(selectedId) {
   const sel = document.getElementById('tm-agent');
   sel.innerHTML = '<option value="">Unassigned</option>';
   Object.values(agentMap).forEach(a => {
-    sel.innerHTML += `<option value="${esc(a.id)}">${esc(a.name)}</option>`;
+    sel.innerHTML += `<option value="${esc(a.id)}" ${a.id===selectedId?'selected':''}>${esc(a.name)}</option>`;
   });
+}
+
+function openTaskModal() {
+  _populateAgentSelect('');
+  document.getElementById('tm-id').value = '';
   document.getElementById('tm-title').value = '';
   document.getElementById('tm-desc').value = '';
   document.getElementById('tm-priority').value = 'medium';
   document.getElementById('tm-due').value = '';
   document.getElementById('tm-hours').value = '';
+  document.getElementById('tm-status').value = 'pending';
+  document.getElementById('tm-status').parentElement.parentElement.style.display = 'none';
+  document.getElementById('tm-modal-title').textContent = 'New Task';
+  document.getElementById('tm-submit-btn').textContent = 'Create Task';
+  document.getElementById('task-modal').classList.add('show');
+}
+
+function openEditTaskModal(taskId) {
+  const t = allTasks.find(x => x.id === taskId);
+  if (!t) return;
+  _populateAgentSelect(t.assignedTo || '');
+  document.getElementById('tm-id').value = t.id;
+  document.getElementById('tm-title').value = t.title || '';
+  document.getElementById('tm-desc').value = t.description || '';
+  document.getElementById('tm-priority').value = t.priority || 'medium';
+  document.getElementById('tm-due').value = t.dueDate || '';
+  document.getElementById('tm-hours').value = t.hours || '';
+  document.getElementById('tm-status').value = t.status || 'pending';
+  document.getElementById('tm-status').parentElement.parentElement.style.display = '';
+  document.getElementById('tm-modal-title').textContent = 'Edit Task';
+  document.getElementById('tm-submit-btn').textContent = 'Update Task';
   document.getElementById('task-modal').classList.add('show');
 }
 
 function closeTaskModal() { document.getElementById('task-modal').classList.remove('show'); }
 
-async function createTask() {
+async function saveTask() {
   const title = document.getElementById('tm-title').value.trim();
   if (!title) return;
+  const taskId = document.getElementById('tm-id').value;
+  const payload = {
+    title,
+    description: document.getElementById('tm-desc').value.trim(),
+    assignedTo: document.getElementById('tm-agent').value,
+    priority: document.getElementById('tm-priority').value,
+    dueDate: document.getElementById('tm-due').value || null,
+    hours: parseFloat(document.getElementById('tm-hours').value) || 0,
+  };
   try {
-    await fetch('/api/tasks', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        title,
-        description: document.getElementById('tm-desc').value.trim(),
-        assignedTo: document.getElementById('tm-agent').value,
-        priority: document.getElementById('tm-priority').value,
-        dueDate: document.getElementById('tm-due').value || null,
-        hours: parseFloat(document.getElementById('tm-hours').value) || 0,
-      })
-    });
+    if (taskId) {
+      payload.status = document.getElementById('tm-status').value;
+      await fetch(`/api/tasks/${taskId}/update`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      showToast('Task updated', 'success');
+    } else {
+      await fetch('/api/tasks', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      showToast('Task created', 'success');
+    }
     closeTaskModal();
     loadTasks(); loadTaskStats();
-    showToast('Task created', 'success');
-  } catch (e) { showToast('Failed to create task', 'error'); }
+  } catch (e) { showToast('Failed to save task', 'error'); }
 }
 
 async function updateTaskStatus(id, status) {
