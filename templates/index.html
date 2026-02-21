@@ -1750,6 +1750,12 @@ body {
             <option value="">Select model...</option>
           </select>
         </div>
+        <div class="add-provider-row">
+          <span class="add-provider-label">Fallback</span>
+          <select class="setting-select" id="new-agent-fallback" style="flex:1;min-width:0">
+            <option value="">No fallback</option>
+          </select>
+        </div>
         <div class="add-provider-row" style="justify-content:flex-end">
           <button class="btn-action primary" onclick="addAgent()">Add Agent</button>
         </div>
@@ -3207,6 +3213,16 @@ function renderDetail() {
       </select>
       <div class="model-status" id="model-status"></div>
 
+      <div class="sec">Fallback Models</div>
+      <div class="fallback-list" id="agent-fallback-list"></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <select class="model-select" id="agent-add-fallback" style="flex:1;min-width:0;font-size:11px">
+          ${availableModels.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}
+        </select>
+        <button class="btn-action secondary" style="font-size:10px;padding:4px 10px" onclick="addAgentFallback()">+ Add</button>
+      </div>
+      <div class="model-status" id="agent-fallback-status"></div>
+
       <div class="sec">Platform</div>
       <select class="model-select" id="platform-selector" onchange="changePlatform(this.value)">
         ${availablePlatforms.map(p => `<option value="${esc(p)}" ${p===(d.platform||'')?'selected':''}>${PLATFORM_LABELS[p]||p}</option>`).join('')}
@@ -3217,6 +3233,7 @@ function renderDetail() {
       <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;background:${isDarkMode()?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)'};padding:12px;border-radius:var(--radius-xs);word-break:break-word">
         ${a.currentTask?esc(a.currentTask):'<em style="color:var(--text-tertiary)">No active task</em>'}
       </div>`;
+    renderAgentFallbacks(d.fallbacks || []);
   } else if (curTab==='messages') {
     const msgs=(d.messages||[]).slice(-20);
     if (!msgs.length) { body.innerHTML='<div style="color:var(--text-tertiary);font-size:12px;padding:20px;text-align:center">No messages.</div>'; return; }
@@ -3263,6 +3280,69 @@ async function changeModel(model) {
     status.textContent = 'Failed: ' + e.message;
     status.style.color = 'var(--red)';
   }
+}
+
+/* AGENT FALLBACKS */
+let agentFallbacks = [];
+
+function renderAgentFallbacks(fallbacks) {
+  agentFallbacks = fallbacks || [];
+  const el = document.getElementById('agent-fallback-list');
+  if (!el) return;
+  if (!agentFallbacks.length) {
+    el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px;padding:4px 0">No fallbacks configured</div>';
+    return;
+  }
+  el.innerHTML = agentFallbacks.map((m, i) => `
+    <div class="fallback-item">
+      <span class="fb-order">${i+1}</span>
+      <span class="fb-name">${esc(m)}</span>
+      <button class="fb-move" onclick="moveAgentFallback(${i},-1)" ${i===0?'disabled':''}>&uarr;</button>
+      <button class="fb-move" onclick="moveAgentFallback(${i},1)" ${i===agentFallbacks.length-1?'disabled':''}>&darr;</button>
+      <button class="fb-remove" onclick="removeAgentFallback(${i})">&times;</button>
+    </div>
+  `).join('');
+}
+
+async function saveAgentFallbacks(fallbacks) {
+  if (!selectedId) return;
+  const status = document.getElementById('agent-fallback-status');
+  try {
+    const r = await fetch(`/api/agent/${selectedId}/fallbacks`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({fallbacks})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      renderAgentFallbacks(d.fallbacks);
+      if (status) { status.textContent = 'Fallbacks updated'; status.style.color = 'var(--green)'; }
+      showToast('Agent fallbacks updated');
+    } else throw new Error(d.error || 'Error');
+  } catch(e) {
+    if (status) { status.textContent = 'Failed: ' + e.message; status.style.color = 'var(--red)'; }
+  }
+  if (status) setTimeout(() => { status.textContent = ''; }, 3000);
+}
+
+function addAgentFallback() {
+  const sel = document.getElementById('agent-add-fallback');
+  if (!sel || !sel.value) return;
+  const fb = [...agentFallbacks, sel.value];
+  saveAgentFallbacks(fb);
+}
+
+function removeAgentFallback(idx) {
+  const fb = [...agentFallbacks];
+  fb.splice(idx, 1);
+  saveAgentFallbacks(fb);
+}
+
+function moveAgentFallback(idx, dir) {
+  const fb = [...agentFallbacks];
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= fb.length) return;
+  [fb[idx], fb[newIdx]] = [fb[newIdx], fb[idx]];
+  saveAgentFallbacks(fb);
 }
 
 /* PLATFORM CHANGE */
@@ -3620,6 +3700,13 @@ function renderAgentMgmt() {
     modelSel.innerHTML = '<option value="">Select model...</option>' +
       availableModels.map(m => `<option value="${esc(m)}" ${m===current?'selected':''}>${esc(m)}</option>`).join('');
   }
+  // Populate new-agent fallback dropdown
+  const fbSel = document.getElementById('new-agent-fallback');
+  if (fbSel) {
+    const current = fbSel.value;
+    fbSel.innerHTML = '<option value="">No fallback</option>' +
+      availableModels.map(m => `<option value="${esc(m)}" ${m===current?'selected':''}>${esc(m)}</option>`).join('');
+  }
 }
 
 function setAgentCharStyle(id, style) {
@@ -3632,21 +3719,26 @@ async function addAgent() {
   const idEl = document.getElementById('new-agent-id');
   const nameEl = document.getElementById('new-agent-name');
   const modelEl = document.getElementById('new-agent-model');
+  const fbEl = document.getElementById('new-agent-fallback');
   const id = idEl.value.trim().toLowerCase();
   const name = nameEl.value.trim();
   const model = modelEl.value;
+  const fallback = fbEl ? fbEl.value : '';
 
   if (!id) { showToast('Agent ID is required', 'error'); return; }
 
   try {
+    const payload = { id, name: name || id, model };
+    if (fallback) payload.fallback = fallback;
     const r = await fetch('/api/agents/add', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ id, name: name || id, model })
+      body: JSON.stringify(payload)
     });
     const d = await r.json();
     if (d.ok) {
       showToast('Agent "' + id + '" created', 'success');
       idEl.value = ''; nameEl.value = ''; modelEl.value = '';
+      if (fbEl) fbEl.value = '';
       fetchAgents();
       setTimeout(renderAgentMgmt, 500);
     } else {

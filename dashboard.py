@@ -808,6 +808,7 @@ def api_agent_detail(agent_id):
         'id': agent_id,
         'name': agent.get('name', agent_id),
         'model': agent.get('model', {}).get('primary', 'unknown'),
+        'fallbacks': agent.get('model', {}).get('fallbacks', []),
         'platform': platform,
         'sessionCount': len(sessions_data),
         'messages': messages[-20:],
@@ -870,6 +871,27 @@ def api_agent_model(agent_id):
     agent['model']['primary'] = model
     save_config(cfg)
     return jsonify({'ok': True, 'model': model})
+
+
+@app.route('/api/agent/<agent_id>/fallbacks', methods=['POST'])
+def api_agent_fallbacks(agent_id):
+    """Change fallback models for an agent."""
+    data = request.get_json() or {}
+    fallbacks = data.get('fallbacks', [])
+    if not isinstance(fallbacks, list):
+        return jsonify({'error': 'fallbacks must be a list'}), 400
+
+    cfg = load_config()
+    agents_list = cfg.get('agents', {}).get('list', [])
+    agent = next((a for a in agents_list if a['id'] == agent_id), None)
+    if not agent:
+        return jsonify({'error': 'agent not found'}), 404
+
+    if 'model' not in agent:
+        agent['model'] = {}
+    agent['model']['fallbacks'] = [f.strip() for f in fallbacks if f.strip()]
+    save_config(cfg)
+    return jsonify({'ok': True, 'fallbacks': agent['model']['fallbacks']})
 
 
 @app.route('/api/agent/<agent_id>/platform', methods=['POST'])
@@ -1579,6 +1601,9 @@ def api_agents_add():
         'agentDir': agent_dir,
         'model': {'primary': model} if model else {},
     }
+    fallback = data.get('fallback', '').strip()
+    if fallback:
+        agent_entry['model']['fallbacks'] = [fallback]
     agents_list.append(agent_entry)
     save_config(cfg)
 
