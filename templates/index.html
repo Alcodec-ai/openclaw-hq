@@ -130,39 +130,52 @@ body {
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 #topbar-meta { font-size: 10px; color: var(--text-tertiary); font-family: 'SF Mono', 'Menlo', monospace; }
 #live-clock {
-  display: flex; align-items: center; gap: 10px;
-  font-family: inherit;
-  padding: 6px 14px; border-radius: 12px;
-  background: linear-gradient(135deg, rgba(0,122,255,0.08), rgba(88,86,214,0.08));
-  border: 1px solid rgba(0,122,255,0.12);
-  position: relative;
-  overflow: hidden;
+  display: flex; align-items: center; gap: 14px;
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  padding: 8px 18px; border-radius: 14px;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 0.5px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+#live-clock:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
 }
 #live-clock::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(0,122,255,0.06), transparent);
-  animation: clockShimmer 3s ease-in-out infinite;
+  content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: appleShimmer 4s ease-in-out infinite;
 }
-@keyframes clockShimmer {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
+@keyframes appleShimmer {
+  0% { left: -60%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
 }
 #clock-time {
-  font-size: 18px; font-weight: 700; color: var(--text);
-  letter-spacing: 1px; position: relative; z-index: 1;
+  font-size: 20px; font-weight: 600; color: #1d1d1f;
+  letter-spacing: -0.5px; position: relative; z-index: 1;
+  font-feature-settings: 'tnum';
 }
 #clock-separator {
-  animation: clockBlink 1s step-end infinite;
+  animation: appleBlink 2s ease-in-out infinite;
+  display: inline-block;
 }
-@keyframes clockBlink {
+@keyframes appleBlink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50% { opacity: 0.2; }
 }
 #clock-date {
-  font-size: 18px; font-weight: 700; color: var(--text);
+  font-size: 15px; font-weight: 500; color: #86868b;
   position: relative; z-index: 1; white-space: nowrap;
-  padding-left: 10px; border-left: 1px solid rgba(0,122,255,0.15);
-  letter-spacing: 0.3px;
+  letter-spacing: -0.2px;
+}
+#clock-dot {
+  width: 4px; height: 4px; border-radius: 50%; background: #86868b;
+  opacity: 0.5; position: relative; z-index: 1; flex-shrink: 0;
 }
 #btn-drawer {
   display: flex; align-items: center; gap: 5px;
@@ -231,20 +244,20 @@ body {
   box-shadow: var(--shadow-sm);
 }
 .agent-avatar .av-status {
-  position: absolute; bottom: -1px; right: -1px;
-  width: 11px; height: 11px; border-radius: 50%;
-  border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: absolute; bottom: -2px; right: -2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2.5px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
-.av-status.busy     { background: var(--blue); animation: pulse-dot 2s infinite; }
-.av-status.idle     { background: var(--green); }
-.av-status.inactive { background: var(--orange); }
+.av-status.busy     { background: var(--blue); box-shadow: 0 0 0 2.5px white, 0 0 8px rgba(0,122,255,0.5); animation: pulse-dot 2s ease-in-out infinite; }
+.av-status.idle     { background: var(--green); box-shadow: 0 0 0 2.5px white, 0 0 8px rgba(52,199,89,0.5); }
+.av-status.inactive { background: var(--orange); box-shadow: 0 0 0 2.5px white, 0 0 8px rgba(255,149,0,0.4); }
 .av-status.offline  { background: #c7c7cc; }
-@keyframes pulse-dot { 0%,100%{transform:scale(1)} 50%{transform:scale(0.8)} }
+@keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(0.85);opacity:0.7} }
 
 .agent-info { flex: 1; min-width: 0; }
-.ai-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.ai-name { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
 .ai-task {
-  font-size: 11px; color: var(--text-tertiary); margin-top: 1px;
+  font-size: 10px; color: var(--text-tertiary); margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 145px;
 }
 .ai-meta { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
@@ -260,14 +273,14 @@ body {
 }
 
 #float-stats {
-  display: flex; gap: 6px; padding: 6px 10px;
+  display: flex; gap: 6px; padding: 4px 10px;
   flex-shrink: 0; background: var(--bg);
 }
 .fstat {
-  flex: 1; background: var(--bg-white); border-radius: var(--radius);
-  padding: 8px 10px; box-shadow: var(--shadow-sm);
+  flex: 1; background: var(--bg-white); border-radius: 10px;
+  padding: 4px 8px; box-shadow: var(--shadow-sm);
   transition: all 0.3s cubic-bezier(0.25,0.1,0.25,1); border: 0.5px solid var(--border);
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; min-width: 80px;
 }
 .fstat::after {
   content: ''; position: absolute; inset: 0; border-radius: var(--radius);
@@ -278,15 +291,15 @@ body {
 .fstat:hover::after { opacity: 1; }
 .fstat:hover { box-shadow: var(--shadow-md); transform: translateY(-2px) scale(1.01); }
 @keyframes shimmer { 0%{background-position:100% 100%} 50%{background-position:0 0} 100%{background-position:100% 100%} }
-.fstat-label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
-.fstat-row { display: flex; align-items: baseline; gap: 6px; margin-top: 2px; }
+.fstat-label { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; }
+.fstat-row { display: flex; align-items: baseline; gap: 4px; margin: 2px 0; }
 .fstat-value {
-  font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.5px;
+  font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: -0.3px;
   transition: transform 0.3s, color 0.3s;
 }
-.fstat-value.counting { transform: scale(1.15); color: var(--blue); }
-.fstat-unit { font-size: 11px; color: var(--text-tertiary); }
-.fstat-bar { height: 3px; background: rgba(0,0,0,0.04); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.fstat-value.counting { transform: scale(1.1); color: var(--blue); }
+.fstat-unit { font-size: 9px; color: var(--text-tertiary); }
+.fstat-bar { height: 4px; background: rgba(0,0,0,0.05); border-radius: 2px; margin-top: 2px; overflow: hidden; }
 .fstat-bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.25,0.1,0.25,1); }
 .fstat.pulse { animation: statPulse 0.6s ease; }
 @keyframes statPulse {
@@ -815,9 +828,11 @@ body {
 [data-theme="dark"] .toggle-knob { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
 
 [data-theme="dark"] .kpi-pill { background: rgba(255,255,255,0.04); }
-[data-theme="dark"] #live-clock { background: linear-gradient(135deg, rgba(0,122,255,0.12), rgba(88,86,214,0.12)); border-color: rgba(0,122,255,0.2); }
-[data-theme="dark"] #clock-time { color: #fff; }
-[data-theme="dark"] #clock-date { color: rgba(255,255,255,0.6); border-left-color: rgba(0,122,255,0.25); }
+[data-theme="dark"] #live-clock { background: rgba(28,28,30,0.7); border-color: rgba(255,255,255,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+[data-theme="dark"] #live-clock::before { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); }
+[data-theme="dark"] #clock-time { color: #f5f5f7; }
+[data-theme="dark"] #clock-date { color: #98989d; }
+[data-theme="dark"] #clock-dot { background: #98989d; }
 [data-theme="dark"] #btn-drawer { background: rgba(255,255,255,0.05); }
 [data-theme="dark"] #btn-drawer:hover { background: rgba(255,255,255,0.08); }
 [data-theme="dark"] #gw-badge.offline-badge { background: rgba(255,255,255,0.05); }
@@ -826,6 +841,9 @@ body {
 [data-theme="dark"] .ai-sessions { background: rgba(255,255,255,0.05); }
 
 [data-theme="dark"] .agent-avatar .av-status { border-color: #2c2c2e; }
+[data-theme="dark"] .av-status.busy { box-shadow: 0 0 0 2.5px #2c2c2e, 0 0 10px rgba(10,132,255,0.6); }
+[data-theme="dark"] .av-status.idle { box-shadow: 0 0 0 2.5px #2c2c2e, 0 0 10px rgba(48,209,88,0.6); }
+[data-theme="dark"] .av-status.inactive { box-shadow: 0 0 0 2.5px #2c2c2e, 0 0 10px rgba(255,159,10,0.5); }
 [data-theme="dark"] .av-status.offline { background: #48484a; }
 
 [data-theme="dark"] .fstat-bar { background: rgba(255,255,255,0.06); }
@@ -1030,12 +1048,13 @@ body {
   position: relative; overflow: hidden;
   padding: 14px 16px; margin: 0 14px 0; flex-shrink: 0;
   border-radius: var(--radius); min-height: 56px;
-  background: linear-gradient(-45deg, #007aff, #5856d6, #af52de, #ff2d55, #ff9500, #34c759);
-  background-size: 400% 400%;
-  animation: heroGradient 12s ease infinite;
+  background: linear-gradient(-45deg, var(--hero-c1, #a8c0ff), var(--hero-c2, #b8d0f0), var(--hero-c3, #c4b5fd), var(--hero-c4, #ddd6fe));
+  background-size: 300% 300%;
+  animation: heroGradient 16s ease infinite;
+  transition: --hero-c1 2s, --hero-c2 2s, --hero-c3 2s, --hero-c4 2s;
 }
 @keyframes heroGradient {
-  0%{background-position:0% 50%} 25%{background-position:100% 50%} 50%{background-position:100% 0%} 75%{background-position:0% 100%} 100%{background-position:0% 50%}
+  0%{background-position:0% 50%} 33%{background-position:100% 50%} 66%{background-position:50% 100%} 100%{background-position:0% 50%}
 }
 .hero-banner canvas.hero-particles {
   position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
@@ -1067,8 +1086,8 @@ body {
 }
 @keyframes heroPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
 [data-theme="dark"] .hero-banner {
-  background: linear-gradient(-45deg, #0a84ff, #5e5ce6, #bf5af2, #ff375f, #ff9f0a, #30d158);
-  background-size: 400% 400%;
+  background: linear-gradient(-45deg, var(--hero-d1, #1e3a5f), var(--hero-d2, #2d2b55), var(--hero-d3, #3b1f5e), var(--hero-d4, #1a1a3e));
+  background-size: 300% 300%;
 }
 
 /* ── WAVE DIVIDER ── */
@@ -1373,6 +1392,7 @@ body {
     <span id="topbar-meta"></span>
     <div id="live-clock">
       <span id="clock-time"></span>
+      <span id="clock-dot"></span>
       <span id="clock-date"></span>
     </div>
     <button id="btn-theme" onclick="toggleTheme()" title="Toggle dark mode">
@@ -4310,6 +4330,7 @@ function updateHero(agents) {
   const total = agents.length;
   const titleEl = document.getElementById('hero-title');
   const subEl = document.getElementById('hero-sub');
+  const banner = document.querySelector('.hero-banner');
   const now = new Date();
   const hour = now.getHours();
   let greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
@@ -4317,6 +4338,36 @@ function updateHero(agents) {
   if (titleEl) titleEl.textContent = `${greeting}, ${name}`;
   const customMsg = hqSettings.welcomeMessage;
   if (subEl) subEl.textContent = customMsg || `${active}/${total} agents active \u2022 ${now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}`;
+
+  // Time-based soft gradient colors
+  if (banner) {
+    let c, d;
+    if (hour >= 6 && hour < 12) {
+      // Morning: warm peach, soft orange, light gold
+      c = ['#ffecd2','#fcb69f','#ffd89b','#f6c28b'];
+      d = ['#4a3728','#5c3d2e','#4e3a20','#3d2e1a'];
+    } else if (hour >= 12 && hour < 18) {
+      // Afternoon: soft sky blue, lavender, light cyan
+      c = ['#a1c4fd','#c2e9fb','#b8cfe6','#d4e4f7'];
+      d = ['#1a3a5c','#1e2d4a','#243b55','#1a2940'];
+    } else if (hour >= 18 && hour < 22) {
+      // Evening: soft purple, rose, dusky pink
+      c = ['#c9b1ff','#e0c3fc','#f5c6d0','#d4b5e6'];
+      d = ['#2d1b4e','#3b1f5e','#4a1942','#261340'];
+    } else {
+      // Night: deep navy, soft indigo, midnight
+      c = ['#667eea','#764ba2','#6a73c1','#8e7cc3'];
+      d = ['#0f1628','#161b33','#1a1535','#0d1020'];
+    }
+    banner.style.setProperty('--hero-c1', c[0]);
+    banner.style.setProperty('--hero-c2', c[1]);
+    banner.style.setProperty('--hero-c3', c[2]);
+    banner.style.setProperty('--hero-c4', c[3]);
+    banner.style.setProperty('--hero-d1', d[0]);
+    banner.style.setProperty('--hero-d2', d[1]);
+    banner.style.setProperty('--hero-d3', d[2]);
+    banner.style.setProperty('--hero-d4', d[3]);
+  }
 }
 
 /* ── ACTIVITY TICKER ── */
