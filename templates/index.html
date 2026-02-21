@@ -671,6 +671,149 @@ body {
   background-repeat: no-repeat; background-position: right 6px center;
 }
 
+/* ── APP INTEGRATIONS ── */
+.app-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px; margin-top: 10px;
+}
+.app-tile {
+  background: var(--bg); border-radius: var(--radius-sm); padding: 12px 10px;
+  border: 0.5px solid var(--border); text-align: center; cursor: pointer;
+  transition: all 0.2s; position: relative;
+}
+.app-tile:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.app-tile .at-icon { font-size: 24px; margin-bottom: 6px; }
+.app-tile .at-name { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.app-tile .at-cat { font-size: 9px; color: var(--text-tertiary); margin-top: 2px; }
+.app-tile .at-dot {
+  position: absolute; top: 8px; right: 8px; width: 7px; height: 7px;
+  border-radius: 50%; background: var(--green); box-shadow: 0 0 4px rgba(52,199,89,0.4);
+  display: none;
+}
+.app-tile.enabled .at-dot { display: block; }
+
+.app-search-input {
+  width: 100%; padding: 8px 12px; border-radius: var(--radius-xs);
+  background: var(--bg); border: 0.5px solid var(--border); color: var(--text);
+  font-size: 12px; font-family: inherit; outline: none; transition: all 0.2s;
+}
+.app-search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,122,255,0.1); }
+.app-search-input::placeholder { color: var(--text-tertiary); }
+
+.app-cat-tabs {
+  display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0;
+}
+.app-cat-tab {
+  padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;
+  background: var(--bg); border: 0.5px solid var(--border); color: var(--text-secondary);
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.app-cat-tab:hover { border-color: var(--border-strong); }
+.app-cat-tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+.app-config-field {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.app-config-field label {
+  font-size: 10px; font-weight: 600; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.3px; min-width: 80px; flex-shrink: 0;
+}
+.app-config-field input {
+  flex: 1; padding: 6px 10px; border-radius: 6px;
+  background: var(--bg); border: 0.5px solid var(--border); color: var(--text);
+  font-size: 11px; font-family: 'SF Mono', 'Menlo', monospace; outline: none; transition: all 0.2s;
+}
+.app-config-field input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,122,255,0.1); }
+
+.agent-app-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  background: var(--bg); border-radius: var(--radius-xs); margin-bottom: 6px;
+  border: 0.5px solid var(--border); transition: all 0.15s;
+}
+.agent-app-item:hover { border-color: var(--border-strong); }
+.agent-app-item .aai-icon { font-size: 18px; flex-shrink: 0; }
+.agent-app-item .aai-name { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; min-width: 0; }
+.agent-app-item .aai-mode {
+  font-size: 10px; padding: 2px 8px; border-radius: 8px;
+  background: rgba(0,122,255,0.08); color: var(--blue); font-weight: 500;
+}
+.agent-app-item .aai-mode-select {
+  padding: 3px 20px 3px 6px; border-radius: 6px; font-size: 10px;
+  background: var(--bg-white); border: 0.5px solid var(--border); color: var(--text);
+  font-family: inherit; outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 4px center;
+}
+.agent-app-item .aai-remove {
+  background: none; border: none; cursor: pointer; color: var(--text-tertiary);
+  font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: all 0.15s; line-height: 1;
+}
+.agent-app-item .aai-remove:hover { color: var(--red); background: rgba(255,59,48,0.08); }
+
+.app-picker-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 250;
+  display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.app-picker-overlay.show { display: flex; }
+.app-picker {
+  background: var(--bg-white); border-radius: var(--radius); padding: 20px;
+  width: 380px; max-height: 500px; box-shadow: var(--shadow-xl);
+  display: flex; flex-direction: column;
+}
+.app-picker-hdr {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.app-picker-hdr h3 { font-size: 14px; font-weight: 700; color: var(--text); }
+.app-picker-hdr button { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-tertiary); }
+.app-picker-search {
+  width: 100%; padding: 7px 10px; border-radius: var(--radius-xs);
+  background: var(--bg); border: 0.5px solid var(--border); color: var(--text);
+  font-size: 11px; font-family: inherit; outline: none; margin-bottom: 10px;
+}
+.app-picker-search:focus { border-color: var(--blue); }
+.app-picker-list {
+  flex: 1; overflow-y: auto; margin-bottom: 12px; max-height: 280px;
+}
+.app-picker-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: var(--radius-xs); cursor: pointer; transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.app-picker-item:hover { background: var(--bg-hover); }
+.app-picker-item.selected { background: var(--bg-active); }
+.app-picker-item .api-icon { font-size: 18px; }
+.app-picker-item .api-name { font-size: 12px; font-weight: 500; color: var(--text); flex: 1; }
+.app-picker-item .api-check {
+  width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent;
+  transition: all 0.15s;
+}
+.app-picker-item.selected .api-check {
+  background: var(--blue); border-color: var(--blue); color: white;
+}
+.app-picker-actions {
+  display: flex; align-items: center; gap: 8px; padding-top: 10px;
+  border-top: 0.5px solid var(--border);
+}
+.app-picker-actions select {
+  flex: 1; padding: 6px 22px 6px 8px; border-radius: 6px;
+  background: var(--bg); border: 0.5px solid var(--border); color: var(--text);
+  font-size: 11px; font-family: inherit; outline: none; appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%236e6e73' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 6px center;
+}
+
+.bulk-bind-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;
+  background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary);
+  cursor: pointer; transition: all 0.15s; margin: 2px;
+}
+.bulk-bind-chip:hover { border-color: var(--border-strong); }
+.bulk-bind-chip.selected { background: var(--blue); color: white; border-color: var(--blue); }
+.bulk-bind-chip .bbc-icon { font-size: 12px; }
+
 /* Toast notification */
 .toast {
   position: fixed; bottom: 24px; right: 24px; z-index: 300;
@@ -795,6 +938,47 @@ body {
   font-size: 10px; color: var(--text-tertiary);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* ── AGENT SETTINGS VIEW ── */
+.as-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 16px; padding: 4px 0;
+}
+.as-card {
+  background: var(--bg-white); border-radius: var(--radius);
+  border: 0.5px solid var(--border); box-shadow: var(--shadow-sm);
+  padding: 18px 20px; transition: border-color 0.2s;
+}
+.as-card:hover { border-color: var(--border-strong); }
+.as-card-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  padding-bottom: 12px; border-bottom: 0.5px solid var(--border);
+}
+.as-card-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.as-card-identity { flex: 1; min-width: 0; }
+.as-card-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.as-card-id { font-size: 10px; color: var(--text-tertiary); }
+.as-section-title {
+  font-size: 10px; font-weight: 700; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.8px; margin: 14px 0 6px;
+}
+.as-section-title:first-of-type { margin-top: 0; }
+.as-fb-add {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.as-fb-add select { flex: 1; min-width: 0; font-size: 11px; }
+.as-status {
+  font-size: 10px; min-height: 14px; margin-top: 4px;
+  transition: color 0.2s;
+}
+.as-empty {
+  color: var(--text-tertiary); font-size: 11px; padding: 4px 0;
+}
+
 /* Character style preview strip */
 .csp-strip {
   display: flex; gap: 6px; overflow-x: auto; padding: 2px 0;
@@ -1460,6 +1644,10 @@ body {
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
       Cron
     </button>
+    <button class="nav-btn" id="nav-agent-settings" onclick="switchView('agent-settings')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Agents
+    </button>
     <button class="nav-btn" id="nav-settings" onclick="toggleDrawer()" style="margin-left:auto">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Settings
@@ -1617,6 +1805,15 @@ body {
     </div>
     <div id="cron-list"></div>
   </div>
+
+  <!-- AGENT SETTINGS VIEW -->
+  <div id="view-agent-settings" class="view-container">
+    <div class="section-header">
+      <h2>Agent Settings</h2>
+      <button class="btn-action secondary" onclick="loadAgentSettings()">Refresh</button>
+    </div>
+    <div id="agent-settings-list"></div>
+  </div>
 </div>
 
 <!-- CRON MODAL -->
@@ -1687,6 +1884,7 @@ body {
     <div class="dtab act" onclick="switchTab('overview')">Overview</div>
     <div class="dtab" onclick="switchTab('messages')">Messages</div>
     <div class="dtab" onclick="switchTab('profile')">Profile</div>
+    <div class="dtab" onclick="switchTab('apps')">Apps</div>
     <div class="dtab" onclick="switchTab('task')">Send Task</div>
   </div>
   <div id="dp-body"></div>
@@ -1849,6 +2047,35 @@ body {
     <div class="settings-group">
       <div class="sg-title"><span class="sg-icon">&#x1F4E1;</span> Telegram Channels</div>
       <div id="settings-channels"></div>
+    </div>
+
+    <!-- App Integrations -->
+    <div class="settings-group">
+      <div class="sg-title"><span class="sg-icon">&#x1F517;</span> App Integrations</div>
+      <input class="app-search-input" id="app-search" placeholder="Search apps..." oninput="filterApps()">
+      <div class="app-cat-tabs" id="app-cat-tabs"></div>
+      <div class="app-grid" id="app-grid"></div>
+      <div style="margin-top:16px;padding-top:12px;border-top:0.5px solid var(--border)">
+        <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Bulk Binding</div>
+        <div style="margin-bottom:8px">
+          <div style="font-size:10px;color:var(--text-tertiary);margin-bottom:4px;font-weight:600">AGENTS</div>
+          <div id="bulk-agent-chips"></div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div style="font-size:10px;color:var(--text-tertiary);margin-bottom:4px;font-weight:600">APPS (enabled only)</div>
+          <div id="bulk-app-chips"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="setting-select" id="bulk-mode" style="flex:1">
+            <option value="read_only">Read Only</option>
+            <option value="write_only">Write Only</option>
+            <option value="read_write">Read & Write</option>
+            <option value="event_listener">Event Listener</option>
+            <option value="action_trigger">Action Trigger</option>
+          </select>
+          <button class="btn-action primary" onclick="applyBulkBinding()" style="font-size:11px;white-space:nowrap">Apply Bindings</button>
+        </div>
+      </div>
     </div>
 
     <!-- MD File Backup -->
@@ -2022,6 +2249,58 @@ body {
   </div>
 </div>
 
+<!-- APP CONFIG MODAL -->
+<div class="modal-overlay" id="app-config-modal" onclick="if(event.target===this)closeAppConfigModal()">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-box-hdr">
+      <span id="acm-title">App Config</span>
+      <button onclick="closeAppConfigModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span id="acm-icon" style="font-size:28px"></span>
+        <div style="flex:1">
+          <div id="acm-name" style="font-size:14px;font-weight:700;color:var(--text)"></div>
+          <div id="acm-cat" style="font-size:10px;color:var(--text-tertiary)"></div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="acm-enabled" onchange="toggleAppEnabled()">
+          <div class="toggle-track"></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
+      <div id="acm-fields"></div>
+      <div class="settings-status" id="acm-status"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action secondary" onclick="closeAppConfigModal()">Cancel</button>
+      <button class="btn-action primary" onclick="saveAppConfig()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP PICKER POPUP -->
+<div class="app-picker-overlay" id="app-picker" onclick="if(event.target===this)closeAppPicker()">
+  <div class="app-picker">
+    <div class="app-picker-hdr">
+      <h3>Add Apps</h3>
+      <button onclick="closeAppPicker()">&times;</button>
+    </div>
+    <input class="app-picker-search" id="app-picker-search" placeholder="Search enabled apps..." oninput="filterAppPicker()">
+    <div class="app-picker-list" id="app-picker-list"></div>
+    <div class="app-picker-actions">
+      <select id="app-picker-mode">
+        <option value="read_only">Read Only</option>
+        <option value="write_only">Write Only</option>
+        <option value="read_write">Read & Write</option>
+        <option value="event_listener">Event Listener</option>
+        <option value="action_trigger">Action Trigger</option>
+      </select>
+      <button class="btn-action primary" id="app-picker-bind-btn" onclick="bindSelectedApps()" style="font-size:11px;white-space:nowrap">Bind (0)</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ── THEME ── */
 function getPreferredTheme() {
@@ -2191,6 +2470,15 @@ let curTab = 'overview';
 let detailCache = null;
 let drawerOpen = false;
 let availableModels = [];
+
+let appsData = [];
+let appBindings = [];
+let currentAppCat = '';
+let appPickerSelected = new Set();
+let bulkSelectedAgents = new Set();
+let bulkSelectedApps = new Set();
+let editingAppId = null;
+const APP_USAGE_MODES = {read_only:'Read Only',write_only:'Write Only',read_write:'Read & Write',event_listener:'Event Listener',action_trigger:'Action Trigger'};
 
 const PLATFORM_ICONS = { telegram:'\u2708\uFE0F', discord:'\uD83D\uDCAC', whatsapp:'\uD83D\uDCF1' };
 const PLATFORM_LABELS = { telegram:'Telegram', discord:'Discord', whatsapp:'WhatsApp' };
@@ -2599,6 +2887,23 @@ class OfficeMap {
         return d.life>0;
       });
     }
+
+    // 6. Meeting room badge (drawn after everything so it stays visible)
+    if (this.meetingCell) {
+      const mc = this._cellO(this.meetingCell.col, this.meetingCell.row);
+      const mW = this.CW, mH = this.CH;
+      const projBot = mc.y + mH*0.06 + mH*0.22;
+      const mbW=96, mbH=24, mbX=mc.x+(mW-mbW)/2, mbY=projBot+6;
+      // Solid background pill
+      ctx.fillStyle = isDarkMode() ? '#3b1f6e' : '#7c3aed';
+      this._roundRect(ctx, mbX, mbY, mbW, mbH, 10); ctx.fill();
+      // White text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `800 ${Math.max(12,this.S+5)}px Inter,-apple-system,sans-serif`;
+      ctx.textBaseline='middle'; ctx.textAlign='center';
+      ctx.fillText('MEETING', mc.x+mW/2, mbY+mbH/2);
+      ctx.textAlign='left';
+    }
   }
 
   _drawRoom(col, row, id) {
@@ -2789,14 +3094,19 @@ class OfficeMap {
     ctx.strokeStyle = mt.border+mb+')'; ctx.lineWidth=1+0.5*Math.sin(tick*0.03);
     this._roundRect(ctx, x+gap, y+gap, W-gap*2, H-gap*2, 16); ctx.stroke();
 
-    // Badge
-    const bw=90, bx=x+(W-bw)/2;
-    ctx.fillStyle = mt.badge;
-    this._roundRect(ctx, bx, y+gap+8, bw, 22, 8); ctx.fill();
-    ctx.fillStyle = mt.badgeText;
-    ctx.font = `700 ${Math.max(11,this.S+4)}px Inter,-apple-system,sans-serif`;
-    ctx.textBaseline='middle'; ctx.textAlign='center';
-    ctx.fillText('MEETING', x+W/2, y+gap+19); ctx.textAlign='left';
+    // Projector — always show, more animated when busy
+    const sx=x+W*0.15, sy=y+H*0.06, sw=W*0.7, sh=H*0.22;
+    ctx.fillStyle = busyN>0 ? mt.projBg : mt.projIdle;
+    this._roundRect(ctx, sx, sy, sw, sh, 8); ctx.fill();
+    ctx.strokeStyle = mt.projStroke; ctx.lineWidth=0.5;
+    this._roundRect(ctx, sx, sy, sw, sh, 8); ctx.stroke();
+    const bars=8, barW=(sw-14)/bars;
+    for (let i=0;i<bars;i++) {
+      const speed = busyN>0 ? 0.06 : 0.02;
+      const bh=sh*0.6*(0.2+0.8*Math.abs(Math.sin(tick*speed+i*0.7)));
+      ctx.fillStyle=mt.barColors[i];
+      this._roundRect(ctx, sx+7+i*barW, sy+sh-bh-4, barW-2, bh, 3); ctx.fill();
+    }
 
     // Table with shimmer
     const tw=W*0.45, th2=H*0.22, tx=x+(W-tw)/2, ty=y+H*0.42;
@@ -2811,20 +3121,6 @@ class OfficeMap {
     ctx.restore();
     ctx.strokeStyle = mt.tableStroke; ctx.lineWidth=0.5;
     this._roundRect(ctx, tx, ty, tw, th2, 10); ctx.stroke();
-
-    // Projector — always show, more animated when busy
-    const sx=x+W*0.15, sy=y+H*0.06, sw=W*0.7, sh=H*0.22;
-    ctx.fillStyle = busyN>0 ? mt.projBg : mt.projIdle;
-    this._roundRect(ctx, sx, sy, sw, sh, 8); ctx.fill();
-    ctx.strokeStyle = mt.projStroke; ctx.lineWidth=0.5;
-    this._roundRect(ctx, sx, sy, sw, sh, 8); ctx.stroke();
-    const bars=8, barW=(sw-14)/bars;
-    for (let i=0;i<bars;i++) {
-      const speed = busyN>0 ? 0.06 : 0.02;
-      const bh=sh*0.6*(0.2+0.8*Math.abs(Math.sin(tick*speed+i*0.7)));
-      ctx.fillStyle=mt.barColors[i];
-      this._roundRect(ctx, sx+7+i*barW, sy+sh-bh-4, barW-2, bh, 3); ctx.fill();
-    }
 
     // Sine wave energy field
     ctx.save();
@@ -2856,6 +3152,8 @@ class OfficeMap {
     ctx.fillStyle = busyN>0 ? mt.ledActive : mt.ledIdle; ctx.fill();
     ctx.beginPath(); ctx.arc(lx2,ly2,2*p2,0,Math.PI*2);
     ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill();
+
+    // Badge is drawn in _render() after particles so it stays on top
   }
 
   _drawServer(col, row) {
@@ -3170,7 +3468,7 @@ function closeDetail() {
 
 function switchTab(tab) {
   curTab=tab;
-  const tabs=['overview','messages','profile','task'];
+  const tabs=['overview','messages','profile','apps','task'];
   document.querySelectorAll('.dtab').forEach((el,i)=>el.classList.toggle('act',tabs[i]===tab));
   document.getElementById('task-form').style.display=tab==='task'?'block':'none';
   if (tab==='profile' && selectedId) loadProfile(selectedId);
@@ -3245,6 +3543,27 @@ function renderDetail() {
     body.scrollTop=body.scrollHeight;
   } else if (curTab==='profile') {
     body.innerHTML='<div style="color:var(--text-tertiary);font-size:12px;padding:20px;text-align:center">Loading profile...</div>';
+  } else if (curTab==='apps') {
+    const apps = d.apps || [];
+    const modeOpts = ['read_only','write_only','read_write','event_listener','action_trigger'];
+    const modeLabels = {read_only:'Read Only',write_only:'Write Only',read_write:'Read & Write',event_listener:'Event Listener',action_trigger:'Action Trigger'};
+    let html = '<div class="sec">Bound Apps</div>';
+    if (!apps.length) {
+      html += '<div style="color:var(--text-tertiary);font-size:11px;padding:8px 0">No apps bound to this agent.</div>';
+    } else {
+      html += apps.map(a => `
+        <div class="agent-app-item">
+          <span class="aai-icon">${a.appIcon}</span>
+          <span class="aai-name">${esc(a.appName)}</span>
+          <select class="aai-mode-select" onchange="changeAgentAppMode('${esc(a.appId)}',this.value)">
+            ${modeOpts.map(m=>`<option value="${m}" ${m===a.mode?'selected':''}>${modeLabels[m]}</option>`).join('')}
+          </select>
+          <button class="aai-remove" onclick="unbindAgentApp('${esc(a.appId)}')" title="Remove">&times;</button>
+        </div>
+      `).join('');
+    }
+    html += '<div style="margin-top:10px"><button class="btn-action secondary" style="font-size:11px;padding:6px 12px" onclick="openAppPicker()">+ Add App</button></div>';
+    body.innerHTML = html;
   } else {
     body.innerHTML='<div style="font-size:12px;color:var(--text-tertiary);padding:16px;text-align:center">Type a message below to send to this agent.</div>';
   }
@@ -3436,6 +3755,8 @@ async function fetchSettings() {
     fetchProviders();
     fetchBackupStatus();
     fetchHqSettings();
+    fetchApps();
+    fetchAppBindings();
   } catch(e) {}
 }
 
@@ -3933,6 +4254,15 @@ function renderSettingsChannels(channels) {
           <div class="toggle-knob"></div>
         </label>
       </div>
+      <div class="cc-token-row" style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+        <span class="cc-p-label" style="font-size:10px;color:var(--text-tertiary);font-weight:600;min-width:45px;flex-shrink:0">Token</span>
+        <input class="provider-input" id="cc-token-${esc(name)}" type="password"
+          placeholder="${ch.hasToken ? ch.tokenPreview : 'Bot token...'}"
+          style="flex:1;font-size:10px;padding:4px 8px">
+        <button class="btn-icon" onclick="toggleCcTokenVis('${esc(name)}')" title="Show/Hide" style="font-size:11px;padding:2px 4px">&#x1F441;</button>
+        <button class="btn-action primary" onclick="saveChannelToken('${esc(name)}')" style="font-size:9px;padding:3px 8px">Save</button>
+      </div>
+      <div class="settings-status" id="cc-token-status-${esc(name)}" style="margin-bottom:6px"></div>
       <div class="cc-policies">
         <div class="cc-policy-row">
           <span class="cc-p-label">DM</span>
@@ -3985,6 +4315,31 @@ async function saveChannelSetting(name, key, value) {
     const d = await r.json();
     if (d.ok) showToast(name + ' ' + key + ' updated');
   } catch(e) { showToast('Failed to save setting', 'error'); }
+}
+
+async function saveChannelToken(name) {
+  const input = document.getElementById('cc-token-'+name);
+  const status = document.getElementById('cc-token-status-'+name);
+  const token = input ? input.value.trim() : '';
+  if (!token) { status.textContent = 'Enter a token first'; status.style.color = 'var(--orange)'; return; }
+  status.textContent = 'Saving...'; status.style.color = 'var(--text-tertiary)';
+  try {
+    const r = await fetch('/api/channel/'+name+'/settings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({botToken: token})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      status.textContent = 'Token saved!'; status.style.color = 'var(--green)';
+      input.value = '';
+      fetchSettings();
+    } else throw new Error(d.error||'Error');
+  } catch(e) { status.textContent = 'Failed: '+e.message; status.style.color = 'var(--red)'; }
+}
+
+function toggleCcTokenVis(name) {
+  const input = document.getElementById('cc-token-'+name);
+  if (input) input.type = input.type === 'password' ? 'text' : 'password';
 }
 
 /* Channels top stat bar — updated from /api/channels */
@@ -4983,9 +5338,248 @@ initHeroParticles();
   await fetchSysStats();
   fetchAvailableModels();
   fetchAvailablePlatforms();
+  fetchApps();
+  fetchAppBindings();
   document.getElementById('task-form').style.display=curTab==='task'?'block':'none';
 })();
 setInterval(fetchStatus,10000); setInterval(fetchAgents,10000); setInterval(fetchSys,30000); setInterval(fetchSysStats,10000);
+
+// ── APP INTEGRATION FUNCTIONS ──
+
+async function fetchApps() {
+  try {
+    const r = await (await fetch('/api/apps')).json();
+    appsData = r.apps || [];
+    renderAppGrid();
+    renderAppCatTabs(r.categories || {});
+    renderBulkChips();
+  } catch(e) { console.error('fetchApps', e); }
+}
+
+async function fetchAppBindings() {
+  try {
+    appBindings = await (await fetch('/api/apps/bindings')).json();
+  } catch(e) { console.error('fetchAppBindings', e); }
+}
+
+function renderAppCatTabs(categories) {
+  const el = document.getElementById('app-cat-tabs');
+  if (!el) return;
+  let html = `<span class="app-cat-tab ${currentAppCat===''?'active':''}" onclick="filterAppsByCat('')">All</span>`;
+  for (const [key, label] of Object.entries(categories)) {
+    html += `<span class="app-cat-tab ${currentAppCat===key?'active':''}" onclick="filterAppsByCat('${key}')">${label}</span>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderAppGrid() {
+  const el = document.getElementById('app-grid');
+  if (!el) return;
+  const q = (document.getElementById('app-search')?.value || '').toLowerCase();
+  const filtered = appsData.filter(a => {
+    if (q && !a.name.toLowerCase().includes(q) && !a.id.toLowerCase().includes(q)) return false;
+    if (currentAppCat && a.category !== currentAppCat) return false;
+    return true;
+  });
+  if (!filtered.length) {
+    el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px;padding:12px 0;text-align:center">No apps found</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(a => `
+    <div class="app-tile ${a.enabled?'enabled':''}" onclick="openAppConfigModal('${a.id}')">
+      <div class="at-dot"></div>
+      <div class="at-icon">${a.icon}</div>
+      <div class="at-name">${esc(a.name)}</div>
+      <div class="at-cat">${esc(a.categoryLabel)}</div>
+    </div>
+  `).join('');
+}
+
+function filterApps() { renderAppGrid(); }
+function filterAppsByCat(cat) { currentAppCat = cat; renderAppGrid(); renderAppCatTabs(Object.fromEntries(appsData.map(a=>[a.category, a.categoryLabel]).filter((v,i,arr)=>arr.findIndex(x=>x[0]===v[0])===i))); }
+
+function openAppConfigModal(id) {
+  editingAppId = id;
+  const a = appsData.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('acm-icon').textContent = a.icon;
+  document.getElementById('acm-name').textContent = a.name;
+  document.getElementById('acm-cat').textContent = a.categoryLabel;
+  document.getElementById('acm-enabled').checked = a.enabled;
+  document.getElementById('acm-title').textContent = a.name + ' Config';
+  document.getElementById('acm-status').textContent = '';
+  const fieldsEl = document.getElementById('acm-fields');
+  fieldsEl.innerHTML = a.configFields.map(f => `
+    <div class="app-config-field">
+      <label>${esc(f)}</label>
+      <input id="acm-f-${f}" type="${f.toLowerCase().includes('password')||f.toLowerCase().includes('secret')||f.toLowerCase().includes('token')||f.toLowerCase().includes('key')?'password':'text'}" placeholder="${esc(f)}..." value="${esc(a.configured[f]||'')}">
+    </div>
+  `).join('');
+  document.getElementById('app-config-modal').style.display = 'flex';
+}
+
+function closeAppConfigModal() {
+  document.getElementById('app-config-modal').style.display = 'none';
+  editingAppId = null;
+}
+
+async function toggleAppEnabled() {
+  if (!editingAppId) return;
+  try {
+    const r = await fetch(`/api/apps/${editingAppId}/toggle`, {method:'POST'});
+    const d = await r.json();
+    if (d.ok) {
+      const a = appsData.find(x => x.id === editingAppId);
+      if (a) a.enabled = d.enabled;
+      renderAppGrid();
+      renderBulkChips();
+      document.getElementById('acm-status').textContent = d.enabled ? 'Enabled' : 'Disabled';
+      document.getElementById('acm-status').style.color = d.enabled ? 'var(--green)' : 'var(--text-tertiary)';
+    }
+  } catch(e) { document.getElementById('acm-status').textContent = 'Error'; document.getElementById('acm-status').style.color = 'var(--red)'; }
+}
+
+async function saveAppConfig() {
+  if (!editingAppId) return;
+  const a = appsData.find(x => x.id === editingAppId);
+  if (!a) return;
+  const config = {};
+  a.configFields.forEach(f => { config[f] = document.getElementById('acm-f-'+f)?.value || ''; });
+  const status = document.getElementById('acm-status');
+  status.textContent = 'Saving...'; status.style.color = 'var(--text-tertiary)';
+  try {
+    const r = await fetch(`/api/apps/${editingAppId}/config`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({config})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      status.textContent = 'Saved!'; status.style.color = 'var(--green)';
+      fetchApps();
+      setTimeout(closeAppConfigModal, 600);
+    } else throw new Error(d.error||'Error');
+  } catch(e) { status.textContent = 'Failed: '+e.message; status.style.color = 'var(--red)'; }
+}
+
+// App Picker (for agent detail)
+function openAppPicker() {
+  if (!selectedId) return;
+  appPickerSelected.clear();
+  document.getElementById('app-picker-search').value = '';
+  renderAppPickerList();
+  document.getElementById('app-picker').classList.add('show');
+}
+function closeAppPicker() { document.getElementById('app-picker').classList.remove('show'); }
+
+function renderAppPickerList() {
+  const el = document.getElementById('app-picker-list');
+  const q = (document.getElementById('app-picker-search')?.value || '').toLowerCase();
+  const boundIds = new Set((detailCache?.apps || []).map(a => a.appId));
+  const available = appsData.filter(a => a.enabled && !boundIds.has(a.id) && (!q || a.name.toLowerCase().includes(q)));
+  if (!available.length) {
+    el.innerHTML = '<div style="color:var(--text-tertiary);font-size:11px;padding:16px;text-align:center">No available apps</div>';
+    return;
+  }
+  el.innerHTML = available.map(a => `
+    <div class="app-picker-item ${appPickerSelected.has(a.id)?'selected':''}" onclick="toggleAppPickerItem('${a.id}')">
+      <span class="api-icon">${a.icon}</span>
+      <span class="api-name">${esc(a.name)}</span>
+      <span class="api-check">${appPickerSelected.has(a.id)?'&#x2713;':''}</span>
+    </div>
+  `).join('');
+  document.getElementById('app-picker-bind-btn').textContent = `Bind (${appPickerSelected.size})`;
+}
+
+function toggleAppPickerItem(id) {
+  if (appPickerSelected.has(id)) appPickerSelected.delete(id); else appPickerSelected.add(id);
+  renderAppPickerList();
+}
+function filterAppPicker() { renderAppPickerList(); }
+
+async function bindSelectedApps() {
+  if (!selectedId || !appPickerSelected.size) return;
+  const mode = document.getElementById('app-picker-mode').value;
+  const items = [...appPickerSelected].map(appId => ({agentId: selectedId, appId, mode}));
+  try {
+    await fetch('/api/apps/bindings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(items)
+    });
+    closeAppPicker();
+    showToast(`Bound ${items.length} app(s)`, 'success');
+    // Refresh detail
+    const r = await fetch(`/api/agent/${selectedId}`);
+    detailCache = await r.json();
+    renderDetail();
+    fetchAppBindings();
+  } catch(e) { showToast('Failed to bind apps', 'error'); }
+}
+
+async function changeAgentAppMode(appId, mode) {
+  if (!selectedId) return;
+  try {
+    await fetch('/api/apps/bindings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({agentId: selectedId, appId, mode})
+    });
+    const a = (detailCache?.apps || []).find(x => x.appId === appId);
+    if (a) { a.mode = mode; a.modeLabel = APP_USAGE_MODES[mode] || mode; }
+    showToast('Mode updated', 'success');
+  } catch(e) { showToast('Failed to update mode', 'error'); }
+}
+
+async function unbindAgentApp(appId) {
+  if (!selectedId) return;
+  try {
+    await fetch('/api/apps/bindings/remove', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({agentId: selectedId, appId})
+    });
+    if (detailCache) detailCache.apps = (detailCache.apps || []).filter(a => a.appId !== appId);
+    renderDetail();
+    fetchAppBindings();
+    showToast('App unbound', 'success');
+  } catch(e) { showToast('Failed to unbind', 'error'); }
+}
+
+// Bulk binding
+function renderBulkChips() {
+  const agentsEl = document.getElementById('bulk-agent-chips');
+  const appsEl = document.getElementById('bulk-app-chips');
+  if (!agentsEl || !appsEl) return;
+  const agents = Object.values(agentMap);
+  agentsEl.innerHTML = agents.map(a => `<span class="bulk-bind-chip ${bulkSelectedAgents.has(a.id)?'selected':''}" onclick="toggleBulkAgent('${esc(a.id)}')">${esc(a.name||a.id)}</span>`).join('');
+  const enabledApps = appsData.filter(a => a.enabled);
+  appsEl.innerHTML = enabledApps.map(a => `<span class="bulk-bind-chip ${bulkSelectedApps.has(a.id)?'selected':''}" onclick="toggleBulkApp('${a.id}')"><span class="bbc-icon">${a.icon}</span> ${esc(a.name)}</span>`).join('');
+  if (!enabledApps.length) appsEl.innerHTML = '<span style="font-size:10px;color:var(--text-tertiary)">Enable apps above first</span>';
+}
+
+function toggleBulkAgent(id) { if (bulkSelectedAgents.has(id)) bulkSelectedAgents.delete(id); else bulkSelectedAgents.add(id); renderBulkChips(); }
+function toggleBulkApp(id) { if (bulkSelectedApps.has(id)) bulkSelectedApps.delete(id); else bulkSelectedApps.add(id); renderBulkChips(); }
+
+async function applyBulkBinding() {
+  if (!bulkSelectedAgents.size || !bulkSelectedApps.size) { showToast('Select agents and apps first', 'error'); return; }
+  const mode = document.getElementById('bulk-mode').value;
+  const items = [];
+  for (const agentId of bulkSelectedAgents) {
+    for (const appId of bulkSelectedApps) {
+      items.push({agentId, appId, mode});
+    }
+  }
+  try {
+    const r = await fetch('/api/apps/bindings', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(items)
+    });
+    const d = await r.json();
+    if (d.ok) {
+      showToast(`Created ${d.added} binding(s), updated ${d.updated}`, 'success');
+      bulkSelectedAgents.clear(); bulkSelectedApps.clear();
+      renderBulkChips();
+      fetchAppBindings();
+    }
+  } catch(e) { showToast('Bulk binding failed', 'error'); }
+}
 
 // ── CRON FUNCTIONS ──
 async function fetchCronJobs() {
@@ -5053,11 +5647,234 @@ async function deleteCron(id) {
   } catch(e) { alert(e); }
 }
 
-// Override switchView to load cron
+/* ── AGENT SETTINGS VIEW ── */
+let asAgentDetails = {};
+
+async function loadAgentSettings() {
+  const el = document.getElementById('agent-settings-list');
+  if (!el) return;
+  const agents = Object.values(agentMap);
+  if (!agents.length) { el.innerHTML = '<div class="as-empty" style="padding:20px;text-align:center">No agents found</div>'; return; }
+  el.innerHTML = '<div style="color:var(--text-tertiary);font-size:12px;padding:20px;text-align:center">Loading agent details...</div>';
+  try {
+    const results = await Promise.all(agents.map(a => fetch(`/api/agent/${a.id}`).then(r => r.json()).catch(() => null)));
+    results.forEach((d, i) => { if (d) asAgentDetails[agents[i].id] = d; });
+    renderAgentSettingsGrid();
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--red);font-size:12px;padding:20px;text-align:center">Failed to load agent details</div>';
+  }
+}
+
+function renderAgentSettingsGrid() {
+  const el = document.getElementById('agent-settings-list');
+  if (!el) return;
+  const agents = Object.values(agentMap);
+  if (!agents.length) { el.innerHTML = '<div class="as-empty" style="padding:20px;text-align:center">No agents found</div>'; return; }
+  const modeOpts = ['read_only','write_only','read_write','event_listener','action_trigger'];
+  const modeLabels = APP_USAGE_MODES;
+
+  el.innerHTML = '<div class="as-grid">' + agents.map(a => {
+    const pal = PALETTES[a.id] || PALETTES.raven;
+    const d = asAgentDetails[a.id] || {};
+    const fallbacks = d.fallbacks || [];
+    const apps = d.apps || [];
+    const initials = (a.name || a.id).substring(0, 2).toUpperCase();
+
+    let html = `<div class="as-card" id="as-card-${esc(a.id)}">`;
+    html += `<div class="as-card-header">`;
+    html += `<div class="as-card-avatar" style="background:linear-gradient(135deg,${pal.body},${pal.dark})">${initials}</div>`;
+    html += `<div class="as-card-identity"><div class="as-card-name">${esc(a.name || a.id)}</div><div class="as-card-id">${esc(a.id)}</div></div>`;
+    html += `</div>`;
+
+    // Model
+    html += `<div class="as-section-title">Model</div>`;
+    html += `<select class="model-select" onchange="asChangeModel('${esc(a.id)}',this.value)">`;
+    html += `<option value="">${a.model || '(default)'}</option>`;
+    html += availableModels.map(m => `<option value="${esc(m)}" ${m === (a.model || '') ? 'selected' : ''}>${esc(m)}</option>`).join('');
+    html += `</select>`;
+    html += `<div class="as-status" id="as-model-status-${esc(a.id)}"></div>`;
+
+    // Fallbacks
+    html += `<div class="as-section-title">Fallback Models</div>`;
+    html += `<div id="as-fb-list-${esc(a.id)}">`;
+    if (!fallbacks.length) {
+      html += `<div class="as-empty">No fallbacks configured</div>`;
+    } else {
+      html += fallbacks.map((m, i) => `
+        <div class="fallback-item">
+          <span class="fb-order">${i + 1}</span>
+          <span class="fb-name">${esc(m)}</span>
+          <button class="fb-move" onclick="asMoveFallback('${esc(a.id)}',${i},-1)" ${i === 0 ? 'disabled' : ''}>&uarr;</button>
+          <button class="fb-move" onclick="asMoveFallback('${esc(a.id)}',${i},1)" ${i === fallbacks.length - 1 ? 'disabled' : ''}>&darr;</button>
+          <button class="fb-remove" onclick="asRemoveFallback('${esc(a.id)}',${i})">&times;</button>
+        </div>
+      `).join('');
+    }
+    html += `</div>`;
+    html += `<div class="as-fb-add">`;
+    html += `<select class="model-select" id="as-fb-sel-${esc(a.id)}">`;
+    html += availableModels.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
+    html += `</select>`;
+    html += `<button class="btn-action secondary" style="font-size:10px;padding:4px 10px;white-space:nowrap" onclick="asAddFallback('${esc(a.id)}')">+ Add</button>`;
+    html += `</div>`;
+
+    // Apps
+    html += `<div class="as-section-title">Bound Apps</div>`;
+    html += `<div id="as-apps-${esc(a.id)}">`;
+    if (!apps.length) {
+      html += `<div class="as-empty">No apps bound</div>`;
+    } else {
+      html += apps.map(ap => `
+        <div class="agent-app-item">
+          <span class="aai-icon">${ap.appIcon}</span>
+          <span class="aai-name">${esc(ap.appName)}</span>
+          <select class="aai-mode-select" onchange="asChangeAppMode('${esc(a.id)}','${esc(ap.appId)}',this.value)">
+            ${modeOpts.map(m => `<option value="${m}" ${m === ap.mode ? 'selected' : ''}>${modeLabels[m]}</option>`).join('')}
+          </select>
+          <button class="aai-remove" onclick="asUnbindApp('${esc(a.id)}','${esc(ap.appId)}')" title="Remove">&times;</button>
+        </div>
+      `).join('');
+    }
+    html += `</div>`;
+    html += `<div style="margin-top:8px"><button class="btn-action secondary" style="font-size:11px;padding:6px 12px" onclick="asOpenAppPicker('${esc(a.id)}')">+ Add App</button></div>`;
+
+    html += `</div>`;
+    return html;
+  }).join('') + '</div>';
+}
+
+async function asChangeModel(agentId, model) {
+  if (!model) return;
+  const status = document.getElementById('as-model-status-' + agentId);
+  if (status) { status.textContent = 'Changing...'; status.style.color = 'var(--text-tertiary)'; }
+  try {
+    const r = await fetch(`/api/agent/${agentId}/model`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({model})
+    });
+    const data = await r.json();
+    if (data.ok) {
+      if (agentMap[agentId]) agentMap[agentId].model = data.model;
+      if (status) { status.textContent = 'Updated'; status.style.color = 'var(--green)'; }
+      showToast(`${agentId} model updated`);
+      setTimeout(() => { if (status) status.textContent = ''; }, 3000);
+    } else throw new Error(data.error || 'Error');
+  } catch(e) {
+    if (status) { status.textContent = 'Failed: ' + e.message; status.style.color = 'var(--red)'; }
+    setTimeout(() => { if (status) status.textContent = ''; }, 3000);
+  }
+}
+
+async function asSaveFallbacks(agentId, fallbacks) {
+  try {
+    const r = await fetch(`/api/agent/${agentId}/fallbacks`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({fallbacks})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      if (asAgentDetails[agentId]) asAgentDetails[agentId].fallbacks = d.fallbacks;
+      renderAgentSettingsGrid();
+      showToast(`${agentId} fallbacks updated`);
+    } else throw new Error(d.error || 'Error');
+  } catch(e) { showToast('Failed to save fallbacks', 'error'); }
+}
+
+function asAddFallback(agentId) {
+  const sel = document.getElementById('as-fb-sel-' + agentId);
+  if (!sel || !sel.value) return;
+  const fb = [...(asAgentDetails[agentId]?.fallbacks || []), sel.value];
+  asSaveFallbacks(agentId, fb);
+}
+
+function asRemoveFallback(agentId, idx) {
+  const fb = [...(asAgentDetails[agentId]?.fallbacks || [])];
+  fb.splice(idx, 1);
+  asSaveFallbacks(agentId, fb);
+}
+
+function asMoveFallback(agentId, idx, dir) {
+  const fb = [...(asAgentDetails[agentId]?.fallbacks || [])];
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= fb.length) return;
+  [fb[idx], fb[newIdx]] = [fb[newIdx], fb[idx]];
+  asSaveFallbacks(agentId, fb);
+}
+
+async function asChangeAppMode(agentId, appId, mode) {
+  try {
+    await fetch('/api/apps/bindings', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({agentId, appId, mode})
+    });
+    const apps = asAgentDetails[agentId]?.apps || [];
+    const a = apps.find(x => x.appId === appId);
+    if (a) { a.mode = mode; a.modeLabel = APP_USAGE_MODES[mode] || mode; }
+    showToast('Mode updated', 'success');
+  } catch(e) { showToast('Failed to update mode', 'error'); }
+}
+
+async function asUnbindApp(agentId, appId) {
+  try {
+    await fetch('/api/apps/bindings/remove', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({agentId, appId})
+    });
+    if (asAgentDetails[agentId]) {
+      asAgentDetails[agentId].apps = (asAgentDetails[agentId].apps || []).filter(a => a.appId !== appId);
+    }
+    renderAgentSettingsGrid();
+    showToast('App unbound', 'success');
+  } catch(e) { showToast('Failed to unbind', 'error'); }
+}
+
+function asOpenAppPicker(agentId) {
+  // Temporarily override picker to work with this agent
+  const origSelectedId = selectedId;
+  const origDetailCache = detailCache;
+  selectedId = agentId;
+  detailCache = asAgentDetails[agentId] || {};
+  const origClose = closeAppPicker;
+  const origBind = bindSelectedApps;
+
+  closeAppPicker = function() {
+    document.getElementById('app-picker').classList.remove('show');
+    selectedId = origSelectedId;
+    detailCache = origDetailCache;
+    closeAppPicker = origClose;
+    bindSelectedApps = origBind;
+  };
+
+  bindSelectedApps = async function() {
+    if (!appPickerSelected.size) return;
+    const mode = document.getElementById('app-picker-mode').value;
+    const items = [...appPickerSelected].map(appId => ({agentId, appId, mode}));
+    try {
+      await fetch('/api/apps/bindings', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(items)
+      });
+      closeAppPicker();
+      showToast(`Bound ${items.length} app(s)`, 'success');
+      // Refresh this agent's details
+      const r = await fetch(`/api/agent/${agentId}`);
+      asAgentDetails[agentId] = await r.json();
+      renderAgentSettingsGrid();
+    } catch(e) { showToast('Failed to bind apps', 'error'); }
+  };
+
+  appPickerSelected.clear();
+  document.getElementById('app-picker-search').value = '';
+  renderAppPickerList();
+  document.getElementById('app-picker').classList.add('show');
+}
+
+// Override switchView to load cron and agent-settings
 const _origSwitchView = switchView;
 switchView = function(name) {
   _origSwitchView(name);
   if (name === 'cron') fetchCronJobs();
+  if (name === 'agent-settings') loadAgentSettings();
 };
 </script>
 </body>

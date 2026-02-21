@@ -1,10 +1,10 @@
 services:
   dashboard:
     build: .
-    image: openclaw-dashboard
+    image: openclaw-hq
     network_mode: host
     restart: unless-stopped
     environment:
-      - OPENCLAW_DASH_PORT=7842
+      - OPENCLAW_HQ_PORT=7843
     volumes:
       - ~/.openclaw:/home/openclaw/.openclaw:rw

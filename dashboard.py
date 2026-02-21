@@ -43,6 +43,87 @@ PLATFORM_LABELS = {
     'whatsapp': 'WhatsApp',
 }
 
+APP_REGISTRY = {
+    'github': {'name': 'GitHub', 'category': 'dev_tools', 'icon': 'github', 'configFields': ['token', 'org']},
+    'gitlab': {'name': 'GitLab', 'category': 'dev_tools', 'icon': 'gitlab', 'configFields': ['token', 'url']},
+    'bitbucket': {'name': 'Bitbucket', 'category': 'dev_tools', 'icon': 'bitbucket', 'configFields': ['token', 'workspace']},
+    'jira': {'name': 'Jira', 'category': 'dev_tools', 'icon': 'jira', 'configFields': ['token', 'url', 'project']},
+    'linear': {'name': 'Linear', 'category': 'dev_tools', 'icon': 'linear', 'configFields': ['apiKey']},
+    'sentry': {'name': 'Sentry', 'category': 'dev_tools', 'icon': 'sentry', 'configFields': ['token', 'org']},
+    'slack': {'name': 'Slack', 'category': 'communication', 'icon': 'slack', 'configFields': ['botToken', 'appToken']},
+    'discord_app': {'name': 'Discord Bot', 'category': 'communication', 'icon': 'discord', 'configFields': ['botToken']},
+    'teams': {'name': 'Microsoft Teams', 'category': 'communication', 'icon': 'teams', 'configFields': ['webhookUrl']},
+    'email': {'name': 'Email (SMTP)', 'category': 'communication', 'icon': 'email', 'configFields': ['smtpHost', 'smtpPort', 'username', 'password']},
+    'twilio': {'name': 'Twilio', 'category': 'communication', 'icon': 'twilio', 'configFields': ['accountSid', 'authToken', 'phoneNumber']},
+    'aws': {'name': 'AWS', 'category': 'cloud_infra', 'icon': 'aws', 'configFields': ['accessKeyId', 'secretAccessKey', 'region']},
+    'gcp': {'name': 'Google Cloud', 'category': 'cloud_infra', 'icon': 'gcp', 'configFields': ['serviceAccountJson', 'project']},
+    'azure': {'name': 'Azure', 'category': 'cloud_infra', 'icon': 'azure', 'configFields': ['tenantId', 'clientId', 'clientSecret']},
+    'digitalocean': {'name': 'DigitalOcean', 'category': 'cloud_infra', 'icon': 'digitalocean', 'configFields': ['token']},
+    'vercel': {'name': 'Vercel', 'category': 'cloud_infra', 'icon': 'vercel', 'configFields': ['token']},
+    'cloudflare': {'name': 'Cloudflare', 'category': 'cloud_infra', 'icon': 'cloudflare', 'configFields': ['apiToken', 'accountId']},
+    'docker': {'name': 'Docker Hub', 'category': 'cloud_infra', 'icon': 'docker', 'configFields': ['username', 'token']},
+    'postgres': {'name': 'PostgreSQL', 'category': 'data', 'icon': 'postgres', 'configFields': ['connectionString']},
+    'redis': {'name': 'Redis', 'category': 'data', 'icon': 'redis', 'configFields': ['url']},
+    'mongodb': {'name': 'MongoDB', 'category': 'data', 'icon': 'mongodb', 'configFields': ['connectionString']},
+    'elasticsearch': {'name': 'Elasticsearch', 'category': 'data', 'icon': 'elasticsearch', 'configFields': ['url', 'apiKey']},
+    'openai': {'name': 'OpenAI', 'category': 'ai_ml', 'icon': 'openai', 'configFields': ['apiKey']},
+    'anthropic': {'name': 'Anthropic', 'category': 'ai_ml', 'icon': 'anthropic', 'configFields': ['apiKey']},
+    'huggingface': {'name': 'Hugging Face', 'category': 'ai_ml', 'icon': 'huggingface', 'configFields': ['token']},
+    'replicate': {'name': 'Replicate', 'category': 'ai_ml', 'icon': 'replicate', 'configFields': ['apiToken']},
+    'pinecone': {'name': 'Pinecone', 'category': 'ai_ml', 'icon': 'pinecone', 'configFields': ['apiKey', 'environment']},
+    'zapier': {'name': 'Zapier', 'category': 'automation', 'icon': 'zapier', 'configFields': ['webhookUrl']},
+    'n8n': {'name': 'n8n', 'category': 'automation', 'icon': 'n8n', 'configFields': ['url', 'apiKey']},
+    'make': {'name': 'Make (Integromat)', 'category': 'automation', 'icon': 'make', 'configFields': ['apiToken']},
+    's3': {'name': 'Amazon S3', 'category': 'storage', 'icon': 's3', 'configFields': ['accessKeyId', 'secretAccessKey', 'bucket', 'region']},
+    'gcs': {'name': 'Google Cloud Storage', 'category': 'storage', 'icon': 'gcs', 'configFields': ['serviceAccountJson', 'bucket']},
+    'dropbox': {'name': 'Dropbox', 'category': 'storage', 'icon': 'dropbox', 'configFields': ['accessToken']},
+    'datadog': {'name': 'Datadog', 'category': 'monitoring', 'icon': 'datadog', 'configFields': ['apiKey', 'appKey']},
+    'grafana': {'name': 'Grafana', 'category': 'monitoring', 'icon': 'grafana', 'configFields': ['url', 'apiKey']},
+    'pagerduty': {'name': 'PagerDuty', 'category': 'monitoring', 'icon': 'pagerduty', 'configFields': ['apiKey', 'serviceId']},
+    'webhook': {'name': 'Custom Webhook', 'category': 'custom', 'icon': 'webhook', 'configFields': ['url', 'secret']},
+    'rest_api': {'name': 'REST API', 'category': 'custom', 'icon': 'rest_api', 'configFields': ['baseUrl', 'apiKey', 'headers']},
+}
+
+APP_CATEGORY_LABELS = {
+    'communication': 'Communication',
+    'dev_tools': 'Dev Tools',
+    'cloud_infra': 'Cloud & Infra',
+    'data': 'Data',
+    'ai_ml': 'AI & ML',
+    'automation': 'Automation',
+    'storage': 'Storage',
+    'monitoring': 'Monitoring',
+    'custom': 'Custom',
+}
+
+USAGE_MODES = ['read_only', 'write_only', 'read_write', 'event_listener', 'action_trigger']
+
+USAGE_MODE_LABELS = {
+    'read_only': 'Read Only',
+    'write_only': 'Write Only',
+    'read_write': 'Read & Write',
+    'event_listener': 'Event Listener',
+    'action_trigger': 'Action Trigger',
+}
+
+APP_ICONS = {
+    'github': '\U0001F4BB', 'gitlab': '\U0001F98A', 'bitbucket': '\U0001F4E6',
+    'jira': '\U0001F4CB', 'linear': '\U0001F4D0', 'sentry': '\U0001F6E1',
+    'slack': '\U0001F4AC', 'discord': '\U0001F3AE', 'teams': '\U0001F465',
+    'email': '\U0001F4E7', 'twilio': '\U0001F4DE',
+    'aws': '\u2601', 'gcp': '\U0001F310', 'azure': '\U0001F535',
+    'digitalocean': '\U0001F4A7', 'vercel': '\u25B2', 'cloudflare': '\U0001F7E0',
+    'docker': '\U0001F433',
+    'postgres': '\U0001F418', 'redis': '\U0001F534', 'mongodb': '\U0001F343',
+    'elasticsearch': '\U0001F50D',
+    'openai': '\U0001F9E0', 'anthropic': '\U0001F4A0', 'huggingface': '\U0001F917',
+    'replicate': '\U0001F504', 'pinecone': '\U0001F332',
+    'zapier': '\u26A1', 'n8n': '\U0001F504', 'make': '\U0001F527',
+    's3': '\U0001F5C4', 'gcs': '\U0001F4BE', 'dropbox': '\U0001F4E5',
+    'datadog': '\U0001F415', 'grafana': '\U0001F4CA', 'pagerduty': '\U0001F6A8',
+    'webhook': '\U0001F517', 'rest_api': '\U0001F310',
+}
+
 
 def load_config():
     try:
@@ -813,6 +894,17 @@ def api_agent_detail(agent_id):
         'sessionCount': len(sessions_data),
         'messages': messages[-20:],
         'tokens': tokens,
+        'apps': [
+            {
+                'appId': b['appId'],
+                'appName': APP_REGISTRY.get(b['appId'], {}).get('name', b['appId']),
+                'appIcon': APP_ICONS.get(b['appId'], '\U0001F4E6'),
+                'mode': b.get('mode', 'read_only'),
+                'modeLabel': USAGE_MODE_LABELS.get(b.get('mode', ''), b.get('mode', '')),
+            }
+            for b in cfg.get('apps', {}).get('bindings', [])
+            if b.get('agentId') == agent_id
+        ],
     })
 
 
@@ -943,6 +1035,8 @@ def api_settings():
                 'groupPolicy': acc.get('groupPolicy', 'open'),
                 'streamMode': acc.get('streamMode', 'partial'),
                 'botName': BOT_NAMES.get(name, f'@{name}_Bot'),
+                'hasToken': bool(acc.get('botToken', '')),
+                'tokenPreview': (acc['botToken'][:6] + '***') if acc.get('botToken') else '',
             }
             for name, acc in accounts.items()
         },
@@ -950,6 +1044,10 @@ def api_settings():
             'port': gateway.get('port'),
             'mode': gateway.get('mode', 'local'),
             'bind': gateway.get('bind', 'loopback'),
+        },
+        'apps': {
+            'enabledCount': sum(1 for a in cfg.get('apps', {}).get('registry', {}).values() if a.get('enabled')),
+            'totalBindings': len(cfg.get('apps', {}).get('bindings', [])),
         },
     })
 
@@ -1011,6 +1109,13 @@ def api_channel_settings(name):
     for key in ('dmPolicy', 'groupPolicy', 'streamMode'):
         if key in data:
             acc[key] = data[key]
+
+    if 'botToken' in data:
+        token = data['botToken'].strip()
+        if token:
+            acc['botToken'] = token
+        else:
+            acc.pop('botToken', None)
 
     save_config(cfg)
     return jsonify({'ok': True})
@@ -1656,6 +1761,11 @@ def api_agents_delete(agent_id):
     bindings = cfg.get('bindings', [])
     cfg['bindings'] = [b for b in bindings if b.get('agentId') != agent_id]
 
+    # Remove app bindings
+    app_bindings = cfg.get('apps', {}).get('bindings', [])
+    if app_bindings:
+        cfg['apps']['bindings'] = [b for b in app_bindings if b.get('agentId') != agent_id]
+
     save_config(cfg)
 
     # Remove agent directory
@@ -1671,7 +1781,173 @@ def api_agents_delete(agent_id):
     return jsonify({'ok': True})
 
 
+# ── APP INTEGRATION ENDPOINTS ──
+
+@app.route('/api/apps')
+def api_apps():
+    """Return full app catalog merged with user config."""
+    cfg = load_config()
+    apps_cfg = cfg.get('apps', {}).get('registry', {})
+    result = []
+    for app_id, app_def in APP_REGISTRY.items():
+        user_cfg = apps_cfg.get(app_id, {})
+        masked_config = {}
+        for field in app_def['configFields']:
+            val = user_cfg.get('config', {}).get(field, '')
+            if val:
+                masked_config[field] = val[:3] + '***' if len(val) > 3 else '***'
+            else:
+                masked_config[field] = ''
+        result.append({
+            'id': app_id,
+            'name': app_def['name'],
+            'category': app_def['category'],
+            'categoryLabel': APP_CATEGORY_LABELS.get(app_def['category'], app_def['category']),
+            'icon': APP_ICONS.get(app_id, '\U0001F4E6'),
+            'configFields': app_def['configFields'],
+            'enabled': user_cfg.get('enabled', False),
+            'configured': masked_config,
+        })
+    return jsonify({
+        'apps': result,
+        'categories': APP_CATEGORY_LABELS,
+        'usageModes': USAGE_MODE_LABELS,
+    })
+
+
+@app.route('/api/apps/<app_id>/config', methods=['POST'])
+def api_app_config(app_id):
+    """Save app config fields."""
+    if app_id not in APP_REGISTRY:
+        return jsonify({'error': 'Unknown app'}), 404
+    data = request.get_json() or {}
+    config_values = data.get('config', {})
+
+    cfg = load_config()
+    apps = cfg.setdefault('apps', {}).setdefault('registry', {})
+    app_entry = apps.setdefault(app_id, {})
+    stored = app_entry.setdefault('config', {})
+    for field in APP_REGISTRY[app_id]['configFields']:
+        if field in config_values:
+            val = config_values[field].strip() if isinstance(config_values[field], str) else config_values[field]
+            if val:
+                stored[field] = val
+            else:
+                stored.pop(field, None)
+    save_config(cfg)
+    return jsonify({'ok': True})
+
+
+@app.route('/api/apps/<app_id>/toggle', methods=['POST'])
+def api_app_toggle(app_id):
+    """Enable/disable an app."""
+    if app_id not in APP_REGISTRY:
+        return jsonify({'error': 'Unknown app'}), 404
+    cfg = load_config()
+    apps = cfg.setdefault('apps', {}).setdefault('registry', {})
+    app_entry = apps.setdefault(app_id, {})
+    app_entry['enabled'] = not app_entry.get('enabled', False)
+    save_config(cfg)
+    return jsonify({'ok': True, 'enabled': app_entry['enabled']})
+
+
+@app.route('/api/apps/bindings', methods=['GET'])
+def api_app_bindings_get():
+    """List all app bindings, optional ?agent=X or ?app=Y filter."""
+    cfg = load_config()
+    all_bindings = cfg.get('apps', {}).get('bindings', [])
+    agent_filter = request.args.get('agent', '')
+    app_filter = request.args.get('app', '')
+    if agent_filter:
+        all_bindings = [b for b in all_bindings if b.get('agentId') == agent_filter]
+    if app_filter:
+        all_bindings = [b for b in all_bindings if b.get('appId') == app_filter]
+    # Enrich with app metadata
+    result = []
+    for b in all_bindings:
+        app_def = APP_REGISTRY.get(b.get('appId'), {})
+        result.append({
+            **b,
+            'appName': app_def.get('name', b.get('appId', '')),
+            'appIcon': APP_ICONS.get(b.get('appId', ''), '\U0001F4E6'),
+            'modeLabel': USAGE_MODE_LABELS.get(b.get('mode', ''), b.get('mode', '')),
+        })
+    return jsonify(result)
+
+
+@app.route('/api/apps/bindings', methods=['POST'])
+def api_app_bindings_post():
+    """Add/update bindings. Accepts single object or array."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data'}), 400
+    items = data if isinstance(data, list) else [data]
+    cfg = load_config()
+    bindings = cfg.setdefault('apps', {}).setdefault('bindings', [])
+    added = 0
+    updated = 0
+    for item in items:
+        agent_id = item.get('agentId', '').strip()
+        app_id = item.get('appId', '').strip()
+        mode = item.get('mode', 'read_only').strip()
+        if not agent_id or not app_id:
+            continue
+        if mode not in USAGE_MODES:
+            mode = 'read_only'
+        existing = next((b for b in bindings if b['agentId'] == agent_id and b['appId'] == app_id), None)
+        if existing:
+            existing['mode'] = mode
+            updated += 1
+        else:
+            bindings.append({'agentId': agent_id, 'appId': app_id, 'mode': mode})
+            added += 1
+    save_config(cfg)
+    return jsonify({'ok': True, 'added': added, 'updated': updated})
+
+
+@app.route('/api/apps/bindings/remove', methods=['POST'])
+def api_app_bindings_remove():
+    """Remove bindings."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data'}), 400
+    items = data if isinstance(data, list) else [data]
+    cfg = load_config()
+    bindings = cfg.setdefault('apps', {}).setdefault('bindings', [])
+    removed = 0
+    for item in items:
+        agent_id = item.get('agentId', '')
+        app_id = item.get('appId', '')
+        before = len(bindings)
+        bindings[:] = [b for b in bindings if not (b['agentId'] == agent_id and b['appId'] == app_id)]
+        removed += before - len(bindings)
+    save_config(cfg)
+    return jsonify({'ok': True, 'removed': removed})
+
+
+@app.route('/api/agent/<agent_id>/apps')
+def api_agent_apps(agent_id):
+    """Get apps bound to a specific agent."""
+    cfg = load_config()
+    bindings = cfg.get('apps', {}).get('bindings', [])
+    agent_bindings = [b for b in bindings if b.get('agentId') == agent_id]
+    result = []
+    for b in agent_bindings:
+        app_def = APP_REGISTRY.get(b['appId'], {})
+        enabled = cfg.get('apps', {}).get('registry', {}).get(b['appId'], {}).get('enabled', False)
+        result.append({
+            'appId': b['appId'],
+            'appName': app_def.get('name', b['appId']),
+            'appIcon': APP_ICONS.get(b['appId'], '\U0001F4E6'),
+            'category': app_def.get('category', ''),
+            'mode': b.get('mode', 'read_only'),
+            'modeLabel': USAGE_MODE_LABELS.get(b.get('mode', ''), b.get('mode', '')),
+            'enabled': enabled,
+        })
+    return jsonify(result)
+
+
 if __name__ == '__main__':
-    port = int(os.environ.get('OPENCLAW_DASH_PORT', 7842))
+    port = int(os.environ.get('OPENCLAW_HQ_PORT', 7843))
     _restart_backup_timer()
     app.run(host='0.0.0.0', port=port, debug=False, threaded=True)

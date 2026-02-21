@@ -4,7 +4,7 @@ set -e
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 
-PORT="${OPENCLAW_DASH_PORT:-7842}"
+PORT="${OPENCLAW_HQ_PORT:-7843}"
 
 # Check Python
 if command -v python3 &>/dev/null; then

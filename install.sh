@@ -4,10 +4,10 @@ set -e
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 
-PORT="${OPENCLAW_DASH_PORT:-7842}"
+PORT="${OPENCLAW_HQ_PORT:-7843}"
 OS="$(uname -s)"
 
-echo "=== OpenClaw Dashboard Installer ==="
+echo "=== OpenClaw HQ Installer ==="
 echo ""
 
 # ── Python check ──
@@ -47,7 +47,7 @@ read -rp "Install as system service? [y/N] " INSTALL_SVC
 if [[ "$INSTALL_SVC" =~ ^[Yy]$ ]]; then
   if [ "$OS" = "Darwin" ]; then
     # macOS: launchd plist
-    PLIST="$HOME/Library/LaunchAgents/com.openclaw.dashboard.plist"
+    PLIST="$HOME/Library/LaunchAgents/com.openclaw.hq.plist"
     mkdir -p "$HOME/Library/LaunchAgents"
     cat > "$PLIST" <<PEOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -56,7 +56,7 @@ if [[ "$INSTALL_SVC" =~ ^[Yy]$ ]]; then
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>com.openclaw.dashboard</string>
+  <string>com.openclaw.hq</string>
   <key>ProgramArguments</key>
   <array>
     <string>${DIR}/.venv/bin/python</string>
@@ -66,7 +66,7 @@ if [[ "$INSTALL_SVC" =~ ^[Yy]$ ]]; then
   <string>${DIR}</string>
   <key>EnvironmentVariables</key>
   <dict>
-    <key>OPENCLAW_DASH_PORT</key>
+    <key>OPENCLAW_HQ_PORT</key>
     <string>${PORT}</string>
   </dict>
   <key>RunAtLoad</key>
@@ -74,14 +74,14 @@ if [[ "$INSTALL_SVC" =~ ^[Yy]$ ]]; then
   <key>KeepAlive</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>/tmp/openclaw-dashboard.log</string>
+  <string>/tmp/openclaw-hq.log</string>
   <key>StandardErrorPath</key>
-  <string>/tmp/openclaw-dashboard.log</string>
+  <string>/tmp/openclaw-hq.log</string>
 </dict>
 </plist>
 PEOF
     launchctl load "$PLIST" 2>/dev/null || true
-    echo "Installed launchd service: com.openclaw.dashboard"
+    echo "Installed launchd service: com.openclaw.hq"
     echo "  Start:  launchctl load $PLIST"
     echo "  Stop:   launchctl unload $PLIST"
 
@@ -89,16 +89,16 @@ PEOF
     # Linux: systemd user service
     UNIT_DIR="$HOME/.config/systemd/user"
     mkdir -p "$UNIT_DIR"
-    cat > "$UNIT_DIR/openclaw-dashboard.service" <<SEOF
+    cat > "$UNIT_DIR/openclaw-hq.service" <<SEOF
 [Unit]
-Description=OpenClaw Dashboard
+Description=OpenClaw HQ
 After=network.target
 
 [Service]
 Type=simple
 WorkingDirectory=${DIR}
 ExecStart=${DIR}/.venv/bin/python ${DIR}/dashboard.py
-Environment=OPENCLAW_DASH_PORT=${PORT}
+Environment=OPENCLAW_HQ_PORT=${PORT}
 Restart=on-failure
 RestartSec=5
 
@@ -106,12 +106,12 @@ RestartSec=5
 WantedBy=default.target
 SEOF
     systemctl --user daemon-reload
-    systemctl --user enable openclaw-dashboard.service
-    systemctl --user start openclaw-dashboard.service
-    echo "Installed systemd user service: openclaw-dashboard"
-    echo "  Status: systemctl --user status openclaw-dashboard"
-    echo "  Stop:   systemctl --user stop openclaw-dashboard"
-    echo "  Logs:   journalctl --user -u openclaw-dashboard -f"
+    systemctl --user enable openclaw-hq.service
+    systemctl --user start openclaw-hq.service
+    echo "Installed systemd user service: openclaw-hq"
+    echo "  Status: systemctl --user status openclaw-hq"
+    echo "  Stop:   systemctl --user stop openclaw-hq"
+    echo "  Logs:   journalctl --user -u openclaw-hq -f"
   fi
 fi
 
