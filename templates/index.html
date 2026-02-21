@@ -2417,14 +2417,13 @@ class OfficeMap {
     ctx.textBaseline='middle'; ctx.textAlign='left';
     ctx.fillText(nameText, badgeX+8, badgeY+badgeH/2);
 
-    // Model
-    const mdl = (a.model||'').split('/').pop().substring(0,16);
+    // Model — below name badge, left-aligned
+    const mdl = (a.model||'').split('/').pop().substring(0,20);
     if (mdl) {
-      ctx.fillStyle = th.text+'88';
-      ctx.font = `500 ${Math.max(9,S+2)}px Inter,-apple-system,sans-serif`;
-      ctx.textAlign='center'; ctx.textBaseline='top';
-      ctx.fillText(mdl, x+W/2, badgeY+badgeH+3);
-      ctx.textAlign='left';
+      ctx.fillStyle = pal.dark+'99';
+      ctx.font = `500 ${Math.max(8,S+1)}px Inter,-apple-system,sans-serif`;
+      ctx.textBaseline='top'; ctx.textAlign='left';
+      ctx.fillText(mdl, badgeX+8, badgeY+badgeH+3);
     }
 
     // Task board
