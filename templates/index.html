@@ -1223,6 +1223,79 @@ body {
 }
 .task-stat-num { font-weight: 700; color: var(--text); }
 
+/* ── MEETING PICKER POPUP ── */
+.meeting-picker-overlay {
+  display: none; position: fixed; inset: 0; z-index: 350;
+  background: rgba(0,0,0,0.2); backdrop-filter: blur(3px);
+}
+.meeting-picker-overlay.show { display: flex; align-items: center; justify-content: center; }
+.meeting-picker {
+  background: var(--bg-white); border-radius: 18px; box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+  width: 360px; max-height: 70vh; overflow: hidden;
+  animation: dirModalIn 0.25s ease;
+}
+.meeting-picker-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 0.5px solid var(--border);
+}
+.meeting-picker-hdr h3 { font-size: 15px; font-weight: 700; margin: 0; }
+.meeting-picker-hdr button {
+  background: none; border: none; cursor: pointer; color: var(--text-tertiary);
+  font-size: 18px; padding: 2px 6px; border-radius: 6px; transition: all 0.15s;
+}
+.meeting-picker-hdr button:hover { background: var(--bg-hover); color: var(--text); }
+.meeting-picker-list {
+  padding: 12px 16px; max-height: 320px; overflow-y: auto;
+}
+.meeting-picker-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border-radius: 12px; cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.meeting-picker-item:hover { background: var(--bg-hover); }
+.meeting-picker-item.selected { background: rgba(0,122,255,0.08); }
+.meeting-picker-cb {
+  width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.meeting-picker-item.selected .meeting-picker-cb {
+  background: var(--blue); border-color: var(--blue); color: #fff;
+}
+.meeting-picker-cb svg { width: 14px; height: 14px; opacity: 0; transition: opacity 0.15s; }
+.meeting-picker-item.selected .meeting-picker-cb svg { opacity: 1; }
+.meeting-picker-info { flex: 1; min-width: 0; }
+.meeting-picker-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.meeting-picker-model { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+.meeting-picker-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.meeting-picker-dot.busy { background: var(--blue); box-shadow: 0 0 6px rgba(0,122,255,0.4); }
+.meeting-picker-dot.idle { background: var(--green); box-shadow: 0 0 6px rgba(52,199,89,0.4); }
+.meeting-picker-dot.inactive { background: var(--orange); }
+.meeting-picker-dot.offline { background: var(--text-tertiary); }
+.meeting-picker-actions {
+  padding: 12px 16px; border-top: 0.5px solid var(--border);
+  display: flex; gap: 10px; justify-content: space-between; align-items: center;
+}
+.meeting-picker-actions .mp-select-info {
+  font-size: 11px; color: var(--text-tertiary); font-weight: 500;
+}
+.meeting-picker-actions .mp-btns { display: flex; gap: 8px; }
+.mp-btn-all {
+  background: var(--bg-hover); border: none; cursor: pointer; padding: 8px 14px;
+  border-radius: 10px; font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  transition: all 0.15s;
+}
+.mp-btn-all:hover { background: var(--border); color: var(--text); }
+.mp-btn-start {
+  background: var(--blue); border: none; cursor: pointer; padding: 8px 18px;
+  border-radius: 10px; font-size: 12px; font-weight: 700; color: #fff;
+  transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+}
+.mp-btn-start:hover { background: #0066e6; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,122,255,0.4); }
+.mp-btn-start:disabled { opacity: 0.4; pointer-events: none; }
+[data-theme="dark"] .meeting-picker { background: var(--bg-white); }
+
 /* ── TASK/CALENDAR MODAL ── */
 .modal-overlay {
   display: none; position: fixed; inset: 0; z-index: 300;
@@ -1841,6 +1914,24 @@ body {
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- MEETING PICKER POPUP -->
+<div class="meeting-picker-overlay" id="meeting-picker" onclick="if(event.target===this)closeMeetingPicker()">
+  <div class="meeting-picker">
+    <div class="meeting-picker-hdr">
+      <h3>Toplantıya Davet Et</h3>
+      <button onclick="closeMeetingPicker()">&times;</button>
+    </div>
+    <div class="meeting-picker-list" id="mp-agent-list"></div>
+    <div class="meeting-picker-actions">
+      <span class="mp-select-info" id="mp-select-info">0 ajan seçildi</span>
+      <div class="mp-btns">
+        <button class="mp-btn-all" onclick="toggleAllMeetingAgents()">Tümü</button>
+        <button class="mp-btn-start" id="mp-start-btn" disabled onclick="startSelectedMeeting()">Toplantı Başlat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TASK MODAL (Create & Edit) -->
 <div class="modal-overlay" id="task-modal" onclick="if(event.target===this)closeTaskModal()">
   <div class="modal-box">
@@ -2249,10 +2340,10 @@ class OfficeMap {
     const rect = this.canvas.getBoundingClientRect();
     const cell = this._cellAt(e.clientX - rect.left, e.clientY - rect.top);
     if (!cell) return;
-    // Click on meeting room triggers meeting
+    // Click on meeting room opens picker or ends meeting
     if (this.meetingCell && cell.col === this.meetingCell.col && cell.row === this.meetingCell.row) {
-      if (!this.meetingMode) { this.triggerMeeting(250); showToast('Meeting started!', 'info'); }
-      else { this.endMeeting(); showToast('Meeting ended', 'info'); }
+      if (this.meetingMode) { this.endMeeting(); showToast('Meeting ended', 'info'); }
+      else { openMeetingPicker(); }
       return;
     }
     const id = Object.keys(this.agentCells).find(k => this.agentCells[k].col===cell.col && this.agentCells[k].row===cell.row);
@@ -2287,21 +2378,24 @@ class OfficeMap {
     });
   }
 
-  // All agents go to meeting room
-  triggerMeeting(durationTicks) {
+  // Selected agents go to meeting room (or all if no selection)
+  triggerMeeting(durationTicks, selectedIds) {
     if (this.meetingMode) return;
     this.meetingMode = true;
+    this.meetingAgentIds = selectedIds || null;
     const mc = this.meetingCell;
     if (!mc) return;
     const meetPos = this._cellO(mc.col, mc.row);
     const mx = meetPos.x + this.CW * 0.5;
     const my = meetPos.y + this.CH * 0.7;
-    this.agentList.forEach((a, i) => {
+    const agents = selectedIds
+      ? this.agentList.filter(a => selectedIds.includes(a.id))
+      : this.agentList;
+    agents.forEach((a, i) => {
       const home = this._home(a.id);
       if (!home) return;
       this.movements = this.movements.filter(m => m.agentId !== a.id);
-      // Offset positions around meeting table
-      const angle = (i / Math.max(1, this.agentList.length)) * Math.PI * 2;
+      const angle = (i / Math.max(1, agents.length)) * Math.PI * 2;
       const radius = Math.min(this.CW, this.CH) * 0.25;
       this.movements.push({
         agentId: a.id, fromX: home.x, fromY: home.y,
@@ -4157,6 +4251,71 @@ function _populateAgentSelect(selectedId) {
   Object.values(agentMap).forEach(a => {
     sel.innerHTML += `<option value="${esc(a.id)}" ${a.id===selectedId?'selected':''}>${esc(a.name)}</option>`;
   });
+}
+
+/* ── Meeting Picker Functions ── */
+let meetingSelected = new Set();
+
+function openMeetingPicker() {
+  meetingSelected.clear();
+  const list = document.getElementById('mp-agent-list');
+  const agents = Object.values(agentMap);
+  list.innerHTML = agents.map(a => {
+    const st = (a.status || 'offline').toLowerCase();
+    const model = (a.model || '').split('/').pop() || '';
+    return `<div class="meeting-picker-item" data-id="${a.id}" onclick="toggleMeetingAgent('${a.id}')">
+      <div class="meeting-picker-cb"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 7.5 5.5 10.5 11.5 4"/></svg></div>
+      <div class="meeting-picker-info">
+        <div class="meeting-picker-name">${a.name || a.id}</div>
+        <div class="meeting-picker-model">${model}</div>
+      </div>
+      <div class="meeting-picker-dot ${st}"></div>
+    </div>`;
+  }).join('');
+  updateMeetingPickerInfo();
+  document.getElementById('meeting-picker').classList.add('show');
+}
+
+function closeMeetingPicker() {
+  document.getElementById('meeting-picker').classList.remove('show');
+}
+
+function toggleMeetingAgent(id) {
+  if (meetingSelected.has(id)) meetingSelected.delete(id);
+  else meetingSelected.add(id);
+  document.querySelectorAll('.meeting-picker-item').forEach(el => {
+    el.classList.toggle('selected', meetingSelected.has(el.dataset.id));
+  });
+  updateMeetingPickerInfo();
+}
+
+function toggleAllMeetingAgents() {
+  const agents = Object.values(agentMap);
+  if (meetingSelected.size === agents.length) {
+    meetingSelected.clear();
+  } else {
+    agents.forEach(a => meetingSelected.add(a.id));
+  }
+  document.querySelectorAll('.meeting-picker-item').forEach(el => {
+    el.classList.toggle('selected', meetingSelected.has(el.dataset.id));
+  });
+  updateMeetingPickerInfo();
+}
+
+function updateMeetingPickerInfo() {
+  const count = meetingSelected.size;
+  document.getElementById('mp-select-info').textContent = `${count} ajan seçildi`;
+  document.getElementById('mp-start-btn').disabled = count === 0;
+}
+
+function startSelectedMeeting() {
+  if (meetingSelected.size === 0) return;
+  const ids = [...meetingSelected];
+  closeMeetingPicker();
+  if (window.officeMap) {
+    window.officeMap.triggerMeeting(250, ids);
+    showToast(`Toplantı başladı (${ids.length} ajan)`, 'info');
+  }
 }
 
 function openTaskModal() {
